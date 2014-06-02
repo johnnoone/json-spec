@@ -1,100 +1,26 @@
 """
-    jsontools.schema.validators
-    ~~~~~~~~~~~~~~~~~~~~~~~~~~~
+    jsontools.schema.validators.primitives
+    ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
 """
 
 from __future__ import absolute_import, print_function, unicode_literals
 
-__all__ = ['factory', 'Validator', 'CompoundValidator',
-           'ArrayValidator', 'BooleanValidator', 'IntegerValidator',
+__all__ = ['ArrayValidator', 'BooleanValidator', 'IntegerValidator',
            'NullValidator', 'NumberValidator', 'ObjectValidator',
            'StringValidator']
 
-from abc import ABCMeta, abstractmethod
 import itertools
 import logging
 import os.path
 import re
 
-from six import add_metaclass
+from six import integer_types, string_types
+
+from .bases import factory, Validator
 from jsontools.exceptions import CompilationError, ValidationError
 
 logger = logging.getLogger(__name__)
-
-registry = {}
-
-
-def factory(schema, uri):
-    spec = schema.get('$schema', 'http://json-schema.org/draft-04/schema#')
-    if spec != 'http://json-schema.org/draft-04/schema#':
-        raise CompilationError('can parse draft-04 only', schema)
-
-    if 'type' in schema:
-        if isinstance(schema['type'], str):
-            # direct schema
-            return registry[schema['type']].compile(schema, uri)
-        if isinstance(schema['type'], list):
-            # multi schema
-            return [registry[t].compile(schema, uri) for t in schema['type']]
-    elif schema == {}:
-        return CompoundValidator()
-    else:
-        # not implemented yet
-        logger.error('what the fuck %s', schema)
-
-
-class ValidatorBase(ABCMeta):
-    def __new__(cls, clsname, bases, attrs):
-        proto = super(ValidatorBase, cls).__new__(cls, clsname, bases, attrs)
-        if getattr(proto, 'type', None):
-            registry[proto.type] = proto
-        return proto
-
-
-@add_metaclass(ValidatorBase)
-class Validator(object):
-    @abstractmethod
-    def __init__(self, **attrs):
-        self.uri = attrs.pop('uri', None)
-        self.title = attrs.pop('title', None)
-        self.description = attrs.pop('description', None)
-        self.default = attrs.pop('default', None)
-
-    @classmethod
-    @abstractmethod
-    def compile(cls, schema, uri):
-        """Compile the current schema"""
-        attrs = {}
-        attrs['title'] = schema.pop('title', None)
-        attrs['description'] = schema.pop('description', None)
-        attrs['uri'] = uri
-        return attrs
-
-    @abstractmethod
-    def validate(self, obj):
-        pass
-
-
-class CompoundValidator(Validator):
-    def __init__(self, **attrs):
-        super().__init__(**attrs)
-        self.validators = attrs.pop('validators', [])
-
-    @classmethod
-    def compile(cls, validators, uri):
-        return cls(validators)
-
-    def validate(self, obj):
-        errors = []
-        try:
-            for validator in self.validators:
-                return validator.validate(obj)
-        except ValidationError as error:
-            errors.append(error)
-
-        if errors:
-            raise ValidationError(errors)
 
 
 class ArrayValidator(Validator):
@@ -181,6 +107,7 @@ class ArrayValidator(Validator):
         self.validate_count(obj)
         self.validate_unique(obj)
         self.validate_items(obj)
+        return super().validate(obj)
 
     def validate_type(self, obj):
         if not isinstance(obj, list):
@@ -270,13 +197,21 @@ class ObjectValidator(Validator):
         return cls(**attrs)
 
     def validate(self, obj):
+        self.validate_type(obj)
+        self.validate_required(obj)
+        self.validate_properties(obj)
+        return super().validate(obj)
+
+    def validate_type(self, obj):
         if not isinstance(obj, dict):
             raise ValidationError('object must be a dict')
 
+    def validate_required(self, obj):
         for member in self.required:
             if member not in obj:
                 raise ValidationError('{!r} is required'.format(member))
 
+    def validate_properties(self, obj):
         errors = {}
         for member, value in obj.items():
             if member in self.properties:
@@ -357,9 +292,10 @@ class NumberValidator(Validator):
         self.validate_minimum(obj)
         self.validate_maximum(obj)
         self.validate_multiple(obj)
+        return super().validate(obj)
 
     def validate_type(self, obj):
-        if not isinstance(obj, (int, float)):
+        if not isinstance(obj, (int, integer_types, float)):
             raise ValidationError('object must be a number')
         if isinstance(obj, bool):
             raise ValidationError('obj must be an int', obj)
@@ -392,7 +328,7 @@ class IntegerValidator(NumberValidator):
     type = 'integer'
 
     def validate_type(self, obj):
-        if not isinstance(obj, int):
+        if not isinstance(obj, integer_types):
             raise ValidationError('obj must be an int', obj)
         if isinstance(obj, bool):
             raise ValidationError('obj must be an int', obj)
@@ -402,6 +338,9 @@ class StringValidator(Validator):
     type = 'string'
 
     def __init__(self, **attrs):
+        """
+        todo implement format validator.
+        """
         super().__init__(**attrs)
         self.maxLength = attrs.pop('maxLength', None)
         self.minLength = attrs.pop('minLength', None)
@@ -441,9 +380,10 @@ class StringValidator(Validator):
         self.validate_type(obj)
         self.validate_length(obj)
         self.validate_pattern(obj)
+        return super().validate(obj)
 
     def validate_type(self, obj):
-        if not isinstance(obj, str):
+        if not isinstance(obj, string_types):
             raise ValidationError('obj must be a string', obj)
 
     def validate_length(self, obj):

@@ -205,5 +205,52 @@ class TestArray(unittest.TestCase):
             validator.validate([None, {'a': 'b'}, True, 31.000002020013])
 
 
+class TestObject(unittest.TestCase):
+    def test_any_object(self):
+        validator = ObjectValidator()
+        validator.validate({})
+        validator.validate({'foo': 'bar'})
+        with self.assertRaises(ValidationError):
+            validator.validate('foo')
+        with self.assertRaises(ValidationError):
+            validator.validate(123)
+        with self.assertRaises(ValidationError):
+            validator.validate([])
+
+
+class TestGeneral(unittest.TestCase):
+    def test_enum(self):
+        validator = Validator(enum=['foo', 42])
+        validator.validate('foo')
+        validator.validate(42)
+        with self.assertRaises(ValidationError):
+            validator.validate('bar')
+
+    def test_all_of(self):
+        foo = StringValidator(enum=['foo'])
+        bar = StringValidator(pattern='^f[o]+$')
+        validator = StringValidator(allOf=[foo, bar])
+        validator.validate('foo')
+        with self.assertRaises(ValidationError):
+            validator.validate('bar')
+
+    def test_any_of(self):
+        foo = StringValidator(enum=['foo'])
+        bar = StringValidator(enum=['bar'])
+        validator = StringValidator(anyOf=[foo, bar])
+        validator.validate('foo')
+        validator.validate('bar')
+        with self.assertRaises(ValidationError):
+            validator.validate('baz')
+
+    def test_one_of(self):
+        foo = StringValidator(enum=['foo'])
+        bar = StringValidator(pattern='^f[o]+$')
+        baz = StringValidator(enum=['bar'])
+        validator = StringValidator(oneOf=[foo, bar, baz])
+        validator.validate('bar')
+        with self.assertRaises(ValidationError):
+            validator.validate('foo')
+
 if __name__ == '__main__':
     unittest.main()
