@@ -1,6 +1,6 @@
 """
-    jsontools
-    ~~~~~~~~~
+    jsontools.exceptions
+    ~~~~~~~~~~~~~~~~~~~~
 
 """
 

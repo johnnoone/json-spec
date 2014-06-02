@@ -1,3 +1,15 @@
+"""
+    jsontools.schema.validators
+    ~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+"""
+
+from __future__ import absolute_import, print_function, unicode_literals
+
+__all__ = ['factory', 'Validator', 'CompoundValidator',
+           'ArrayValidator', 'BooleanValidator', 'IntegerValidator',
+           'NullValidator', 'NumberValidator', 'ObjectValidator',
+           'StringValidator']
 
 from abc import ABCMeta, abstractmethod
 import itertools
@@ -26,9 +38,9 @@ def factory(schema, uri):
             # multi schema
             return [registry[t].compile(schema, uri) for t in schema['type']]
     elif schema == {}:
-        # not implemented yet
         return CompoundValidator()
     else:
+        # not implemented yet
         logger.error('what the fuck %s', schema)
 
 
@@ -43,8 +55,8 @@ class ValidatorBase(ABCMeta):
 @add_metaclass(ValidatorBase)
 class Validator(object):
     @abstractmethod
-    def __init__(self, uri, **attrs):
-        self.uri = uri
+    def __init__(self, **attrs):
+        self.uri = attrs.pop('uri', None)
         self.title = attrs.pop('title', None)
         self.description = attrs.pop('description', None)
         self.default = attrs.pop('default', None)

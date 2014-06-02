@@ -2,7 +2,7 @@
     jsontools.parser
     ~~~~~~~~~~~~~~~~
 
-    Parse json document.
+    Parse json document
 """
 
 
