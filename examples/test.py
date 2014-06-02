@@ -1,5 +1,6 @@
 from __future__ import absolute_import, print_function, unicode_literals
 from jsontools import schema
+from jsontools.exceptions import ValidationError
 import os
 
 here = os.path.dirname(os.path.abspath(__file__))
@@ -8,14 +9,14 @@ dataset = [
     ('basic.json', {
         'firstName': 'John',
         'lastName': 'Noone',
-        'age': '33',
+        'age': 33,
     }),
-    ('simple.json', {
+    ('simple.json', [{
         'id': 1,
         'name': 'A green door',
         'price': 12.50,
         'tags': ['home', 'green']
-    }),
+    }]),
 ]
 
 for filename, data in dataset:
@@ -23,5 +24,10 @@ for filename, data in dataset:
         print('validate {}'.format(filename))
 
         validator = schema.load(file)
-        errors = list(validator.validate(data))
-        print(errors)
+        try:
+            validator.validate(data)
+            print('all fine')
+        except ValidationError as error:
+            print(error)
+
+        print()

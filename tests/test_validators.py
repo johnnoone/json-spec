@@ -195,9 +195,9 @@ class TestArray(unittest.TestCase):
             validator.validate({})
 
     def test_items(self):
-        validator = ArrayValidator(items=[], additionalItems=False)
+        validator = ArrayValidator(items=[{}, {}, {}], additionalItems=False)
         validator.validate([])
-        validator.validate([[1, 2, 3, 4], [5, 6, 7, 8 ]])
+        validator.validate([[1, 2, 3, 4], [5, 6, 7, 8]])
         validator.validate([1, 2, 3])
         with self.assertRaises(ValidationError):
             validator.validate([1, 2, 3, 4])
