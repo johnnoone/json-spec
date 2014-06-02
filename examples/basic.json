@@ -1,0 +1,21 @@
+{
+  "properties": {
+    "age": {
+      "description": "Age in years",
+      "minimum": 0,
+      "type": "integer"
+    },
+    "firstName": {
+      "type": "string"
+    },
+    "lastName": {
+      "type": "string"
+    }
+  },
+  "required": [
+    "firstName",
+    "lastName"
+  ],
+  "title": "Example Schema",
+  "type": "object"
+}
