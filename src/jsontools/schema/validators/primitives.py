@@ -15,6 +15,7 @@ import logging
 import os.path
 import re
 
+from copy import deepcopy
 from six import integer_types, string_types
 
 from .bases import factory, Validator
@@ -160,6 +161,10 @@ class ObjectValidator(Validator):
     def __init__(self, **attrs):
         super().__init__(**attrs)
         self.properties = attrs.pop('properties', {})
+        self.patternProperties = attrs.pop('patternProperties', {})
+        self.additionalProperties = attrs.pop('additionalProperties', {})
+        self.maxProperties = attrs.pop('maxProperties', None)
+        self.minProperties = attrs.pop('minProperties', None)
         self.required = attrs.pop('required', [])
 
     @classmethod
@@ -181,11 +186,23 @@ class ObjectValidator(Validator):
                     attr[subname] = factory(subschema, os.path.join(uri, name))
                 attrs[name] = attr
 
+        for name in ('maxProperties', 'minProperties'):
+            if name in schema:
+                attr = schema[name]
+                if not isinstance(attr, integer_types):
+                    raise CompilationError('{} must be an integer'.format(name),
+                                           schema)
+                if attr < 0:
+                    raise CompilationError('{} must be greater than 0'.format(name),
+                                           schema)
+                attrs[name] = attr
+
         if 'additionalProperties' in schema:
-            attr = {}
-            if isinstance(schema['additionalProperties'], dict):
-                for name, subschema in schema['additionalProperties'].items():
-                    attr[name] = factory(subschema, os.path.join(uri, name))
+            attr = schema['additionalProperties']
+            if isinstance(attr, dict):
+                attr = factory(attr, os.path.join(uri, name))
+            elif attr is True:
+                attr = factory({}, os.path.join(uri, name))
             elif not isinstance(schema['additionalProperties'], bool):
                 raise CompilationError('additionalProperties must be '
                                        'a dict or a bool', schema)
@@ -199,7 +216,7 @@ class ObjectValidator(Validator):
     def validate(self, obj):
         self.validate_type(obj)
         self.validate_required(obj)
-        self.validate_properties(obj)
+        obj = self.validate_properties(obj)
         return super().validate(obj)
 
     def validate_type(self, obj):
@@ -212,15 +229,55 @@ class ObjectValidator(Validator):
                 raise ValidationError('{!r} is required'.format(member))
 
     def validate_properties(self, obj):
-        errors = {}
-        for member, value in obj.items():
-            if member in self.properties:
+        l = len(obj)
+        if isinstance(self.maxProperties, integer_types) and l > self.maxProperties:
+            raise ValidationError('too much properties, max {}'.format(self.maxProperties))
+        if isinstance(self.minProperties, integer_types) and l < self.minProperties:
+            raise ValidationError('too few properties, min {}'.format(self.minProperties))
+
+        obj = deepcopy(obj)
+        errors, missing = {}, set(obj.keys())
+        for member, schema in self.properties.items():
+            if member in obj:
                 try:
-                    self.properties[member].validate(value)
+                    schema.validate(obj[member])
+                    missing.discard(member)
                 except ValidationError as error:
                     errors[member] = error
+            elif schema.has_default():
+                obj[member] = deepcopy(schema.default)
         if errors:
             raise ValidationError(errors)
+        for pattern, schema in self.patternProperties.items():
+            regex = re.compile(pattern)
+            for member, value in obj.items():
+                if regex.match(member):
+                    try:
+                        schema.validate(value)
+                        missing.discard(member)
+                    except ValidationError as error:
+                        errors[member] = error
+        if errors:
+            raise ValidationError(errors)
+
+        if missing:
+            if self.additionalProperties in ({}, True):
+                missing.clear()
+            elif self.additionalProperties:
+                schema = self.additionalProperties
+                for member in missing:
+                    try:
+                        obj[member] = schema.validate(obj[member])
+                        missing.discard(member)
+                    except ValidationError as error:
+                        errors[member] = error
+        if errors:
+            raise ValidationError(errors)
+
+        if missing:
+            raise ValidationError('missing definitions for {}'.format(missing))
+
+        return obj
 
 
 class BooleanValidator(Validator):

@@ -18,6 +18,9 @@ logger = logging.getLogger(__name__)
 registry = {}
 
 
+class EMPTY(object): pass
+
+
 def factory(schema, uri):
     spec = schema.get('$schema', 'http://json-schema.org/draft-04/schema#')
     if spec != 'http://json-schema.org/draft-04/schema#':
@@ -48,6 +51,8 @@ class ValidatorBase(ABCMeta):
 @add_metaclass(ValidatorBase)
 class Validator(object):
     def __init__(self, **attrs):
+        if 'id' in attrs:
+            logger.info('id is not implemented')
         self.uri = attrs.pop('uri', None)
         self.title = attrs.pop('title', None)
         self.description = attrs.pop('description', None)
@@ -64,7 +69,7 @@ class Validator(object):
         attrs = {}
         attrs['title'] = schema.get('title', None)
         attrs['description'] = schema.get('description', None)
-        attrs['default'] = schema.get('default', None)
+        attrs['default'] = schema.get('default', EMPTY)
         attrs['uri'] = uri
         if 'enum' in schema:
             if not isinstance(enum, list):
@@ -83,6 +88,9 @@ class Validator(object):
                 attr = [factory(element, sub_uri) for element in attr]
                 attrs[name] = attr
         return attrs
+
+    def has_default(self):
+        return self.default != EMPTY
 
     def validate(self, obj):
         self.validate_enum(obj)
