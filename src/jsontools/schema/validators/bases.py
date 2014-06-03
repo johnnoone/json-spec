@@ -219,9 +219,9 @@ def compile(schema, uri, loader):
         attrs['minLength'] = attr
 
     if 'pattern' in schema:
-        attr = 'pattern'
+        attr = schema['pattern']
         if not isinstance(attr, str):
-            raise CompilationError('pattern must be an integer', schema)
+            raise CompilationError('pattern must be a string', schema)
         attrs['pattern'] = attr
 
     return Validator(**attrs)
