@@ -1,0 +1,18 @@
+CHANGES
+=======
+
+* more tests
+* cleanup draft04
+* fix pattern
+* poor's man pointer
+* implement naive json reference into json schema
+* debug object properties
+* validate more keywords
+* cleanup
+* more on the other primitives
+* validate strings, numbers and integers
+
+0.1.0
+-----
+
+* initial commit

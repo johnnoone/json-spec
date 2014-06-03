@@ -1,3 +1,4 @@
 nose
 nose-exclude
 nosexcover
+pytest
