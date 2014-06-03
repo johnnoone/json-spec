@@ -7,7 +7,7 @@
 """
 
 import unittest
-from jsontools.schema.validators import *
+from jsontools.schema.draft04 import Validator
 from jsontools.exceptions import ValidationError
 
 
@@ -196,7 +196,9 @@ class TestArray(unittest.TestCase):
             validator.validate({})
 
     def test_items(self):
-        validator = Validator(type='array', items=[{}, {}, {}], additionalItems=False)
+        validator = Validator(type='array',
+                              items=[{}, {}, {}],
+                              additionalItems=False)
         validator.validate([])
         validator.validate([[1, 2, 3, 4], [5, 6, 7, 8]])
         validator.validate([1, 2, 3])

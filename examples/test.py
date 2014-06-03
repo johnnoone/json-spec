@@ -29,5 +29,3 @@ for filename, data in dataset:
             print('all fine')
         except ValidationError as error:
             print(error)
-
-        print()

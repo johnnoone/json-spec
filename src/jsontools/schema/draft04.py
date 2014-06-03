@@ -1,12 +1,14 @@
 """
-    jsontools.schema.validators.bases
-    ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+    jsontools.schema.draft04
+    ~~~~~~~~~~~~~~~~~~~~~~~~
+
+    Implementation of JSON Schema draft04.
 
 """
 
 from __future__ import absolute_import, print_function, unicode_literals
 
-__all__ = ['factory', 'Validator']
+__all__ = ['compile', 'Validator']
 
 from copy import deepcopy
 import itertools
@@ -17,7 +19,7 @@ import re
 from six import integer_types, string_types
 from jsontools.exceptions import CompilationError, ValidationError
 
-from jsontools.parser import dumps
+from jsontools.schema.bases import BaseValidator
 
 logger = logging.getLogger(__name__)
 
@@ -29,20 +31,6 @@ def absolute(src, dest):
     a, _, b = src.partition('#')
     c, _, d = dest.partition('#')
     return '{}#{}'.format(a, d)
-
-
-class EMPTY(object): pass
-
-
-def factory(schema, uri, loader=None):
-    spec = schema.get('$schema', 'http://json-schema.org/draft-04/schema#')
-    if spec != 'http://json-schema.org/draft-04/schema#':
-        raise CompilationError('can parse draft-04 only', schema)
-
-    loader = loader or {}
-    loader[uri] = deepcopy(schema)
-
-    return compile(schema, uri, loader)
 
 
 def compile(schema, uri, loader):
@@ -79,7 +67,8 @@ def compile(schema, uri, loader):
         if name in schema:
             attr = schema[name]
             if not isinstance(attr, list):
-                raise CompilationError('{} must be a list'.format(name), schema)
+                raise CompilationError('{} must be a list'.format(name),
+                                       schema)
             sub_uri = os.path.join(uri, name)
             for i, element in enumerate(attr):
                 attr[i] = compile(element, sub_uri, loader)
@@ -133,7 +122,8 @@ def compile(schema, uri, loader):
                                        schema)
             attr = {}
             for subname, subschema in schema[name].items():
-                attr[subname] = compile(subschema, os.path.join(uri, name), loader)
+                attr[subname] = compile(subschema, os.path.join(uri, name),
+                                        loader)
             attrs[name] = attr
 
     for name in ('maxProperties', 'minProperties'):
@@ -143,7 +133,7 @@ def compile(schema, uri, loader):
                 raise CompilationError('{} must be an integer'.format(name),
                                        schema)
             if attr < 0:
-                raise CompilationError('{} must be greater than 0'.format(name),
+                raise CompilationError('{} must be greater than 0'.format(name),  # noqa
                                        schema)
             attrs[name] = attr
 
@@ -243,7 +233,7 @@ class Items(object):
         setattr(obj, self.key, value)
 
 
-class Validator(object):
+class Validator(BaseValidator):
 
     items = Items('_items')
     additionalItems = Items('_additionalItems')
@@ -366,7 +356,7 @@ class Validator(object):
         return False
 
     def validate_number(self, obj):
-        if isinstance(obj, (integer_types, float)) and not isinstance(obj, bool):
+        if isinstance(obj, (integer_types, float)) and not isinstance(obj, bool):  # noqa
             return True
         elif self.has_type('number'):
             raise ValidationError('obj must be a number')
@@ -471,10 +461,12 @@ class Validator(object):
 
     def validate_properties(self, obj):
         l = len(obj)
-        if isinstance(self.maxProperties, integer_types) and l > self.maxProperties:
-            raise ValidationError('too much properties, max {}'.format(self.maxProperties))
-        if isinstance(self.minProperties, integer_types) and l < self.minProperties:
-            raise ValidationError('too few properties, min {}'.format(self.minProperties))
+        if isinstance(self.maxProperties, integer_types) and l > self.maxProperties:  # noqa
+            raise ValidationError('too much properties, '
+                                  'max {}'.format(self.maxProperties))
+        if isinstance(self.minProperties, integer_types) and l < self.minProperties:  # noqa
+            raise ValidationError('too few properties, '
+                                  'min {}'.format(self.minProperties))
 
         obj = deepcopy(obj)
         errors, missing = {}, set(obj.keys())
@@ -575,7 +567,7 @@ class Validator(object):
         return obj
 
 
-class ReferenceValidator(object):
+class ReferenceValidator(BaseValidator):
     """
     Loads lately validator.
     """
