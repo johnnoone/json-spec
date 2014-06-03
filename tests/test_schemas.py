@@ -1,8 +1,8 @@
 #!/usr/bin/env python
 
 """
-    tests_validators
-    ~~~~~~~~~~~~~~~~
+    tests_schemas
+    ~~~~~~~~~~~~~
 
     examples are taken from:
 
@@ -318,6 +318,68 @@ class TestSchema(unittest.TestCase):
             'http://some.site.somewhere/entry-schema#': entry_schema
         })
         validator.validate(data)
+
+    def test_five(self):
+        validator = loads({
+          '$schema': 'http://json-schema.org/draft-04/schema#',
+          'title': 'Credit card validation',
+          'description': 'Credit card with or without security code',
+          'type': 'object',
+          'properties': {
+            'creditcard': {
+              'oneOf': [
+                {
+                  'properties': {
+                    'provider': {
+                        'type': 'string',
+                        'enum': ['mastercard']
+                    }
+                  },
+                  'additionalProperties': False,
+                  'required': ['provider']
+                },
+                {
+                  'properties': {
+                    'provider': {
+                        'type': 'string',
+                        'enum': ['visa']
+                    },
+                    'securitycode': {'type': 'integer'}
+                  },
+                  'additionalProperties': False,
+                  'required': ['provider', 'securitycode']
+                }
+              ]
+            }
+          }
+        })
+        validator.validate({
+            'creditcard': {
+                'provider': 'visa',
+                'securitycode': 123
+            }
+        })
+        validator.validate({
+            'creditcard': {
+                'provider': 'mastercard'
+            }
+        })
+
+        with self.assertRaises(ValidationError):
+            validator.validate({
+                'creditcard': {
+                    'provider': 'visa'
+                }
+            })
+
+        with self.assertRaises(ValidationError):
+            validator.validate({
+                'creditcard': {
+                    'provider': 'mastercard',
+                    'securitycode': 123
+                }
+            })
+
 
 if __name__ == '__main__':
     unittest.main()
