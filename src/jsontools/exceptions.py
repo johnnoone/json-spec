@@ -22,7 +22,7 @@ class ReferenceError(Exception):
 
 class ValidationError(Exception):
     """Raised while validating an obj with JsonSchema"""
-    def __init__(self, message, reference=None):
+    def __init__(self, message, uri=None):
         super(ValidationError, self).__init__(message)
         self.message = message
-        self.reference = reference
+        self.uri = uri

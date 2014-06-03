@@ -11,11 +11,17 @@
 """
 
 import unittest
+from jsontools.resolver import load
 from jsontools.schema import loads
 from jsontools.exceptions import ValidationError
 
 
 class TestSchema(unittest.TestCase):
+
+    def load(self, filename):
+        with open(filename) as file:
+            return load(file)
+
     def test_first(self):
         data1 = {
             'name': 'George Washington',
