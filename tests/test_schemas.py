@@ -177,9 +177,19 @@ class TestSchema(unittest.TestCase):
             }
         }
         validator = loads(schema)
+
+        assert validator.validate(data2) == {
+            'shipping_address': {
+                'street_address': '1600 Pennsylvania Avenue NW',
+                'city': 'Washington',
+                'state': 'DC',
+                'type': 'business'
+            }
+        }
+
         with self.assertRaises(ValidationError):
-            validator.validate(data1)
-        validator.validate(data2)
+            res = validator.validate(data1)
+            print('-', res)
 
     def test_four(self):
         data = {

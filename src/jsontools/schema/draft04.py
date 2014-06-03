@@ -39,12 +39,6 @@ def compile(schema, uri, loader):
 
     schema = deepcopy(schema)
     attrs = {}
-    if 'type' in schema:
-        t = schema['type']
-        if isinstance(t, dict):
-            schema.update(t)
-            del schema['type']
-
     attrs['title'] = schema.get('title', None)
     attrs['description'] = schema.get('description', None)
     if 'default' in schema:
@@ -287,6 +281,9 @@ class Validator(BaseValidator):
     def has_default(self):
         return getattr(self, 'default', False)
 
+    def has_type(self, type):
+        return self.type and (self.type == type or type in self.type)
+
     def validate(self, obj):
         # common
         self.validate_enum(obj)
@@ -324,8 +321,9 @@ class Validator(BaseValidator):
 
         return obj
 
-    def has_type(self, type):
-        return self.type and (self.type == type or type in self.type)
+    def validate_enum(self, obj):
+        if self.enum and obj not in self.enum:
+            raise ValidationError('obj is not allowed', obj)
 
     def validate_array(self, obj):
         if isinstance(obj, list):
@@ -471,6 +469,7 @@ class Validator(BaseValidator):
         obj = deepcopy(obj)
         errors, missing = {}, set(obj.keys())
         missing.update(self.required)
+        missing.update(self.properties.keys())
         for member, schema in self.properties.items():
             if member in obj:
                 try:
@@ -507,6 +506,9 @@ class Validator(BaseValidator):
                         missing.discard(member)
                     except ValidationError as error:
                         errors[member] = error
+        for member in self.required:
+            if member not in obj:
+                missing.add(member)
         if errors:
             raise ValidationError(errors)
 
@@ -514,10 +516,6 @@ class Validator(BaseValidator):
             raise ValidationError('missing definitions for {}'.format(missing))
 
         return obj
-
-    def validate_enum(self, obj):
-        if self.enum and obj not in self.enum:
-            raise ValidationError('obj is not allowed', obj)
 
     def validate_negate(self, obj):
         if self.negate:
