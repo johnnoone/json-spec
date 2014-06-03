@@ -159,9 +159,6 @@ class TestString(unittest.TestCase):
         validator.validate(u'bar')
 
         with self.assertRaises(ValidationError):
-            validator.validate(b'baz')
-
-        with self.assertRaises(ValidationError):
             validator.validate(1)
 
         with self.assertRaises(ValidationError):

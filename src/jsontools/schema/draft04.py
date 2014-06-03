@@ -16,7 +16,7 @@ import logging
 import os.path
 import re
 
-from six import integer_types, string_types
+from six import integer_types, string_types, binary_type, PY2
 from jsontools.exceptions import CompilationError, ValidationError
 
 from jsontools.schema.bases import BaseValidator
@@ -369,6 +369,8 @@ class Validator(BaseValidator):
 
     def validate_string(self, obj):
         if isinstance(obj, string_types):
+            return True
+        if PY2 and isinstance(obj, binary_type):
             return True
         elif self.has_type('string'):
             raise ValidationError('obj must be a string', obj)
