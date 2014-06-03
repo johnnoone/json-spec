@@ -9,7 +9,9 @@ from __future__ import absolute_import, print_function, unicode_literals
 __all__ = ['factory', 'CompoundValidator', 'Validator']
 
 from abc import ABCMeta, abstractmethod
+from copy import deepcopy
 import logging
+import os.path
 
 from six import add_metaclass
 from jsontools.exceptions import CompilationError, ValidationError
@@ -21,23 +23,35 @@ registry = {}
 class EMPTY(object): pass
 
 
-def factory(schema, uri):
+def factory(schema, uri, loader=None):
     spec = schema.get('$schema', 'http://json-schema.org/draft-04/schema#')
     if spec != 'http://json-schema.org/draft-04/schema#':
         raise CompilationError('can parse draft-04 only', schema)
 
+    loader = loader or {}
+    loader[uri] = deepcopy(schema)
+
+    if '$ref' in schema:
+        return ReferenceValidator(schema['$ref'], loader)
+
+    if 'type' in schema:
+        t = schema['type']
+        if isinstance(t, dict):
+            schema.update(t)
+            del schema['type']
+
     if 'type' in schema:
         if isinstance(schema['type'], str):
             # direct schema
-            return registry[schema['type']].compile(schema, uri)
-        if isinstance(schema['type'], list):
+            return registry[schema['type']].compile(schema, uri, loader)
+        elif isinstance(schema['type'], list):
             # multi schema
-            return [registry[t].compile(schema, uri) for t in schema['type']]
-    elif schema == {}:
-        return CompoundValidator()
-    else:
-        # not implemented yet
-        logger.error('what the fuck %s', schema)
+            return CompoundValidator(registry[t].compile(schema, uri, loader) for t in schema['type'])
+    elif isinstance(schema, dict):
+        return Validator(**Validator.compile(schema, uri, loader=loader))
+
+    # not implemented yet
+    logger.error('what the fuck %s', schema)
 
 
 class ValidatorBase(ABCMeta):
@@ -64,7 +78,7 @@ class Validator(object):
         self.oneOf = attrs.pop('oneOf', [])
 
     @classmethod
-    def compile(cls, schema, uri):
+    def compile(cls, schema, uri, loader):
         """Compile the current schema"""
         attrs = {}
         attrs['title'] = schema.get('title', None)
@@ -78,14 +92,17 @@ class Validator(object):
         if 'not' in schema:
             if not isinstance(enum, dict):
                 raise CompilationError('not must be a dict', schema)
-            attrs['not'] = factory(schema['not'], os.path.join(uri, 'not'))
+            attrs['not'] = factory(schema['not'], os.path.join(uri, 'not'), loader)
         for name in ('allOf', 'anyOf', 'oneOf'):
             if name in schema:
                 attr = schema[name]
                 if not isinstance(attr, list):
                     raise CompilationError('{} must be a list'.format(name), schema)
                 sub_uri = os.path.join(uri, name)
-                attr = [factory(element, sub_uri) for element in attr]
+                attr = []
+                for element in attr:
+                    element.setdefault('type', schema['type'])
+                    attr.append(factory(element, sub_uri, loader))
                 attrs[name] = attr
         return attrs
 
@@ -151,13 +168,52 @@ class Validator(object):
         return obj
 
 
+class ReferenceValidator(Validator):
+    """
+    Loads lately validator.
+    """
+
+    def __init__(self, uri, loader):
+        self.uri = uri
+        self.loader = loader
+
+    @property
+    def validator(self):
+        if not hasattr(self, '_validator'):
+            doc, _, pointer = self.uri.partition('#')
+            doc = doc or '<document>'
+
+            fragment = self.loader.get('{}#'.format(doc))
+            pointer = pointer.lstrip('/')
+            while pointer:
+                member, _, pointer = pointer.partition('/')
+                fragment = fragment[member]
+            self._validator = factory(fragment, self.uri, self.loader)
+
+        return self._validator
+
+    def has_default(self):
+        return self.validator.has_default()
+
+    @property
+    def default(self):
+        return self.validator.default
+
+    @classmethod
+    def compile(cls, schema, uri, loader):
+        raise RuntimeError('Not necessary here')
+
+    def validate(self, obj):
+        return self.validator.validate(obj)
+
+
 class CompoundValidator(Validator):
     def __init__(self, **attrs):
         super().__init__(**attrs)
         self.validators = attrs.pop('validators', [])
 
     @classmethod
-    def compile(cls, validators, uri):
+    def compile(cls, validators, uri, loader):
         return cls(validators)
 
     def validate(self, obj):

@@ -62,8 +62,8 @@ class ArrayValidator(Validator):
         self._additionalItems = obj
 
     @classmethod
-    def compile(cls, schema, uri):
-        attrs = super().compile(schema, uri)
+    def compile(cls, schema, uri, loader):
+        attrs = super().compile(schema, uri, loader)
 
         for name in ('items', 'additionalItems'):
             if name not in schema:
@@ -73,10 +73,10 @@ class ArrayValidator(Validator):
             sub_uri = os.path.join(uri, name)
             if isinstance(attr, list):
                 # each value must be a json schema
-                attr = [factory(attr, sub_uri) for element in attr]
+                attr = [factory(attr, sub_uri, loader) for element in attr]
             elif isinstance(attr, dict):
                 # value must be a json schema
-                attr = factory(attr, sub_uri)
+                attr = factory(attr, sub_uri, loader)
             elif not isinstance(attr, bool):
                 # should be a boolean
                 raise CompilationError('wrong type for {}'.format(name), schema)  # noqa
@@ -168,8 +168,8 @@ class ObjectValidator(Validator):
         self.required = attrs.pop('required', [])
 
     @classmethod
-    def compile(cls, schema, uri):
-        attrs = super().compile(schema, uri)
+    def compile(cls, schema, uri, loader):
+        attrs = super().compile(schema, uri, loader)
 
         for name in ('maxProperties', 'minProperties'):
             if name in schema:
@@ -183,7 +183,7 @@ class ObjectValidator(Validator):
                                            schema)
                 attr = {}
                 for subname, subschema in schema[name].items():
-                    attr[subname] = factory(subschema, os.path.join(uri, name))
+                    attr[subname] = factory(subschema, os.path.join(uri, name), loader)
                 attrs[name] = attr
 
         for name in ('maxProperties', 'minProperties'):
@@ -200,9 +200,9 @@ class ObjectValidator(Validator):
         if 'additionalProperties' in schema:
             attr = schema['additionalProperties']
             if isinstance(attr, dict):
-                attr = factory(attr, os.path.join(uri, name))
+                attr = factory(attr, os.path.join(uri, name), loader)
             elif attr is True:
-                attr = factory({}, os.path.join(uri, name))
+                attr = factory({}, os.path.join(uri, name), loader)
             elif not isinstance(schema['additionalProperties'], bool):
                 raise CompilationError('additionalProperties must be '
                                        'a dict or a bool', schema)
@@ -244,6 +244,9 @@ class ObjectValidator(Validator):
                     missing.discard(member)
                 except ValidationError as error:
                     errors[member] = error
+                except AttributeError:
+                    print(self.properties)
+                    raise
             elif schema.has_default():
                 obj[member] = deepcopy(schema.default)
         if errors:
@@ -300,8 +303,8 @@ class NumberValidator(Validator):
         self.multipleOf = attrs.pop('multipleOf', None)
 
     @classmethod
-    def compile(cls, schema, uri):
-        attrs = super().compile(schema, uri)
+    def compile(cls, schema, uri, loader):
+        attrs = super().compile(schema, uri, loader)
 
         if 'multipleOf' in schema:
             attr = schema['multipleOf']
@@ -404,8 +407,8 @@ class StringValidator(Validator):
         self.pattern = attrs.pop('pattern', None)
 
     @classmethod
-    def compile(cls, schema, uri):
-        attrs = super().compile(schema, uri)
+    def compile(cls, schema, uri, loader):
+        attrs = super().compile(schema, uri, loader)
 
         if 'maxLength' in schema:
             attr = 'maxLength'

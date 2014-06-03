@@ -21,4 +21,6 @@ def load(file):
 
 def loads(dataset):
     """load schema from a dataset"""
-    return factory(dataset, '#')
+    return factory(dataset, '<document>#')
+
+shared_loader = {}
