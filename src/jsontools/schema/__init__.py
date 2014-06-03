@@ -13,14 +13,14 @@ from jsontools import parser
 from .validators import factory
 
 
-def load(file):
+def load(file, **kwargs):
     """load schema from a file"""
     dataset = parser.load(file)
-    return loads(dataset)
+    return loads(dataset, **kwargs)
 
 
-def loads(dataset):
+def loads(dataset, **kwargs):
     """load schema from a dataset"""
-    return factory(dataset, '<document>#')
+    return factory(dataset, '<document>#', **kwargs)
 
 shared_loader = {}

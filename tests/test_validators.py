@@ -14,7 +14,7 @@ from jsontools.exceptions import ValidationError
 class TestNumber(unittest.TestCase):
 
     def test_any_number(self):
-        validator = NumberValidator()
+        validator = Validator(type='number')
         validator.validate(1)
         validator.validate(1.1)
         validator.validate(-12e3)
@@ -26,14 +26,14 @@ class TestNumber(unittest.TestCase):
             validator.validate(True)
 
     def test_minimum(self):
-        validator = NumberValidator(minimum=2)
+        validator = Validator(type='number', minimum=2)
         validator.validate(2)
         validator.validate(2.0)
 
         with self.assertRaises(ValidationError):
             validator.validate(1.9)
 
-        validator = NumberValidator(minimum=2, exclusiveMinimum=True)
+        validator = Validator(type='number', minimum=2, exclusiveMinimum=True)
         with self.assertRaises(ValidationError):
             validator.validate(2)
         with self.assertRaises(ValidationError):
@@ -43,14 +43,14 @@ class TestNumber(unittest.TestCase):
         validator.validate(2.01)
 
     def test_maximum(self):
-        validator = NumberValidator(maximum=2)
+        validator = Validator(type='number', maximum=2)
         validator.validate(2)
         validator.validate(2.0)
 
         with self.assertRaises(ValidationError):
             validator.validate(2.1)
 
-        validator = NumberValidator(maximum=2, exclusiveMaximum=True)
+        validator = Validator(type='number', maximum=2, exclusiveMaximum=True)
         with self.assertRaises(ValidationError):
             validator.validate(2)
         with self.assertRaises(ValidationError):
@@ -60,14 +60,14 @@ class TestNumber(unittest.TestCase):
         validator.validate(1.9991)
 
     def test_multiple(self):
-        validator = NumberValidator(multipleOf=2)
+        validator = Validator(type='number', multipleOf=2)
         validator.validate(2)
         validator.validate(2.0)
 
         with self.assertRaises(ValidationError):
             validator.validate(3)
 
-        validator = NumberValidator(multipleOf=2.5)
+        validator = Validator(type='number', multipleOf=2.5)
         validator.validate(2.5)
         validator.validate(50)
         validator.validate(-50)
@@ -78,8 +78,8 @@ class TestNumber(unittest.TestCase):
 
 class TestInteger(unittest.TestCase):
 
-    def test_any_number(self):
-        validator = IntegerValidator()
+    def test_any_integer(self):
+        validator = Validator(type='integer')
         validator.validate(1)
         with self.assertRaises(ValidationError):
             validator.validate(1.1)
@@ -94,7 +94,7 @@ class TestInteger(unittest.TestCase):
             validator.validate(True)
 
     def test_minimum(self):
-        validator = IntegerValidator(minimum=2)
+        validator = Validator(type='integer', minimum=2)
         validator.validate(2)
         with self.assertRaises(ValidationError):
             validator.validate(2.0)
@@ -102,7 +102,7 @@ class TestInteger(unittest.TestCase):
         with self.assertRaises(ValidationError):
             validator.validate(1.9)
 
-        validator = IntegerValidator(minimum=2, exclusiveMinimum=True)
+        validator = Validator(type='integer', minimum=2, exclusiveMinimum=True)
         with self.assertRaises(ValidationError):
             validator.validate(2)
         with self.assertRaises(ValidationError):
@@ -113,7 +113,7 @@ class TestInteger(unittest.TestCase):
             validator.validate(2.01)
 
     def test_maximum(self):
-        validator = IntegerValidator(maximum=2)
+        validator = Validator(type='integer', maximum=2)
         validator.validate(2)
         with self.assertRaises(ValidationError):
             validator.validate(2.0)
@@ -121,7 +121,7 @@ class TestInteger(unittest.TestCase):
         with self.assertRaises(ValidationError):
             validator.validate(2.1)
 
-        validator = IntegerValidator(maximum=2, exclusiveMaximum=True)
+        validator = Validator(type='integer', maximum=2, exclusiveMaximum=True)
         with self.assertRaises(ValidationError):
             validator.validate(2)
         with self.assertRaises(ValidationError):
@@ -132,15 +132,16 @@ class TestInteger(unittest.TestCase):
             validator.validate(1.9991)
 
     def test_multiple(self):
-        validator = IntegerValidator(multipleOf=2)
+        validator = Validator(type='integer', multipleOf=2)
         validator.validate(2)
+
         with self.assertRaises(ValidationError):
             validator.validate(2.0)
 
         with self.assertRaises(ValidationError):
             validator.validate(3)
 
-        validator = IntegerValidator(multipleOf=2.5)
+        validator = Validator(type='integer', multipleOf=2.5)
         with self.assertRaises(ValidationError):
             validator.validate(2.5)
         validator.validate(50)
@@ -153,7 +154,7 @@ class TestInteger(unittest.TestCase):
 class TestString(unittest.TestCase):
 
     def test_any_string(self):
-        validator = StringValidator()
+        validator = Validator(type='string')
         validator.validate('foo')
         validator.validate(u'bar')
 
@@ -167,7 +168,7 @@ class TestString(unittest.TestCase):
             validator.validate(True)
 
     def test_length(self):
-        validator = StringValidator(minLength=3, maxLength=10)
+        validator = Validator(type='string', minLength=3, maxLength=10)
         validator.validate('abc')
         validator.validate('abcdefghij')
         with self.assertRaises(ValidationError):
@@ -176,7 +177,7 @@ class TestString(unittest.TestCase):
             validator.validate('abcdefghijk')
 
     def test_pattern(self):
-        validator = StringValidator(pattern='''foo|bar''')
+        validator = Validator(type='string', pattern='''foo|bar''')
         validator.validate('foo')
         with self.assertRaises(ValidationError):
             validator.validate('baz')
@@ -184,7 +185,7 @@ class TestString(unittest.TestCase):
 
 class TestArray(unittest.TestCase):
     def test_any_array(self):
-        validator = ArrayValidator()
+        validator = Validator(type='array')
         validator.validate([])
         validator.validate(['foo'])
         with self.assertRaises(ValidationError):
@@ -195,7 +196,7 @@ class TestArray(unittest.TestCase):
             validator.validate({})
 
     def test_items(self):
-        validator = ArrayValidator(items=[{}, {}, {}], additionalItems=False)
+        validator = Validator(type='array', items=[{}, {}, {}], additionalItems=False)
         validator.validate([])
         validator.validate([[1, 2, 3, 4], [5, 6, 7, 8]])
         validator.validate([1, 2, 3])
@@ -207,7 +208,7 @@ class TestArray(unittest.TestCase):
 
 class TestObject(unittest.TestCase):
     def test_any_object(self):
-        validator = ObjectValidator()
+        validator = Validator(type='object')
         validator.validate({})
         validator.validate({'foo': 'bar'})
         with self.assertRaises(ValidationError):
@@ -227,27 +228,27 @@ class TestGeneral(unittest.TestCase):
             validator.validate('bar')
 
     def test_all_of(self):
-        foo = StringValidator(enum=['foo'])
-        bar = StringValidator(pattern='^f[o]+$')
-        validator = StringValidator(allOf=[foo, bar])
+        foo = Validator(type='string', enum=['foo'])
+        bar = Validator(type='string', pattern='^f[o]+$')
+        validator = Validator(type='string', allOf=[foo, bar])
         validator.validate('foo')
         with self.assertRaises(ValidationError):
             validator.validate('bar')
 
     def test_any_of(self):
-        foo = StringValidator(enum=['foo'])
-        bar = StringValidator(enum=['bar'])
-        validator = StringValidator(anyOf=[foo, bar])
+        foo = Validator(type='string', enum=['foo'])
+        bar = Validator(type='string', enum=['bar'])
+        validator = Validator(type='string', anyOf=[foo, bar])
         validator.validate('foo')
         validator.validate('bar')
         with self.assertRaises(ValidationError):
             validator.validate('baz')
 
     def test_one_of(self):
-        foo = StringValidator(enum=['foo'])
-        bar = StringValidator(pattern='^f[o]+$')
-        baz = StringValidator(enum=['bar'])
-        validator = StringValidator(oneOf=[foo, bar, baz])
+        foo = Validator(type='string', enum=['foo'])
+        bar = Validator(type='string', pattern='^f[o]+$')
+        baz = Validator(type='string', enum=['bar'])
+        validator = Validator(type='string', oneOf=[foo, bar, baz])
         validator.validate('bar')
         with self.assertRaises(ValidationError):
             validator.validate('foo')

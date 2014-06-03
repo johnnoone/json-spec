@@ -10,7 +10,7 @@ __all__ = ['ReferenceError', 'SchemaError']
 class CompilationError(Exception):
     """Raised while schema parsing"""
     def __init__(self, message, schema):
-        super(SchemaError, self).__init__(message, schema)
+        super(CompilationError, self).__init__(message, schema)
         self.schema = schema
 
 
