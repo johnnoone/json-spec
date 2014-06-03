@@ -301,7 +301,7 @@ class TestSchema(unittest.TestCase):
                         'server': {
                             'type': 'string',
                             'oneOf': [
-                                {'format': 'host-name'},
+                                {'format': 'hostname'},
                                 {'format': 'ipv4'},
                                 {'format': 'ipv6'}
                             ]

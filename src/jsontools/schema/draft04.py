@@ -18,8 +18,8 @@ import re
 
 from six import integer_types, string_types, binary_type, PY2
 from jsontools.exceptions import CompilationError, ValidationError
-
 from jsontools.schema.bases import BaseValidator
+from jsontools.util import rfc3339_to_datetime
 
 logger = logging.getLogger(__name__)
 
@@ -202,11 +202,12 @@ def compile(schema, uri, loader):
                                    'or greater than 0', schema)
         attrs['minLength'] = attr
 
-    if 'pattern' in schema:
-        attr = schema['pattern']
-        if not isinstance(attr, str):
-            raise CompilationError('pattern must be a string', schema)
-        attrs['pattern'] = attr
+    for name in ('pattern', 'format'):
+        if name in schema:
+            attr = schema[name]
+            if not isinstance(attr, str):
+                raise CompilationError('{} must be a string'.format(name), schema)
+            attrs[name] = attr
 
     return Validator(**attrs)
 
@@ -233,8 +234,9 @@ class Validator(BaseValidator):
     additionalItems = Items('_additionalItems')
 
     def __init__(self, **attrs):
-        if 'id' in attrs:
-            logger.info('id is not implemented')
+        self.id = attrs.pop('id', None)
+        if self.id:
+            logger.info('id is not implemented and is here for information purpose')
         self.uri = attrs.pop('uri', None)
         self.title = attrs.pop('title', None)
         self.description = attrs.pop('description', None)
@@ -277,6 +279,7 @@ class Validator(BaseValidator):
         self.maxLength = attrs.pop('maxLength', None)
         self.minLength = attrs.pop('minLength', None)
         self.pattern = attrs.pop('pattern', None)
+        self.format = attrs.pop('format', None)
 
     def has_default(self):
         return getattr(self, 'default', False)
@@ -318,6 +321,7 @@ class Validator(BaseValidator):
         if self.validate_string(obj):
             self.validate_length(obj)
             self.validate_pattern(obj)
+            self.validate_format(obj)
 
         return obj
 
@@ -389,6 +393,24 @@ class Validator(BaseValidator):
         if self.pattern and not self.regex.match(obj):
             raise ValidationError('obj does not validate '
                                   '{!r} pattern'.format(self.pattern))
+
+    def validate_format(self, obj):
+        if not self.format:
+            return obj
+        if self.format == 'date-time':
+            return self.validate_datetime(obj)
+        if self.format == 'email':
+            return self.validate_email(obj)
+        if self.format == 'hostname':
+            return self.validate_hostname(obj)
+        if self.format == 'ipv4':
+            return self.validate_ipv4(obj)
+        if self.format == 'ipv6':
+            return self.validate_ipv6(obj)
+        if self.format == 'uri':
+            return self.validate_uri(obj)
+        raise ValidationError('format {} is not '
+                              'defined.'.format(self.pattern))
 
     @property
     def regex(self):
@@ -565,6 +587,47 @@ class Validator(BaseValidator):
             if errors:
                 raise ValidationError(errors)
         return obj
+
+    def validate_datetime(self, obj):
+        try:
+            return rfc3339_to_datetime(obj)
+        except ValueError:
+            raise ValidationError('{!r} is not a valid datetime'.format(obj))
+
+    def validate_email(self, obj):
+        pattern = re.compile('[^@]+@[^@]+\.[^@]+')
+        if not pattern.match(obj):
+            raise ValidationError('{!r} is not defined'.format(obj))
+
+    def validate_hostname(self, obj):
+        try:
+            host = deepcopy(obj)
+            if len(host) > 255:
+                raise ValueError
+            if host[-1] == ".":
+                host = host[:-1] # strip exactly one dot from the right, if present
+            allowed = re.compile("(?!-)[A-Z\d-]{1,63}(?<!-)$", re.IGNORECASE)
+            if not all(allowed.match(x) for x in host.split(".")):
+                raise ValueError
+            return obj
+        except ValueError:
+            raise ValidationError('{!r} is not a valid hostname'.format(obj))
+
+    def validate_ipv4(self, obj):
+        try:
+            parts = obj.split('.', 3)
+            for part in parts:
+                part = int(part)
+                if part > 127 or part < 0:
+                    raise ValueError
+        except ValueError:
+            raise ValidationError('{!r} is not an ipv4'.format(obj))
+
+    def validate_ipv6(self, obj):
+        raise ValidationError('{!r} is not defined'.format(obj))
+
+    def validate_uri(self, obj):
+        raise ValidationError('{!r} is not defined'.format(obj))
 
 
 class ReferenceValidator(BaseValidator):

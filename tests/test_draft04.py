@@ -226,6 +226,11 @@ class TestGeneral(unittest.TestCase):
         with self.assertRaises(ValidationError):
             validator.validate('bar')
 
+    def test_format(self):
+        pass
+
+
+class TestCollections(unittest.TestCase):
     def test_all_of(self):
         foo = Validator(type='string', enum=['foo'])
         bar = Validator(type='string', pattern='^f[o]+$')
