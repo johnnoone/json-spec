@@ -4,7 +4,7 @@
 
 """
 
-__all__ = ['ReferenceError', 'SchemaError']
+__all__ = ['CompilationError', 'ReferenceError', 'ValidationError']
 
 
 class CompilationError(Exception):

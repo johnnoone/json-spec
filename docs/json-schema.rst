@@ -54,15 +54,27 @@ Low level
 
 .. autofunction:: schema.factory
 
-.. automodule:: schema.bases
-   :members:
-   :undoc-members:
 
-.. automodule:: schema.draft04
-   :members:
+Draft 04
+--------
 
-.. automodule:: schema.exceptions
-   :members:
+.. autofunction:: schema.draft04.compile
+
+.. autoclass:: schema.draft04.Validator
+
+
+Exceptions
+----------
+
+.. autoclass:: schema.exceptions.CompilationError
+
+.. autoclass:: schema.exceptions.ReferenceError
+
+.. autoclass:: schema.exceptions.ValidationError
+
+
+Utils
+-----
 
 .. automodule:: schema.util
    :members:
