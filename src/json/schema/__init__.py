@@ -24,16 +24,30 @@ from .exceptions import CompilationError
 from .draft04 import compile
 
 
-def load(dataset, **kwargs):
-    """load schema from a dataset"""
-    return factory(dataset, '<document>#', **kwargs)
+def load(schema, **kwargs):
+    """load schema from a python object
+
+    :param schema: The schema
+    :type schema: dict
+    :return: The validator instance
+    :rtype: Validator
+    :raises CompilationError: Whole or part of schema failed to be loaded.
+    """
+    return factory(schema, '<document>#', **kwargs)
 
 
 def load_from_file(filename, **kwargs):
-    """load schema from a file"""
+    """load schema from a file
+
+    :param filename: the json file to be loaded
+    :type filename: str
+    :return: The validator instance
+    :rtype: Validator
+    :raises CompilationError: Whole or part of schema failed to be loaded.
+    """
     with open(filename, 'r') as file:
-        dataset = file_load(file)
-    return factory(dataset, '<document>#', **kwargs)
+        schema = file_load(file)
+    return factory(schema, '<document>#', **kwargs)
 
 
 def factory(schema, uri, default_spec=None, loader=None):

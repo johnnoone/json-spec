@@ -13,5 +13,5 @@ from abc import abstractmethod
 
 class BaseValidator(object):
     @abstractmethod
-    def validate(self, arg):
+    def validate(self, obj):
         pass

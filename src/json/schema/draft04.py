@@ -220,6 +220,10 @@ def compile(schema, uri, loader):
 
 
 class Items(object):
+    """
+    Describes items and additionalItems rules
+    """
+
     def __init__(self, key):
         self.key = key
 
@@ -236,6 +240,9 @@ class Items(object):
 
 
 class Validator(BaseValidator):
+    """
+    Implements a draft04 validator.
+    """
 
     items = Items('_items')
     additionalItems = Items('_additionalItems')
@@ -295,6 +302,17 @@ class Validator(BaseValidator):
         return self.type and (self.type == type or type in self.type)
 
     def validate(self, obj):
+        """
+        Validates obj.
+
+        Note that the returned object is not the same as object.
+        It may contains default values.
+
+        :param obj: The object to validate
+        :return: the validated obj
+        :raises ValidationError: Whole or part of obj does not validate.
+        """
+
         # common
         self.validate_enum(obj)
         self.validate_negate(obj)
