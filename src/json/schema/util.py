@@ -1,6 +1,6 @@
 """
-    jsontools.util
-    ~~~~~~~~~~~~~~
+    json.schema.util
+    ~~~~~~~~~~~~~~~~
 
 """
 
@@ -8,6 +8,7 @@ __all__ = ['rfc3339_to_datetime']
 
 from datetime import tzinfo, timedelta, datetime, date
 import time
+
 
 class offset(tzinfo):
     def __init__(self, value):

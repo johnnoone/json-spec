@@ -1,6 +1,7 @@
 CHANGES
 =======
 
+* python2.7 fixes
 * more validation
 * cleaned unittests
 * validate against format

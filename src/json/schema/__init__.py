@@ -1,6 +1,6 @@
 """
-    jsontools.schema
-    ~~~~~~~~~~~~~~~~
+    json.schema
+    ~~~~~~~~~~~
 
     JSON Schema defines the media type "application/schema+json",
     a JSON based format for defining the structure of JSON data.
@@ -15,22 +15,15 @@
 
 from __future__ import absolute_import, print_function, unicode_literals
 
-__all__ = ['load', 'loads']
+__all__ = ['load', 'factory']
 
 from copy import deepcopy
 
-from jsontools import parser
-from jsontools.exceptions import CompilationError
+from .exceptions import CompilationError
 from .draft04 import compile
 
 
-def load(file, **kwargs):
-    """load schema from a file"""
-    dataset = parser.load(file)
-    return loads(dataset, **kwargs)
-
-
-def loads(dataset, **kwargs):
+def load(dataset, **kwargs):
     """load schema from a dataset"""
     return factory(dataset, '<document>#', **kwargs)
 

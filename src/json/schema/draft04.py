@@ -1,6 +1,6 @@
 """
-    jsontools.schema.draft04
-    ~~~~~~~~~~~~~~~~~~~~~~~~
+    json.schema.draft04
+    ~~~~~~~~~~~~~~~~~~~
 
     Implementation of JSON Schema draft04.
 
@@ -17,9 +17,10 @@ import os.path
 import re
 
 from six import integer_types, string_types, binary_type, PY2
-from jsontools.exceptions import CompilationError, ValidationError
-from jsontools.schema.bases import BaseValidator
-from jsontools.util import rfc3339_to_datetime
+
+from .exceptions import CompilationError, ValidationError
+from .bases import BaseValidator
+from .util import rfc3339_to_datetime
 
 logger = logging.getLogger(__name__)
 

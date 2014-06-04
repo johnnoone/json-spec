@@ -8,8 +8,8 @@
     * http://json-schema.org/examples.html
 """
 
-from jsontools.schema import loads
-from jsontools.exceptions import ValidationError
+from json.schema import load
+from json.schema.exceptions import ValidationError
 from . import TestCase, fixture
 
 
@@ -20,7 +20,7 @@ class TestSchema(TestCase):
         data2 = fixture('first.data2.json')
         schema = fixture('first.schema.json')
 
-        validator = loads(schema)
+        validator = load(schema)
         with self.assertRaises(ValidationError):
             validator.validate(data1)
         validator.validate(data2)
@@ -28,14 +28,14 @@ class TestSchema(TestCase):
     def test_second(self):
         schema = fixture('second.schema.json')
         data = fixture('second.data1.json')
-        validator = loads(schema)
+        validator = load(schema)
         validator.validate(data)
 
     def test_three(self):
         schema = fixture('three.schema.json')
         data1 = fixture('three.data1.json')
         data2 = fixture('three.data2.json')
-        validator = loads(schema)
+        validator = load(schema)
 
         assert validator.validate(data2) == {
             'shipping_address': {
@@ -54,13 +54,13 @@ class TestSchema(TestCase):
         data = fixture('four.data.json')
         base_schema = fixture('four.base.schema.json')
         entry_schema = fixture('four.entry.schema.json')
-        validator = loads(base_schema, loader={
+        validator = load(base_schema, loader={
             'http://some.site.somewhere/entry-schema#': entry_schema
         })
         validator.validate(data)
 
     def test_five(self):
-        validator = loads(fixture('five.schema.json'))
+        validator = load(fixture('five.schema.json'))
         validator.validate({
             'creditcard': {
                 'provider': 'visa',

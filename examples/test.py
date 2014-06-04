@@ -1,6 +1,6 @@
 from __future__ import absolute_import, print_function, unicode_literals
-from jsontools import schema
-from jsontools.exceptions import ValidationError
+from json import schema
+from json.schema.exceptions import ValidationError
 import os
 
 here = os.path.dirname(os.path.abspath(__file__))

@@ -5,15 +5,15 @@
 """
 
 
-from jsontools.schema import loads
-from jsontools.exceptions import ValidationError
+from json.schema import load
+from json.schema.exceptions import ValidationError
 from . import TestCase, fixture
 
 
 class TestErrors(TestCase):
 
     def test_check(self):
-        validator = loads(fixture('five.schema.json'))
+        validator = load(fixture('five.schema.json'))
 
         try:
             validator.validate({

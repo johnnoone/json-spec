@@ -4,8 +4,8 @@
 
 """
 
-from jsontools.schema.draft04 import Validator
-from jsontools.exceptions import ValidationError
+from json.schema.draft04 import Validator
+from json.schema.exceptions import ValidationError
 from . import TestCase
 
 

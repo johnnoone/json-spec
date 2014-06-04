@@ -1,6 +1,6 @@
 """
-    jsontools.schema.bases
-    ~~~~~~~~~~~~~~~~~~~~~~
+    json.schema.bases
+    ~~~~~~~~~~~~~~~~~
 
 """
 

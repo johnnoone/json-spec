@@ -1,6 +1,6 @@
 """
-    jsontools.parser
-    ~~~~~~~~~~~~~~~~
+    json.schema.parser
+    ~~~~~~~~~~~~~~~~~~
 
     Parse json document
 """
