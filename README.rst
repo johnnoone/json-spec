@@ -3,13 +3,13 @@ Json Extensions
 ===============
 
 .. image:: https://badge.fury.io/py/json-extensions.png
-    :target: http://badge.fury.io/py/jsontools
+    :target: http://badge.fury.io/py/json-extensions
 
 .. image:: https://travis-ci.org/johnnoone/json-extensions.png?branch=master
-    :target: https://travis-ci.org/johnnoone/jsontools
+    :target: https://travis-ci.org/johnnoone/json-extensions
 
 .. image:: https://pypip.in/d/json-extensions/badge.png
-    :target: https://pypi.python.org/pypi/jsontools
+    :target: https://pypi.python.org/pypi/json-extensions
 
 This library implements several JSON specs, like `JSON Schema`_:
 
