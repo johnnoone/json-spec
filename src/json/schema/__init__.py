@@ -15,9 +15,10 @@
 
 from __future__ import absolute_import, print_function, unicode_literals
 
-__all__ = ['load', 'factory']
+__all__ = ['load', 'load_from_file', 'factory']
 
 from copy import deepcopy
+from json import load as file_load
 
 from .exceptions import CompilationError
 from .draft04 import compile
@@ -25,6 +26,13 @@ from .draft04 import compile
 
 def load(dataset, **kwargs):
     """load schema from a dataset"""
+    return factory(dataset, '<document>#', **kwargs)
+
+
+def load_from_file(filename, **kwargs):
+    """load schema from a file"""
+    with open(filename, 'r') as file:
+        dataset = file_load(file)
     return factory(dataset, '<document>#', **kwargs)
 
 
