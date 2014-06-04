@@ -45,3 +45,4 @@ docs/_build
 # coverage
 cover/
 xunit.xml
+coverage.xml
