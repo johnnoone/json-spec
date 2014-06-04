@@ -31,10 +31,16 @@ def absolute(src, dest):
 
     a, _, b = src.partition('#')
     c, _, d = dest.partition('#')
-    return '{}#{}'.format(a, d)
+    if not c:
+        return '{}#{}'.format(a, d)
+    return dest
 
 
 def compile(schema, uri, loader):
+    """
+    Compile python object into a Validator instance.
+    """
+
     if '$ref' in schema:
         return ReferenceValidator(absolute(uri, schema['$ref']), loader)
 
