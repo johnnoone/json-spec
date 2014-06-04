@@ -1,0 +1,50 @@
+{
+    "$schema": "http://json-schema.org/draft-04/schema#",
+    "definitions": {
+        "address": {
+            "properties": {
+                "city": {
+                    "type": "string"
+                },
+                "state": {
+                    "type": "string"
+                },
+                "street_address": {
+                    "type": "string"
+                }
+            },
+            "required": [
+                "street_address",
+                "city",
+                "state"
+            ],
+            "type": "object"
+        }
+    },
+    "properties": {
+        "billing_address": {
+            "$ref": "#/definitions/address"
+        },
+        "shipping_address": {
+            "allOf": [
+                {
+                    "$ref": "#/definitions/address"
+                },
+                {
+                    "properties": {
+                        "type": {
+                            "enum": [
+                                "residential",
+                                "business"
+                            ]
+                        }
+                    },
+                    "required": [
+                        "type"
+                    ]
+                }
+            ]
+        }
+    },
+    "type": "object"
+}

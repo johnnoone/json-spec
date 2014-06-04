@@ -1,0 +1,33 @@
+{
+    "/": {
+        "fstype": "btrfs",
+        "readonly": true,
+        "storage": {
+            "device": "/dev/sda1",
+            "type": "disk"
+        }
+    },
+    "/tmp": {
+        "storage": {
+            "sizeInMB": 64,
+            "type": "tmpfs"
+        }
+    },
+    "/var": {
+        "fstype": "ext4",
+        "options": [
+            "nosuid"
+        ],
+        "storage": {
+            "label": "8f3ba6f4-5c70-46ec-83af-0d5434953e5f",
+            "type": "disk"
+        }
+    },
+    "/var/www": {
+        "storage": {
+            "remotePath": "/exports/mypath",
+            "server": "my.nfs.server",
+            "type": "nfs"
+        }
+    }
+}

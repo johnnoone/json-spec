@@ -1,0 +1,11 @@
+{
+    "address": {
+        "city": "Mount Vernon",
+        "country": "United States",
+        "state": "Virginia",
+        "street_address": "3200 Mount Vernon Memorial Highway"
+    },
+    "birthday": "1732-02-22",
+    "first_name": "George",
+    "last_name": "Washington"
+}

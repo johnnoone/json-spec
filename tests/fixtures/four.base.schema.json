@@ -1,0 +1,18 @@
+{
+    "$schema": "http://json-schema.org/draft-04/schema#",
+    "additionalProperties": false,
+    "patternProperties": {
+        "^(/[^/]+)+$": {
+            "$ref": "http://some.site.somewhere/entry-schema#"
+        }
+    },
+    "properties": {
+        "/": {
+            "$ref": "http://some.site.somewhere/entry-schema#"
+        }
+    },
+    "required": [
+        "/"
+    ],
+    "type": "object"
+}

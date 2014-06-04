@@ -1,17 +1,15 @@
-#!/usr/bin/env python
-
 """
-    tests_validators
-    ~~~~~~~~~~~~~~~~
+    tests.tests_draft04
+    ~~~~~~~~~~~~~~~~~~~
 
 """
 
-import unittest
 from jsontools.schema.draft04 import Validator
 from jsontools.exceptions import ValidationError
+from . import TestCase
 
 
-class TestNumber(unittest.TestCase):
+class TestNumber(TestCase):
 
     def test_any_number(self):
         validator = Validator(type='number')
@@ -76,7 +74,7 @@ class TestNumber(unittest.TestCase):
             validator.validate(-51)
 
 
-class TestInteger(unittest.TestCase):
+class TestInteger(TestCase):
 
     def test_any_integer(self):
         validator = Validator(type='integer')
@@ -151,7 +149,7 @@ class TestInteger(unittest.TestCase):
             validator.validate(-51)
 
 
-class TestString(unittest.TestCase):
+class TestString(TestCase):
 
     def test_any_string(self):
         validator = Validator(type='string')
@@ -180,7 +178,7 @@ class TestString(unittest.TestCase):
             validator.validate('baz')
 
 
-class TestArray(unittest.TestCase):
+class TestArray(TestCase):
     def test_any_array(self):
         validator = Validator(type='array')
         validator.validate([])
@@ -205,7 +203,7 @@ class TestArray(unittest.TestCase):
             validator.validate([None, {'a': 'b'}, True, 31.000002020013])
 
 
-class TestObject(unittest.TestCase):
+class TestObject(TestCase):
     def test_any_object(self):
         validator = Validator(type='object')
         validator.validate({})
@@ -218,7 +216,7 @@ class TestObject(unittest.TestCase):
             validator.validate([])
 
 
-class TestGeneral(unittest.TestCase):
+class TestGeneral(TestCase):
     def test_enum(self):
         validator = Validator(enum=['foo', 42])
         validator.validate('foo')
@@ -230,7 +228,7 @@ class TestGeneral(unittest.TestCase):
         pass
 
 
-class TestCollections(unittest.TestCase):
+class TestCollections(TestCase):
     def test_all_of(self):
         foo = Validator(type='string', enum=['foo'])
         bar = Validator(type='string', pattern='^f[o]+$')
@@ -256,6 +254,3 @@ class TestCollections(unittest.TestCase):
         validator.validate('bar')
         with self.assertRaises(ValidationError):
             validator.validate('foo')
-
-if __name__ == '__main__':
-    unittest.main()

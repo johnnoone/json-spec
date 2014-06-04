@@ -1,8 +1,6 @@
-#!/usr/bin/env python
-
 """
-    tests_schemas
-    ~~~~~~~~~~~~~
+    tests.tests_schemas
+    ~~~~~~~~~~~~~~~~~~~
 
     examples are taken from:
 
@@ -10,178 +8,33 @@
     * http://json-schema.org/examples.html
 """
 
-import unittest
-from jsontools.resolver import load
 from jsontools.schema import loads
 from jsontools.exceptions import ValidationError
+from . import TestCase, fixture
 
 
-class TestSchema(unittest.TestCase):
-
-    def load(self, filename):
-        with open(filename) as file:
-            return load(file)
+class TestSchema(TestCase):
 
     def test_first(self):
-        data1 = {
-            'name': 'George Washington',
-            'birthday': 'February 22, 1732',
-            'address': 'Mount Vernon, Virginia, United States'
-        }
+        data1 = fixture('first.data1.json')
+        data2 = fixture('first.data2.json')
+        schema = fixture('first.schema.json')
 
-        data2 = {
-            'first_name': 'George',
-            'last_name': 'Washington',
-            'birthday': '1732-02-22',
-            'address': {
-                'street_address': '3200 Mount Vernon Memorial Highway',
-                'city': 'Mount Vernon',
-                'state': 'Virginia',
-                'country': 'United States'
-            }
-        }
-
-        schema = {
-            'type': 'object',
-            'properties': {
-                'first_name': {
-                    'type': 'string'
-                },
-                'last_name': {
-                    'type': 'string'
-                },
-                'birthday': {
-                    'type': 'string',
-                    'format': 'date-time'
-                },
-                'address': {
-                    'type': 'object',
-                    'properties': {
-                        'street_address': {
-                            'type': 'string'
-                        },
-                        'city': {
-                            'type': 'string'
-                        },
-                        'state': {
-                            'type': 'string'
-                        },
-                        'country': {
-                            'type': 'string'
-                        }
-                    }
-                }
-            }
-        }
         validator = loads(schema)
         with self.assertRaises(ValidationError):
             validator.validate(data1)
         validator.validate(data2)
 
     def test_second(self):
-        schema = {
-            '$schema': 'http://json-schema.org/draft-04/schema#',
-            'type': 'object',
-            'properties': {
-                'billing_address': {
-                    '$ref': '#/definitions/address'
-                },
-                'shipping_address': {
-                    '$ref': '#/definitions/address'
-                }
-            },
-            'definitions': {
-                'address': {
-                    'type': 'object',
-                    'properties': {
-                        'street_address': {
-                            'type': 'string'
-                        },
-                        'city': {
-                            'type': 'string'
-                        },
-                        'state': {
-                            'type': 'string'
-                        }
-                    },
-                    'required': ['street_address', 'city', 'state']
-                }
-            }
-        }
-        data = {
-            'shipping_address': {
-                'street_address': '1600 Pennsylvania Avenue NW',
-                'city': 'Washington',
-                'state': 'DC'
-            },
-            'billing_address': {
-                'street_address': '1st Street SE',
-                'city': 'Washington',
-                'state': 'DC'
-            }
-        }
+        schema = fixture('second.schema.json')
+        data = fixture('second.data1.json')
         validator = loads(schema)
         validator.validate(data)
 
     def test_three(self):
-        schema = {
-            '$schema': 'http://json-schema.org/draft-04/schema#',
-            'definitions': {
-                'address': {
-                    'type': 'object',
-                    'properties': {
-                        'street_address': {
-                            'type': 'string'
-                        },
-                        'city': {
-                            'type': 'string'
-                        },
-                        'state': {
-                            'type': 'string'
-                        }
-                    },
-                    'required': ['street_address', 'city', 'state']
-                }
-            },
-            'type': 'object',
-            'properties': {
-                'billing_address': {
-                    '$ref': '#/definitions/address'
-                },
-                'shipping_address': {
-                    'allOf': [
-                        {
-                            '$ref': '#/definitions/address'
-                        },
-                        {
-                            'properties': {
-                                'type': {
-                                    'enum': ['residential', 'business']
-                                }
-                            },
-                            'required': ['type']
-                        }
-                    ]
-                }
-            }
-        }
-
-        data1 = {
-            'shipping_address': {
-                'street_address': '1600 Pennsylvania Avenue NW',
-                'city': 'Washington',
-                'state': 'DC'
-            }
-        }
-
-        data2 = {
-            'shipping_address': {
-                'street_address': '1600 Pennsylvania Avenue NW',
-                'city': 'Washington',
-                'state': 'DC',
-                'type': 'business'
-            }
-        }
+        schema = fixture('three.schema.json')
+        data1 = fixture('three.data1.json')
+        data2 = fixture('three.data2.json')
         validator = loads(schema)
 
         assert validator.validate(data2) == {
@@ -198,177 +51,16 @@ class TestSchema(unittest.TestCase):
             print('-', res)
 
     def test_four(self):
-        data = {
-            '/': {
-                'storage': {
-                    'type': 'disk',
-                    'device': '/dev/sda1'
-                },
-                'fstype': 'btrfs',
-                'readonly': True
-            },
-            '/var': {
-                'storage': {
-                    'type': 'disk',
-                    'label': '8f3ba6f4-5c70-46ec-83af-0d5434953e5f'
-                },
-                'fstype': 'ext4',
-                'options': ['nosuid']
-            },
-            '/tmp': {
-                'storage': {
-                    'type': 'tmpfs',
-                    'sizeInMB': 64
-                }
-            },
-            '/var/www': {
-                'storage': {
-                    'type': 'nfs',
-                    'server': 'my.nfs.server',
-                    'remotePath': '/exports/mypath'
-                }
-            }
-        }
-
-        base_schema = {
-            '$schema': 'http://json-schema.org/draft-04/schema#',
-            'type': 'object',
-            'properties': {
-                '/': {
-                    '$ref': 'http://some.site.somewhere/entry-schema#'
-                }
-            },
-            'patternProperties': {
-                '^(/[^/]+)+$': {
-                    '$ref': 'http://some.site.somewhere/entry-schema#'
-                }
-            },
-            'additionalProperties': False,
-            'required': ['/']
-        }
-
-        entry_schema = {
-            'id': 'http://some.site.somewhere/entry-schema#',
-            '$schema': 'http://json-schema.org/draft-04/schema#',
-            'description': 'schema for an fstab entry',
-            'type': 'object',
-            'required': ['storage'],
-            'properties': {
-                'storage': {
-                    'type': 'object',
-                    'oneOf': [
-                        {'$ref': '#/definitions/diskDevice'},
-                        {'$ref': '#/definitions/diskUUID'},
-                        {'$ref': '#/definitions/nfs'},
-                        {'$ref': '#/definitions/tmpfs'}
-                    ]
-                },
-                'fstype': {
-                    'enum': ['ext3', 'ext4', 'btrfs']
-                },
-                'options': {
-                    'type': 'array',
-                    'minItems': 1,
-                    'items': {'type': 'string'},
-                    'uniqueItems': True
-                },
-                'readonly': {'type': 'boolean'}
-            },
-            'definitions': {
-                'diskDevice': {
-                    'properties': {
-                        'type': {'enum': ['disk']},
-                        'device': {
-                            'type': 'string',
-                            'pattern': '^/dev/[^/]+(/[^/]+)*$'
-                        }
-                    },
-                    'required': ['type', 'device'],
-                    'additionalProperties': False
-                },
-                'diskUUID': {
-                    'properties': {
-                        'type': {'enum': ['disk']},
-                        'label': {
-                            'type': 'string',
-                            'pattern': '^[a-fA-F0-9]{8}-[a-fA-F0-9]{4}-[a-fA-F0-9]{4}-[a-fA-F0-9]{4}-[a-fA-F0-9]{12}$'  # noqa
-                        }
-                    },
-                    'required': ['type', 'label'],
-                    'additionalProperties': False
-                },
-                'nfs': {
-                    'properties': {
-                        'type': {'enum': ['nfs']},
-                        'remotePath': {
-                            'type': 'string',
-                            'pattern': '^(/[^/]+)+$'
-                        },
-                        'server': {
-                            'type': 'string',
-                            'oneOf': [
-                                {'format': 'hostname'},
-                                {'format': 'ipv4'},
-                                {'format': 'ipv6'}
-                            ]
-                        }
-                    },
-                    'required': ['type', 'server', 'remotePath'],
-                    'additionalProperties': False
-                },
-                'tmpfs': {
-                    'properties': {
-                        'type': {'enum': ['tmpfs']},
-                        'sizeInMB': {
-                            'type': 'integer',
-                            'minimum': 16,
-                            'maximum': 512
-                        }
-                    },
-                    'required': ['type', 'sizeInMB'],
-                    'additionalProperties': False
-                }
-            }
-        }
+        data = fixture('four.data.json')
+        base_schema = fixture('four.base.schema.json')
+        entry_schema = fixture('four.entry.schema.json')
         validator = loads(base_schema, loader={
             'http://some.site.somewhere/entry-schema#': entry_schema
         })
         validator.validate(data)
 
     def test_five(self):
-        validator = loads({
-          '$schema': 'http://json-schema.org/draft-04/schema#',
-          'title': 'Credit card validation',
-          'description': 'Credit card with or without security code',
-          'type': 'object',
-          'properties': {
-            'creditcard': {
-              'oneOf': [
-                {
-                  'properties': {
-                    'provider': {
-                        'type': 'string',
-                        'enum': ['mastercard']
-                    }
-                  },
-                  'additionalProperties': False,
-                  'required': ['provider']
-                },
-                {
-                  'properties': {
-                    'provider': {
-                        'type': 'string',
-                        'enum': ['visa']
-                    },
-                    'securitycode': {'type': 'integer'}
-                  },
-                  'additionalProperties': False,
-                  'required': ['provider', 'securitycode']
-                }
-              ]
-            }
-          }
-        })
+        validator = loads(fixture('five.schema.json'))
         validator.validate({
             'creditcard': {
                 'provider': 'visa',
@@ -395,7 +87,3 @@ class TestSchema(unittest.TestCase):
                     'securitycode': 123
                 }
             })
-
-
-if __name__ == '__main__':
-    unittest.main()
