@@ -48,25 +48,23 @@ Basic
 Low level
 ---------
 
-.. autofunction:: json.schema.load
+.. autofunction:: schema.load
 
-.. autofunction:: json.schema.load_from_file
+.. autofunction:: schema.load_from_file
 
-.. autofunction:: json.schema.factory
+.. autofunction:: schema.factory
 
-.. automodule:: json.schema.bases
+.. automodule:: schema.bases
    :members:
    :undoc-members:
 
-.. automodule:: json.schema.draft04
+.. automodule:: schema.draft04
    :members:
 
-.. automodule:: json.schema.exceptions
+.. automodule:: schema.exceptions
    :members:
-   :undoc-members:
 
-.. automodule:: json.schema.util
+.. automodule:: schema.util
    :members:
-   :undoc-members:
 
 .. _`specification`: http://json-schema.org
