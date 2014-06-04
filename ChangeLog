@@ -1,6 +1,11 @@
 CHANGES
 =======
 
+* more validation
+* cleaned unittests
+* validate against format
+* validate against format
+* validate for python2.7
 * validate all tests
 * continuous integration 2
 * continuous integration 2

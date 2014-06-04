@@ -205,7 +205,7 @@ def compile(schema, uri, loader):
     for name in ('pattern', 'format'):
         if name in schema:
             attr = schema[name]
-            if not isinstance(attr, str):
+            if not isinstance(attr, string_types):
                 raise CompilationError('{} must be a string'.format(name), schema)
             attrs[name] = attr
 

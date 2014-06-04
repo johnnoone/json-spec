@@ -12,7 +12,7 @@ import time
 class offset(tzinfo):
     def __init__(self, value):
         self.value = value
-        super().__init__()
+        # super(tzinfo, self).__init__()
 
     def utcoffset(self, dt):
         hours, minutes = self.value.split(':', 1)
