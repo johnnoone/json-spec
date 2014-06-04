@@ -327,48 +327,48 @@ class Validator(BaseValidator):
 
     def validate_enum(self, obj):
         if self.enum and obj not in self.enum:
-            raise ValidationError('obj is not allowed', obj)
+            raise ValidationError('obj is not allowed', obj, rule=self.uri)
 
     def validate_array(self, obj):
         if isinstance(obj, list):
             return True
         elif self.has_type('array'):
-            raise ValidationError('obj must be an array')
+            raise ValidationError('obj must be an array', obj, rule=self.uri)
         return False
 
     def validate_boolean(self, obj):
         if obj in (True, False):
             return True
         elif self.has_type('boolean'):
-            raise ValidationError('obj must be a boolean', obj)
+            raise ValidationError('obj must be a boolean', obj, rule=self.uri)
         return False
 
     def validate_integer(self, obj):
         if isinstance(obj, integer_types) and not isinstance(obj, bool):
             return True
         elif self.has_type('integer'):
-            raise ValidationError('obj must be an integer')
+            raise ValidationError('obj must be an integer', obj, rule=self.uri)
         return False
 
     def validate_null(self, obj):
         if obj is None:
             return True
         elif self.has_type('null'):
-            raise ValidationError('obj must be null', obj)
+            raise ValidationError('obj must be null', obj, rule=self.uri)
         return False
 
     def validate_number(self, obj):
         if isinstance(obj, (integer_types, float)) and not isinstance(obj, bool):  # noqa
             return True
         elif self.has_type('number'):
-            raise ValidationError('obj must be a number')
+            raise ValidationError('obj must be a number', obj, rule=self.uri)
         return False
 
     def validate_object(self, obj):
         if isinstance(obj, dict):
             return True
         elif self.has_type('object'):
-            raise ValidationError('obj must be an object')
+            raise ValidationError('obj must be an object', obj, rule=self.uri)
         return False
 
     def validate_string(self, obj):
@@ -377,22 +377,22 @@ class Validator(BaseValidator):
         if PY2 and isinstance(obj, binary_type):
             return True
         elif self.has_type('string'):
-            raise ValidationError('obj must be a string', obj)
+            raise ValidationError('obj must be a string', obj, rule=self.uri)
         return False
 
     def validate_length(self, obj):
         l = len(obj)
         if self.minLength and l < self.minLength:
             raise ValidationError('length of obj must be greater or equal'
-                                  ' than {}'.format(self.minLength))
+                                  ' than {}'.format(self.minLength), obj, rule=self.uri)
         if self.maxLength and l > self.maxLength:
             raise ValidationError('length of obj must be lesser or equal'
-                                  ' than {}'.format(self.minLength))
+                                  ' than {}'.format(self.minLength), obj, rule=self.uri)
 
     def validate_pattern(self, obj):
         if self.pattern and not self.regex.match(obj):
             raise ValidationError('obj does not validate '
-                                  '{!r} pattern'.format(self.pattern))
+                                  '{!r} pattern'.format(self.pattern), obj, rule=self.uri)
 
     def validate_format(self, obj):
         if not self.format:
@@ -410,7 +410,7 @@ class Validator(BaseValidator):
         if self.format == 'uri':
             return self.validate_uri(obj)
         raise ValidationError('format {} is not '
-                              'defined.'.format(self.pattern))
+                              'defined.'.format(self.pattern), obj, rule=self.uri)
 
     @property
     def regex(self):
@@ -422,33 +422,33 @@ class Validator(BaseValidator):
         if self.minimum is not None:
             if not obj >= self.minimum:
                 raise ValidationError('object must be greater '
-                                      'than {}'.format(self.minimum))
+                                      'than {}'.format(self.minimum), obj, rule=self.uri)
             if self.exclusiveMinimum and obj == self.minimum:
                 raise ValidationError('object must be greater '
-                                      'than {}'.format(self.minimum))
+                                      'than {}'.format(self.minimum), obj, rule=self.uri)
 
     def validate_maximum(self, obj):
         if self.maximum is not None:
             if not obj <= self.maximum:
                 raise ValidationError('object must be lesser '
-                                      'than {}'.format(self.maximum))
+                                      'than {}'.format(self.maximum), obj, rule=self.uri)
             if self.exclusiveMaximum and obj == self.maximum:
                 raise ValidationError('object must be lesser '
-                                      'than {}'.format(self.maximum))
+                                      'than {}'.format(self.maximum), obj, rule=self.uri)
 
     def validate_multiple(self, obj):
         if self.multipleOf and not obj % self.multipleOf == 0:
             raise ValidationError('object must be a multiple '
-                                  'of {}'.format(self.multipleOf))
+                                  'of {}'.format(self.multipleOf), obj, rule=self.uri)
 
     def validate_items(self, obj):
         l = len(obj)
         if self.minItems and l < self.minItems:
             raise ValidationError('object must have at least '
-                                  '{} elements'.format(self.minItems))
+                                  '{} elements'.format(self.minItems), obj, rule=self.uri)
         if self.maxItems and l > self.maxItems:
             raise ValidationError('object must have less than '
-                                  '{} elements'.format(self.maxItems))
+                                  '{} elements'.format(self.maxItems), obj, rule=self.uri)
 
         if self._items == {}:
             # validation of the instance always succeeds
@@ -474,10 +474,10 @@ class Validator(BaseValidator):
             raise ValidationError(errors)
 
         if iteration < len(obj):
-            raise ValidationError('object has too much elements')
+            raise ValidationError('object has too much elements', obj, rule=self.uri)
 
         if self.uniqueItems and len(set(obj)) != len(obj):
-            raise ValidationError('items must be unique')
+            raise ValidationError('items must be unique', obj, rule=self.uri)
 
         return obj
 
@@ -485,13 +485,13 @@ class Validator(BaseValidator):
         l = len(obj)
         if isinstance(self.maxProperties, integer_types) and l > self.maxProperties:  # noqa
             raise ValidationError('too much properties, '
-                                  'max {}'.format(self.maxProperties))
+                                  'max {}'.format(self.maxProperties), obj, rule=self.uri)
         if isinstance(self.minProperties, integer_types) and l < self.minProperties:  # noqa
             raise ValidationError('too few properties, '
-                                  'min {}'.format(self.minProperties))
+                                  'min {}'.format(self.minProperties), obj, rule=self.uri)
 
         obj = deepcopy(obj)
-        errors, missing = {}, set(obj.keys())
+        errors, missing = [], set(obj.keys())
         missing.update(self.required)
         missing.update(self.properties.keys())
         for member, schema in self.properties.items():
@@ -500,7 +500,7 @@ class Validator(BaseValidator):
                     schema.validate(obj[member])
                     missing.discard(member)
                 except ValidationError as error:
-                    errors[member] = error
+                    errors.append(error)
                 except AttributeError:
                     raise
             elif schema.has_default():
@@ -515,7 +515,7 @@ class Validator(BaseValidator):
                         schema.validate(value)
                         missing.discard(member)
                     except ValidationError as error:
-                        errors[member] = error
+                        errors.append(error)
         if errors:
             raise ValidationError(errors)
 
@@ -529,15 +529,15 @@ class Validator(BaseValidator):
                         obj[member] = schema.validate(obj[member])
                         missing.discard(member)
                     except ValidationError as error:
-                        errors[member] = error
+                        errors.append(error)
         for member in self.required:
             if member not in obj:
                 missing.add(member)
         if errors:
-            raise ValidationError(errors)
+            raise ValidationError(errors, obj, rule=self.uri)
 
         if missing:
-            raise ValidationError('missing definitions for {}'.format(missing))
+            raise ValidationError('missing definitions for {}'.format(missing), obj, rule=self.uri)
 
         return obj
 
@@ -548,7 +548,7 @@ class Validator(BaseValidator):
             except ValidationError:
                 pass
             else:
-                raise ValidationError('obj is not allowed', obj)
+                raise ValidationError('obj is not allowed', obj, rule=self.uri)
 
     def validate_and(self, obj):
         if self.allOf:
@@ -592,12 +592,12 @@ class Validator(BaseValidator):
         try:
             return rfc3339_to_datetime(obj)
         except ValueError:
-            raise ValidationError('{!r} is not a valid datetime'.format(obj))
+            raise ValidationError('{!r} is not a valid datetime'.format(obj), obj, rule=self.uri)
 
     def validate_email(self, obj):
         pattern = re.compile('[^@]+@[^@]+\.[^@]+')
         if not pattern.match(obj):
-            raise ValidationError('{!r} is not defined'.format(obj))
+            raise ValidationError('{!r} is not defined'.format(obj), obj, rule=self.uri)
 
     def validate_hostname(self, obj):
         try:
@@ -611,7 +611,7 @@ class Validator(BaseValidator):
                 raise ValueError
             return obj
         except ValueError:
-            raise ValidationError('{!r} is not a valid hostname'.format(obj))
+            raise ValidationError('{!r} is not a valid hostname'.format(obj), obj, rule=self.uri)
 
     def validate_ipv4(self, obj):
         try:
@@ -621,13 +621,13 @@ class Validator(BaseValidator):
                 if part > 127 or part < 0:
                     raise ValueError
         except ValueError:
-            raise ValidationError('{!r} is not an ipv4'.format(obj))
+            raise ValidationError('{!r} is not an ipv4'.format(obj), obj, rule=self.uri)
 
     def validate_ipv6(self, obj):
-        raise ValidationError('{!r} is not defined'.format(obj))
+        raise ValidationError('{!r} is not defined'.format(obj), obj, rule=self.uri)
 
     def validate_uri(self, obj):
-        raise ValidationError('{!r} is not defined'.format(obj))
+        raise ValidationError('{!r} is not defined'.format(obj), obj, rule=self.uri)
 
 
 class ReferenceValidator(BaseValidator):
