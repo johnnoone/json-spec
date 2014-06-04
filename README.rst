@@ -2,28 +2,42 @@
 Json Extensions
 ===============
 
-.. image:: https://badge.fury.io/py/jsontools.png
+.. image:: https://badge.fury.io/py/json-extensions.png
     :target: http://badge.fury.io/py/jsontools
 
-.. image:: https://travis-ci.org/johnnoone/jsontools.png?branch=master
+.. image:: https://travis-ci.org/johnnoone/json-extensions.png?branch=master
     :target: https://travis-ci.org/johnnoone/jsontools
 
-.. image:: https://pypip.in/d/jsontools/badge.png
+.. image:: https://pypip.in/d/json-extensions/badge.png
     :target: https://pypi.python.org/pypi/jsontools
 
+This library implements several JSON specs, like `JSON Schema`_:
 
-* Free software: BSD license
-* Documentation: http://jsonexts.readthedocs.org.
+* It works on python 2.7, python 3.3 and above
+* It is release under the `BSD license`_
 
-json.schema
------------
 
-`JSON Schema`_	describes your JSON data format
+Installation
+------------
 
-.. block-code: python
+This library has no special dependencies. You can simply use pip:
+
+.. code-block:: bash
+
+    $ pip install json-extensions
+
+
+Usage
+-----
+
+Let say you want to validate JSON like objects.
+You can describe you data with `JSON Schema`_:
+
+.. code-block:: python
 
     from json.schema import load
 
+    # data will validate against this schema
     validator = load({
         'title': 'Example Schema',
         'type': 'object',
@@ -46,11 +60,16 @@ json.schema
         ]
     })
 
+    # validate this data
     validator.validate({
         'firstName': 'John',
         'lastName': 'Noone',
         'age': 33,
     })
 
+Other examples can be found in the documentation_ of in the tests_.
 
-:: _`JSON Schema`: http://json-schema.org
+.. _`JSON Schema`: http://json-schema.org
+.. _`BSD license`: LICENSE
+.. _documentation: http://json-extensions.readthedocs.org
+.. _tests: tests/

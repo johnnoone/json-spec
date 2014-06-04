@@ -4,9 +4,9 @@ Installation
 
 At the command line::
 
-    $ easy_install jsontools
+    $ easy_install json-extensions
 
 Or, if you have virtualenvwrapper installed::
 
-    $ mkvirtualenv jsontools
-    $ pip install jsontools
+    $ mkvirtualenv json-extensions
+    $ pip install json-extensions

@@ -1,6 +1,7 @@
 CHANGES
 =======
 
+* renamed project
 * renamed jsontools to json.*
 * python2.7 fixes
 * more validation
