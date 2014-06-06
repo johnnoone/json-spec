@@ -4,7 +4,7 @@
 
 """
 
-from json.schema.draft04 import Validator
+from json.schema.draft04 import Draft04Validator
 from json.schema.exceptions import ValidationError
 from . import TestCase
 
@@ -12,7 +12,7 @@ from . import TestCase
 class TestNumber(TestCase):
 
     def test_any_number(self):
-        validator = Validator(type='number')
+        validator = Draft04Validator(type='number')
         validator.validate(1)
         validator.validate(1.1)
         validator.validate(-12e3)
@@ -24,14 +24,14 @@ class TestNumber(TestCase):
             validator.validate(True)
 
     def test_minimum(self):
-        validator = Validator(type='number', minimum=2)
+        validator = Draft04Validator(type='number', minimum=2)
         validator.validate(2)
         validator.validate(2.0)
 
         with self.assertRaises(ValidationError):
             validator.validate(1.9)
 
-        validator = Validator(type='number', minimum=2, exclusiveMinimum=True)
+        validator = Draft04Validator(type='number', minimum=2, exclusiveMinimum=True)
         with self.assertRaises(ValidationError):
             validator.validate(2)
         with self.assertRaises(ValidationError):
@@ -41,14 +41,14 @@ class TestNumber(TestCase):
         validator.validate(2.01)
 
     def test_maximum(self):
-        validator = Validator(type='number', maximum=2)
+        validator = Draft04Validator(type='number', maximum=2)
         validator.validate(2)
         validator.validate(2.0)
 
         with self.assertRaises(ValidationError):
             validator.validate(2.1)
 
-        validator = Validator(type='number', maximum=2, exclusiveMaximum=True)
+        validator = Draft04Validator(type='number', maximum=2, exclusiveMaximum=True)
         with self.assertRaises(ValidationError):
             validator.validate(2)
         with self.assertRaises(ValidationError):
@@ -58,14 +58,14 @@ class TestNumber(TestCase):
         validator.validate(1.9991)
 
     def test_multiple(self):
-        validator = Validator(type='number', multipleOf=2)
+        validator = Draft04Validator(type='number', multipleOf=2)
         validator.validate(2)
         validator.validate(2.0)
 
         with self.assertRaises(ValidationError):
             validator.validate(3)
 
-        validator = Validator(type='number', multipleOf=2.5)
+        validator = Draft04Validator(type='number', multipleOf=2.5)
         validator.validate(2.5)
         validator.validate(50)
         validator.validate(-50)
@@ -77,7 +77,7 @@ class TestNumber(TestCase):
 class TestInteger(TestCase):
 
     def test_any_integer(self):
-        validator = Validator(type='integer')
+        validator = Draft04Validator(type='integer')
         validator.validate(1)
         with self.assertRaises(ValidationError):
             validator.validate(1.1)
@@ -92,7 +92,7 @@ class TestInteger(TestCase):
             validator.validate(True)
 
     def test_minimum(self):
-        validator = Validator(type='integer', minimum=2)
+        validator = Draft04Validator(type='integer', minimum=2)
         validator.validate(2)
         with self.assertRaises(ValidationError):
             validator.validate(2.0)
@@ -100,7 +100,7 @@ class TestInteger(TestCase):
         with self.assertRaises(ValidationError):
             validator.validate(1.9)
 
-        validator = Validator(type='integer', minimum=2, exclusiveMinimum=True)
+        validator = Draft04Validator(type='integer', minimum=2, exclusiveMinimum=True)
         with self.assertRaises(ValidationError):
             validator.validate(2)
         with self.assertRaises(ValidationError):
@@ -111,7 +111,7 @@ class TestInteger(TestCase):
             validator.validate(2.01)
 
     def test_maximum(self):
-        validator = Validator(type='integer', maximum=2)
+        validator = Draft04Validator(type='integer', maximum=2)
         validator.validate(2)
         with self.assertRaises(ValidationError):
             validator.validate(2.0)
@@ -119,7 +119,7 @@ class TestInteger(TestCase):
         with self.assertRaises(ValidationError):
             validator.validate(2.1)
 
-        validator = Validator(type='integer', maximum=2, exclusiveMaximum=True)
+        validator = Draft04Validator(type='integer', maximum=2, exclusiveMaximum=True)
         with self.assertRaises(ValidationError):
             validator.validate(2)
         with self.assertRaises(ValidationError):
@@ -130,7 +130,7 @@ class TestInteger(TestCase):
             validator.validate(1.9991)
 
     def test_multiple(self):
-        validator = Validator(type='integer', multipleOf=2)
+        validator = Draft04Validator(type='integer', multipleOf=2)
         validator.validate(2)
 
         with self.assertRaises(ValidationError):
@@ -139,7 +139,7 @@ class TestInteger(TestCase):
         with self.assertRaises(ValidationError):
             validator.validate(3)
 
-        validator = Validator(type='integer', multipleOf=2.5)
+        validator = Draft04Validator(type='integer', multipleOf=2.5)
         with self.assertRaises(ValidationError):
             validator.validate(2.5)
         validator.validate(50)
@@ -152,7 +152,7 @@ class TestInteger(TestCase):
 class TestString(TestCase):
 
     def test_any_string(self):
-        validator = Validator(type='string')
+        validator = Draft04Validator(type='string')
         validator.validate('foo')
         validator.validate(u'bar')
 
@@ -163,7 +163,7 @@ class TestString(TestCase):
             validator.validate(True)
 
     def test_length(self):
-        validator = Validator(type='string', minLength=3, maxLength=10)
+        validator = Draft04Validator(type='string', minLength=3, maxLength=10)
         validator.validate('abc')
         validator.validate('abcdefghij')
         with self.assertRaises(ValidationError):
@@ -172,7 +172,7 @@ class TestString(TestCase):
             validator.validate('abcdefghijk')
 
     def test_pattern(self):
-        validator = Validator(type='string', pattern='''foo|bar''')
+        validator = Draft04Validator(type='string', pattern='''foo|bar''')
         validator.validate('foo')
         with self.assertRaises(ValidationError):
             validator.validate('baz')
@@ -180,7 +180,7 @@ class TestString(TestCase):
 
 class TestArray(TestCase):
     def test_any_array(self):
-        validator = Validator(type='array')
+        validator = Draft04Validator(type='array')
         validator.validate([])
         validator.validate(['foo'])
         with self.assertRaises(ValidationError):
@@ -191,7 +191,7 @@ class TestArray(TestCase):
             validator.validate({})
 
     def test_items(self):
-        validator = Validator(type='array',
+        validator = Draft04Validator(type='array',
                               items=[{}, {}, {}],
                               additionalItems=False)
         validator.validate([])
@@ -205,7 +205,7 @@ class TestArray(TestCase):
 
 class TestObject(TestCase):
     def test_any_object(self):
-        validator = Validator(type='object')
+        validator = Draft04Validator(type='object')
         validator.validate({})
         validator.validate({'foo': 'bar'})
         with self.assertRaises(ValidationError):
@@ -218,7 +218,7 @@ class TestObject(TestCase):
 
 class TestGeneral(TestCase):
     def test_enum(self):
-        validator = Validator(enum=['foo', 42])
+        validator = Draft04Validator(enum=['foo', 42])
         validator.validate('foo')
         validator.validate(42)
         with self.assertRaises(ValidationError):
@@ -230,27 +230,27 @@ class TestGeneral(TestCase):
 
 class TestCollections(TestCase):
     def test_all_of(self):
-        foo = Validator(type='string', enum=['foo'])
-        bar = Validator(type='string', pattern='^f[o]+$')
-        validator = Validator(type='string', allOf=[foo, bar])
+        foo = Draft04Validator(type='string', enum=['foo'])
+        bar = Draft04Validator(type='string', pattern='^f[o]+$')
+        validator = Draft04Validator(type='string', allOf=[foo, bar])
         validator.validate('foo')
         with self.assertRaises(ValidationError):
             validator.validate('bar')
 
     def test_any_of(self):
-        foo = Validator(type='string', enum=['foo'])
-        bar = Validator(type='string', enum=['bar'])
-        validator = Validator(type='string', anyOf=[foo, bar])
+        foo = Draft04Validator(type='string', enum=['foo'])
+        bar = Draft04Validator(type='string', enum=['bar'])
+        validator = Draft04Validator(type='string', anyOf=[foo, bar])
         validator.validate('foo')
         validator.validate('bar')
         with self.assertRaises(ValidationError):
             validator.validate('baz')
 
     def test_one_of(self):
-        foo = Validator(type='string', enum=['foo'])
-        bar = Validator(type='string', pattern='^f[o]+$')
-        baz = Validator(type='string', enum=['bar'])
-        validator = Validator(type='string', oneOf=[foo, bar, baz])
+        foo = Draft04Validator(type='string', enum=['foo'])
+        bar = Draft04Validator(type='string', pattern='^f[o]+$')
+        baz = Draft04Validator(type='string', enum=['bar'])
+        validator = Draft04Validator(type='string', oneOf=[foo, bar, baz])
         validator.validate('bar')
         with self.assertRaises(ValidationError):
             validator.validate('foo')

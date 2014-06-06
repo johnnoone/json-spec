@@ -8,7 +8,7 @@
 
 from __future__ import absolute_import, print_function, unicode_literals
 
-__all__ = ['compile', 'Validator']
+__all__ = ['compile', 'Draft04Validator']
 
 from copy import deepcopy
 import itertools
@@ -19,7 +19,7 @@ import re
 from six import integer_types, string_types, binary_type, PY2
 
 from .exceptions import CompilationError, ValidationError
-from .bases import BaseValidator
+from .bases import Validator, ReferenceValidator
 from .util import rfc3339_to_datetime
 
 logger = logging.getLogger(__name__)
@@ -36,13 +36,15 @@ def absolute(src, dest):
     return dest
 
 
-def compile(schema, uri, loader):
+def compile(schema, uri, factory):
     """
-    Compile python object into a Validator instance.
+    Compile python object into a Draft04Validator instance.
     """
 
     if '$ref' in schema:
-        return ReferenceValidator(absolute(uri, schema['$ref']), loader)
+        return ReferenceValidator(absolute(uri, schema['$ref']),
+                                  factory,
+                                  'http://json-schema.org/draft-04/schema#')
 
     schema = deepcopy(schema)
     attrs = {}
@@ -63,7 +65,7 @@ def compile(schema, uri, loader):
         attr = schema['not']
         if not isinstance(attr, dict):
             raise CompilationError('not must be a dict', schema)
-        attrs['not'] = compile(attr, os.path.join(uri, 'not'), loader)
+        attrs['not'] = compile(attr, os.path.join(uri, 'not'), factory)
     for name in ('allOf', 'anyOf', 'oneOf'):
         if name in schema:
             attr = schema[name]
@@ -72,7 +74,7 @@ def compile(schema, uri, loader):
                                        schema)
             sub_uri = os.path.join(uri, name)
             for i, element in enumerate(attr):
-                attr[i] = compile(element, sub_uri, loader)
+                attr[i] = compile(element, sub_uri, factory)
             attrs[name] = attr
 
     for name in ('items', 'additionalItems'):
@@ -83,10 +85,10 @@ def compile(schema, uri, loader):
         sub_uri = os.path.join(uri, name)
         if isinstance(attr, list):
             # each value must be a json schema
-            attr = [compile(attr, sub_uri, loader) for element in attr]
+            attr = [compile(attr, sub_uri, factory) for element in attr]
         elif isinstance(attr, dict):
             # value must be a json schema
-            attr = compile(attr, sub_uri, loader)
+            attr = compile(attr, sub_uri, factory)
         elif not isinstance(attr, bool):
             # should be a boolean
             raise CompilationError('wrong type for {}'.format(name), schema)  # noqa
@@ -124,7 +126,7 @@ def compile(schema, uri, loader):
             attr = {}
             for subname, subschema in schema[name].items():
                 attr[subname] = compile(subschema, os.path.join(uri, name),
-                                        loader)
+                                        factory)
             attrs[name] = attr
 
     for name in ('maxProperties', 'minProperties'):
@@ -141,9 +143,9 @@ def compile(schema, uri, loader):
     if 'additionalProperties' in schema:
         attr = schema['additionalProperties']
         if isinstance(attr, dict):
-            attr = compile(attr, os.path.join(uri, name), loader)
+            attr = compile(attr, os.path.join(uri, name), factory)
         elif attr is True:
-            attr = compile({}, os.path.join(uri, name), loader)
+            attr = compile({}, os.path.join(uri, name), factory)
         elif not isinstance(schema['additionalProperties'], bool):
             raise CompilationError('additionalProperties must be '
                                    'a dict or a bool', schema)
@@ -216,7 +218,7 @@ def compile(schema, uri, loader):
                 raise CompilationError('{} must be a string'.format(name), schema)
             attrs[name] = attr
 
-    return Validator(**attrs)
+    return Draft04Validator(**attrs)
 
 
 class Items(object):
@@ -239,7 +241,7 @@ class Items(object):
         setattr(obj, self.key, value)
 
 
-class Validator(BaseValidator):
+class Draft04Validator(Validator):
     """
     Implements a draft04 validator.
     """
@@ -653,38 +655,3 @@ class Validator(BaseValidator):
 
     def validate_uri(self, obj):
         raise ValidationError('{!r} is not defined'.format(obj), obj, rule=self.uri)
-
-
-class ReferenceValidator(BaseValidator):
-    """
-    Loads lately validator.
-    """
-
-    def __init__(self, uri, loader):
-        self.uri = uri
-        self.loader = loader
-
-    @property
-    def validator(self):
-        if not hasattr(self, '_validator'):
-            doc, _, pointer = self.uri.partition('#')
-            doc = doc or '<document>'
-
-            fragment = self.loader.get('{}#'.format(doc))
-            pointer = pointer.lstrip('/')
-            while pointer:
-                member, _, pointer = pointer.partition('/')
-                fragment = fragment[member]
-            self._validator = compile(fragment, self.uri, self.loader)
-
-        return self._validator
-
-    def has_default(self):
-        return self.validator.has_default()
-
-    @property
-    def default(self):
-        return self.validator.default
-
-    def validate(self, obj):
-        return self.validator.validate(obj)

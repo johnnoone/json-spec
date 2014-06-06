@@ -55,12 +55,9 @@ Low level
 .. autofunction:: schema.factory
 
 
-Draft 04
---------
+.. autoclass:: schema.Draft04Validator
 
-.. autofunction:: schema.draft04.compile
-
-.. autoclass:: schema.draft04.Validator
+.. autoclass:: schema.ReferenceValidator
 
 
 Exceptions

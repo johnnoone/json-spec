@@ -1,6 +1,23 @@
 CHANGES
 =======
 
+0.2.1
+-----
+
+* improved installation
+* rtd fixes
+* rtd fixes
+* rtd fixes
+* add project as documentation dependency
+* do not import json
+
+0.2.0
+-----
+
+* improve draft04 documentation
+* fix reference
+* allow to load from file
+* improved documentation
 * renamed project
 * renamed jsontools to json.*
 * python2.7 fixes
