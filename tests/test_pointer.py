@@ -28,6 +28,7 @@ class TestPointer(TestCase):
 
     def test_compare(self):
         assert '/foo' == Pointer('/foo')
+        assert Pointer('/foo') != Pointer('/bar')
         tokens = Pointer('//a~1b/c%d/e^f/g|h/i\\j/k\"l/ /m~0n').tokens
         assert tokens == ['', 'a/b', 'c%d', 'e^f', 'g|h', 'i\\j', 'k\"l', ' ', 'm~n']  # noqa
 

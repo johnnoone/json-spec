@@ -1,6 +1,11 @@
 CHANGES
 =======
 
+* display members
+* more doc for json pointer
+* implement json pointers
+* cleaned draft04
+
 0.2.1
 -----
 

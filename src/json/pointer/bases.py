@@ -9,6 +9,7 @@ __all__ = ['DocumentPointer', 'Pointer', 'PointerToken']
 
 import logging
 from six import text_type
+from six import string_types
 from .exceptions import ExtractError
 
 logger = logging.getLogger(__name__)
@@ -48,7 +49,7 @@ class DocumentPointer(object):
         return iter([self.document, self.pointer])
 
     def __eq__(self, other):
-        if isinstance(other, text_type):
+        if isinstance(other, string_types):
             return other == self.__str__()
         return super(Pointer, self).__eq__(other)
 
@@ -96,7 +97,7 @@ class Pointer(object):
         return iter(self.tokens)
 
     def __eq__(self, other):
-        if isinstance(other, text_type):
+        if isinstance(other, string_types):
             return other == self.__str__()
         return super(Pointer, self).__eq__(other)
 
