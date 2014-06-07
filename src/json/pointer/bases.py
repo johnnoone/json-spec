@@ -44,6 +44,11 @@ class DocumentPointer(object):
         """
         return self.pointer.extract(obj, bypass_ref)
 
+    def is_inner(self):
+        """Tells if pointer refers to an inner document
+        """
+        return self.document == ''
+
     def __iter__(self):
         return iter([self.document, self.pointer])
 

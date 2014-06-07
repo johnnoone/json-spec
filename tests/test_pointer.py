@@ -4,7 +4,7 @@
 
 """
 
-from json.pointer import extract, ExtractError, Pointer
+from json.pointer import extract, ExtractError, DocumentPointer, Pointer
 from . import TestCase
 
 
@@ -37,3 +37,15 @@ class TestPointer(TestCase):
         for token in Pointer('/foo/1'):
             obj = token.extract(obj)
         assert 'baz' == obj
+
+    def test_document(self):
+        dp = DocumentPointer('example.com#/foo')
+        assert not dp.is_inner()
+        assert dp.document == 'example.com'
+        assert dp.pointer == '/foo'
+
+    def test_inner_document(self):
+        dp = DocumentPointer('#/foo')
+        assert dp.is_inner()
+        assert dp.document == ''
+        assert dp.pointer == '/foo'
