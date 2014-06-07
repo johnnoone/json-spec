@@ -21,6 +21,7 @@ These specifications include `JSON Schema`_:
 
 **Features:**
 
+*   json-pointer
 *   json-schema
 
 
@@ -31,6 +32,7 @@ Documentation
    :maxdepth: 2
 
    installation
+   json-pointer
    json-schema
 
 Additional Information
