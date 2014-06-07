@@ -40,10 +40,13 @@ Low level
 .. autofunction:: pointer.extract
 
 .. autoclass:: pointer.DocumentPointer
+    :members:
 
 .. autoclass:: pointer.Pointer
+    :members:
 
 .. autoclass:: pointer.PointerToken
+    :members:
 
 
 Exceptions
