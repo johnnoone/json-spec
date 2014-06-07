@@ -8,7 +8,6 @@
 __all__ = ['DocumentPointer', 'Pointer', 'PointerToken']
 
 import logging
-from six import text_type
 from six import string_types
 from .exceptions import ExtractError
 
@@ -68,7 +67,7 @@ class Pointer(object):
         :param pointer: a string or Pointer instance
         """
         if isinstance(pointer, Pointer):
-            tokens = pointer.parts[:]
+            tokens = pointer.tokens[:]
         elif pointer == '':
             tokens = []
         elif not pointer.startswith('/'):
