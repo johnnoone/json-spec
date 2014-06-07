@@ -35,6 +35,13 @@ class DocumentPointer(object):
         self.pointer = Pointer(path)
 
     def extract(self, obj, bypass_ref=False):
+        """
+        Extract subelement from obj, according to pointer.
+        It assums that document is the object.
+
+        :param obj: the object source
+        :param bypass_ref: disable JSON Reference errors
+        """
         return self.pointer.extract(obj, bypass_ref)
 
     def __iter__(self):
@@ -52,7 +59,7 @@ class DocumentPointer(object):
 class Pointer(object):
     """Defines a pointer
 
-    :ivar tokens: list of PointerTokens
+    :ivar tokens: list of PointerToken
     """
 
     def __init__(self, pointer):
@@ -75,6 +82,12 @@ class Pointer(object):
         self.tokens = tokens
 
     def extract(self, obj, bypass_ref=False):
+        """
+        Extract subelement from obj, according to tokens.
+
+        :param obj: the object source
+        :param bypass_ref: disable JSON Reference errors
+        """
         for token in self.tokens:
             obj = token.extract(obj, bypass_ref)
         return obj
@@ -100,7 +113,17 @@ class Pointer(object):
 
 
 class PointerToken(str):
+    """
+    A single token
+    """
+
     def extract(self, obj, bypass_ref=False):
+        """
+        Extract subelement from obj, according to current token.
+
+        :param obj: the object source
+        :param bypass_ref: disable JSON Reference errors
+        """
         try:
             if isinstance(obj, dict):
                 if not bypass_ref and '$ref' in obj:
