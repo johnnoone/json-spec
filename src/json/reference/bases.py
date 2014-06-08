@@ -8,7 +8,7 @@ __all__ = ['LocalRegistry', 'Registry']
 
 import logging
 from .exceptions import NotFound, Forbidden
-from .util import ref, MutableMapping
+from .util import ref, MutableMapping, Mapping
 from json.pointer import DocumentPointer
 
 logger = logging.getLogger(__name__)
@@ -110,3 +110,8 @@ class LocalRegistry(Registry):
         yield self.key
         for key in self.registry.keys():
             yield key
+
+
+class Provider(Mapping):
+    """Defines a generic way to provide external documents"""
+    pass

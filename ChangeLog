@@ -1,6 +1,14 @@
 CHANGES
 =======
 
+0.4.0
+-----
+
+* 0.4.0 release
+* Implement JSON References
+* inner document helper
+* fix DocumentPointer
+* fix python 2.7
 * display members
 * more doc for json pointer
 * implement json pointers

@@ -49,4 +49,10 @@ Exceptions
 .. autoclass:: reference.Forbidden
 
 
+Defining providers
+------------------
+
+TODO
+
+
 .. _`JSON Reference`: http://tools.ietf.org/html/draft-pbryan-zyp-json-ref-03

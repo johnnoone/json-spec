@@ -1,3 +1,9 @@
+"""
+    json.reference.exceptions
+    ~~~~~~~~~~~~~~~~~~~~~~~~~
+
+"""
+
 
 class NotFound(Exception):
     """raises when a document is not found"""

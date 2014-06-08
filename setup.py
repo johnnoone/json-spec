@@ -9,5 +9,4 @@ setup(
     pbr=True,
     namespace_packages=['json'],
     packages=find_packages('src'),
-    package_dir = {'': 'src'},
-)
+    package_dir = {'': 'src'})
