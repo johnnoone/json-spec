@@ -33,6 +33,7 @@ Documentation
 
    installation
    json-pointer
+   json-reference
    json-schema
 
 Additional Information
