@@ -26,9 +26,31 @@ def resolve(obj, pointer, registry=None):
 
     :param obj: the local object.
     :param pointer: the pointer
+    :type pointer: DocumentPointer, str
     :param registry: the registry.
                     It mays be omited if inner json references
                     document don't refer to other documents.
+    :type registry: Provider, dict
+
+    .. warning::
+
+        Once pointer is extracted, it won't follow sub mapping /element!
+        For example, the value of::
+
+            value = resolve({
+                'foo': {'$ref': '#/bar'},
+                'bar': [{'$ref': '#/baz'}],
+                'baz': 'quux',
+            }, '#/foo')
+
+        is::
+
+            assert value == [{'$ref': '#/baz'}]
+
+        and not::
+
+            assert value == ['quux']
+
     """
 
     registry = LocalRegistry(obj, registry or {})

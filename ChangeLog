@@ -1,6 +1,10 @@
 CHANGES
 =======
 
+* update doc
+* update doc
+* more json-pointer tests
+* json submodule is just a mess, rename project to jsonspec
 * starting reference providers
 
 0.4.0

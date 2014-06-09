@@ -5,7 +5,8 @@
 """
 
 from jsonspec.reference import resolve, Registry
-from . import TestCase
+from jsonspec.reference.providers import FilesystemProvider
+from . import TestCase, fixture_dirname
 
 
 class TestReference(TestCase):
@@ -54,3 +55,13 @@ class TestReference(TestCase):
         })
         assert 'quux' == registry.resolve('obj2#/sub/0')
         # assert 'quux' == resolve(obj, '#/foo/2', registry=registry)
+
+    def test_fs_provider(self):
+        """docstring for test_fs_provider"""
+        obj = {
+            'foo': {'$ref': 'test:first.data1#/address'}
+        }
+        provider = FilesystemProvider(fixture_dirname, prefix='test:')
+        for t in provider:
+            print(t)
+        assert 'Mount Vernon, Virginia, United States' == resolve(obj, '#/foo', registry=provider)

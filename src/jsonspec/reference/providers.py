@@ -22,7 +22,9 @@ class PkgProvider(Provider):
     """
     Autoload providers declared into setuptools ``entry_points``.
 
-    For example, with this setup.cfg::
+    For example, with this setup.cfg:
+
+    .. code-block:: ini
 
         [entry_points]
         jsonspec.reference.contributions =
@@ -84,35 +86,39 @@ class FilesystemProvider(Provider):
 
     def __init__(self, directory, prefix=None):
         self.directory = directory
+        if not self.directory.endswith('/'):
+            self.directory += '/'
         self.prefix = prefix or ''
         self.loaded = False
 
-    def load(self):
-        data = {}
+    @property
+    def data(self):
+        if not self.loaded:
+            data = {}
 
-        l = len(self.directory)
-        for filename in loop(self.directory, '*.json'):
-            spec = filename[l:-5]
-            with open(filename, 'r') as file:
-                schema = json.load(file)
-            data[spec] = schema
+            l = len(self.directory)
+            for filename in loop(self.directory, '*.json'):
+                spec = filename[l:-5]
+                with open(filename, 'r') as file:
+                    schema = json.load(file)
+                data[spec] = schema
 
-        # set the fallbacks
-        for spec in sorted(data.keys(), reverse=True):
-            if spec.startswith('draft-'):
-                metaspec = spec.split('/', 1)[1]
-                if metaspec not in data:
-                    data[metaspec] = data[spec]
+            # set the fallbacks
+            for spec in sorted(data.keys(), reverse=True):
+                if spec.startswith('draft-'):
+                    metaspec = spec.split('/', 1)[1]
+                    if metaspec not in data:
+                        data[metaspec] = data[spec]
 
-        self.data = data
-        self.loaded = True
+            self._data = data
+            self.loaded = True
+        return self._data
 
     def __getitem__(self, uri):
-        if not self.loaded:
-            self.load()
-
-        if uri.startswith(self.prefix) and uri.endswith('#'):
-            spec = uri[len(self.prefix):-1]
+        if uri.startswith(self.prefix):
+            spec = uri[len(self.prefix):]
+            if spec.endswith('#'):
+                spec = spec[:-1]
 
         try:
             return self.data[spec]

@@ -1,7 +1,7 @@
 .. module: jsonspec.schema
 
 ===========
-Json Schema
+JSON Schema
 ===========
 
 This document describes use to use Json Schema in this library and not the specification_ itself.

@@ -14,15 +14,20 @@ from jsonspec.pointer import DocumentPointer
 logger = logging.getLogger(__name__)
 
 
-class Registry(MutableMapping):
+class Provider(Mapping):
+    """Defines a generic way to provide external documents"""
+    pass
+
+
+class Registry(Provider, MutableMapping):
     """Register all documents.
 
-    :ivar docs: all documents
-
+    :ivar provider: all documents
+    :ivar provider: Provider, dict
     """
 
-    def __init__(self, docs=None):
-        self.docs = docs or {}
+    def __init__(self, provider=None):
+        self.provider = provider or {}
         super(Registry, self).__init__()
 
     def prototype(self, dp):
@@ -48,37 +53,38 @@ class Registry(MutableMapping):
 
     def __getitem__(self, uri):
         try:
-            return self.docs[uri]
+            return self.provider[uri]
         except KeyError:
             return NotFound('{!r} not registered'.format(uri))
 
     def __setitem__(self, uri, obj):
-        self.docs[uri] = obj
+        self.provider[uri] = obj
 
     def __delitem__(self, uri):
-        del self.docs[uri]
+        del self.provider[uri]
 
     def __len__(self):
-        return len(self.docs)
+        return len(self.provider)
 
     def __iter__(self):
-        return iter(self.docs)
+        return iter(self.provider)
 
 
 class LocalRegistry(Registry):
     """Scoped registry to a local document.
 
     :ivar doc: the local document
-    :ivar registry: all documents
+    :ivar provider: all documents
+    :ivar provider: Provider, dict
     :ivar key: current document identifier
 
     """
 
     key = '<local>'
 
-    def __init__(self, doc, registry=None):
+    def __init__(self, doc, provider=None):
         self.doc = doc
-        self.registry = registry or {}
+        self.provider = provider or {}
 
     def prototype(self, dp):
         if dp.is_inner():
@@ -89,29 +95,24 @@ class LocalRegistry(Registry):
 
     def __getitem__(self, uri):
         try:
-            return self.doc if uri == self.key else self.registry[uri]
+            return self.doc if uri == self.key else self.provider[uri]
         except (NotFound, KeyError):
             return NotFound('{!r} not registered'.format(uri))
 
     def __setitem__(self, uri, obj):
         if uri == self.key:
             raise Forbidden('setting {} is forbidden'.format(self.key))
-        self.registry[uri] = obj
+        self.provider[uri] = obj
 
     def __delitem__(self, uri):
         if uri == self.key:
             raise Forbidden('deleting {} is forbidden'.format(self.key))
-        del self.registry[uri]
+        del self.provider[uri]
 
     def __len__(self):
-        return len(set(list(self.registry.keys()) + [self.key]))
+        return len(set(list(self.provider.keys()) + [self.key]))
 
     def __iter__(self):
         yield self.key
-        for key in self.registry.keys():
+        for key in self.provider.keys():
             yield key
-
-
-class Provider(Mapping):
-    """Defines a generic way to provide external documents"""
-    pass

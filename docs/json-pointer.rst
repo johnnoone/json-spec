@@ -2,7 +2,7 @@
 .. module: jsonspec.pointer
 
 ============
-Json Pointer
+JSON Pointer
 ============
 
 `JSON Pointer`_ defines a string syntax for identifying a specific value within a JSON document. The most common usage is this:

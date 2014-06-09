@@ -3,13 +3,14 @@
     ~~~~~
 """
 
-__all__ = ['fixture', 'TestCase']
+__all__ = ['fixture', 'fixture_dirname', 'TestCase']
 
 import os.path
 import unittest
 import json
 
 here = os.path.dirname(os.path.abspath(__file__))
+fixture_dirname = os.path.join(here, 'fixtures')
 
 
 def fixture(filename):
