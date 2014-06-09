@@ -1,14 +1,14 @@
 Json Spec
 =========
 
-.. image:: https://badge.fury.io/py/json-extensions.png
-    :target: http://badge.fury.io/py/json-extensions
+.. image:: https://badge.fury.io/py/jsonspec.png
+    :target: http://badge.fury.io/py/jsonspec
 
-.. image:: https://travis-ci.org/johnnoone/json-extensions.png?branch=master
-    :target: https://travis-ci.org/johnnoone/json-extensions
+.. image:: https://travis-ci.org/johnnoone/jsonspec.png?branch=master
+    :target: https://travis-ci.org/johnnoone/jsonspec
 
-.. image:: https://pypip.in/d/json-extensions/badge.png
-    :target: https://pypi.python.org/pypi/json-extensions
+.. image:: https://pypip.in/d/jsonspec/badge.png
+    :target: https://pypi.python.org/pypi/jsonspec
 
 This library implements several JSON specs, like `JSON Schema`_,  `JSON Reference`_ and `JSON Pointer`_:
 
@@ -23,7 +23,7 @@ This library has no special dependencies. You can simply use pip:
 
 .. code-block:: bash
 
-    $ pip install json-extensions
+    $ pip install jsonspec
 
 
 Usage
@@ -95,5 +95,5 @@ Other examples can be found in the documentation_ or in the tests_.
 .. _`JSON Reference`: http://tools.ietf.org/html/draft-pbryan-zyp-json-ref-03
 .. _`JSON Pointer`: http://tools.ietf.org/html/rfc6901
 .. _`BSD license`: LICENSE
-.. _documentation: http://json-extensions.readthedocs.org
-.. _tests: https://github.com/johnnoone/json-extensions/tree/master/tests
+.. _documentation: http://json-spec.readdthedocs.org
+.. _tests: https://github.com/johnnoone/jsonspec/tree/master/tests
