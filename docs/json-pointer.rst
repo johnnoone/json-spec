@@ -46,8 +46,7 @@ Here is the most meaningful:
 
 .. _ajr:
 
-About JSON Reference
-~~~~~~~~~~~~~~~~~~~~
+**About JSON Reference**
 
 A :class:`pointer.RefError` is raised when when a JSON Reference is encountered.
 This behavior can be desactivated by setting ``bypass_ref=True``.

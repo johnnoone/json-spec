@@ -12,6 +12,7 @@ from abc import abstractmethod
 
 
 class Validator(object):
+
     @abstractmethod
     def has_default(self):
         pass

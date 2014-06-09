@@ -23,6 +23,7 @@ from jsonspec.driver import load as file_load
 from .exceptions import CompilationError
 from .draft04 import compile, Draft04Validator
 from .bases import Validator, ReferenceValidator
+from jsonspec.reference import Registry
 
 
 def load(schema, **kwargs):
@@ -56,20 +57,11 @@ def factory(schema, uri, default_spec=None, loader=None):
     instance = Factory(loader)
     return instance(schema, uri)
 
-    default_spec = default_spec or 'http://json-schema.org/draft-04/schema#'
-    spec = schema.get('$schema', default_spec)
-    if spec != 'http://json-schema.org/draft-04/schema#':
-        raise CompilationError('can parse draft-04 only', schema)
-
-    loader = loader or {}
-    loader[uri] = deepcopy(schema)
-
-    return compile(schema, uri, loader)
 
 class Factory(object):
 
     def __init__(self, loader=None, spec=None):
-        self.loader = loader or {}
+        self.loader = Registry(loader or {})
         self.spec = spec or 'http://json-schema.org/draft-04/schema#'
         self.compilers = {
             'http://json-schema.org/draft-04/schema#': compile,
