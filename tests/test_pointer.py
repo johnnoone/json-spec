@@ -4,7 +4,7 @@
 
 """
 
-from json.pointer import extract, ExtractError, DocumentPointer, Pointer
+from jsonspec.pointer import extract, ExtractError, RefError, DocumentPointer, Pointer
 from . import TestCase
 
 
@@ -19,7 +19,7 @@ class TestPointer(TestCase):
         assert 'baz' == extract(self.document, '/foo/1')
 
     def test_with_reference(self):
-        with self.assertRaises(ExtractError):
+        with self.assertRaises(RefError):
             assert 'quux' == extract(self.document, '/foo/2')
 
     def test_bypass_reference(self):

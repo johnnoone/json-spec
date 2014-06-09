@@ -1,4 +1,4 @@
-.. module: json.schema
+.. module: jsonspec.schema
 
 ===========
 Json Schema
@@ -12,7 +12,7 @@ Basic
 
 .. code-block:: python
 
-    from json.schema import load
+    from jsonspec.schema import load
 
     # data will validate against this schema
     validator = load({

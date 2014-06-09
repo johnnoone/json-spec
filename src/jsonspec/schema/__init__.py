@@ -1,6 +1,6 @@
 """
-    json.schema
-    ~~~~~~~~~~~
+    jsonspec.schema
+    ~~~~~~~~~~~~~~~
 
     JSON Schema defines the media type "application/schema+json",
     a JSON based format for defining the structure of JSON data.
@@ -18,7 +18,7 @@ from __future__ import absolute_import, print_function, unicode_literals
 __all__ = ['load', 'load_from_file', 'factory']
 
 from copy import deepcopy
-from json import load as file_load
+from jsonspec.driver import load as file_load
 
 from .exceptions import CompilationError
 from .draft04 import compile, Draft04Validator

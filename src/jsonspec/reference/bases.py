@@ -1,6 +1,6 @@
 """
-    json.reference.bases
-    ~~~~~~~~~~~~~~~~~~~~
+    jsonspec.reference.bases
+    ~~~~~~~~~~~~~~~~~~~~~~~~
 
 """
 
@@ -9,7 +9,7 @@ __all__ = ['LocalRegistry', 'Registry']
 import logging
 from .exceptions import NotFound, Forbidden
 from .util import ref, MutableMapping, Mapping
-from json.pointer import DocumentPointer
+from jsonspec.pointer import DocumentPointer
 
 logger = logging.getLogger(__name__)
 

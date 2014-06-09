@@ -4,7 +4,7 @@
 
 """
 
-from json.reference import resolve, Registry
+from jsonspec.reference import resolve, Registry
 from . import TestCase
 
 

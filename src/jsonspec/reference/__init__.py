@@ -1,6 +1,6 @@
 """
-    json.reference
-    ~~~~~~~~~~~~~~
+    jsonspec.reference
+    ~~~~~~~~~~~~~~~~~~
 
     A JSON Reference is a JSON object, which contains a member named
     "$ref", which has a JSON string value.  Example:
@@ -18,7 +18,7 @@ __all__ = ['resolve', 'Registry', 'LocalRegistry', 'NotFound', 'Forbidden']
 
 from .bases import Registry, LocalRegistry
 from .exceptions import NotFound, Forbidden
-from json.pointer import DocumentPointer
+from jsonspec.pointer import DocumentPointer
 
 
 def resolve(obj, pointer, registry=None):

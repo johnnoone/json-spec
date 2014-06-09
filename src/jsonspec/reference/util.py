@@ -1,6 +1,6 @@
 """
-    json.reference.util
-    ~~~~~~~~~~~~~~~~~~~
+    jsonspec.reference.util
+    ~~~~~~~~~~~~~~~~~~~~~~~
 
 """
 

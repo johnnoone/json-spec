@@ -1,12 +1,12 @@
-Welcome to Json Extensions
-==========================
+Welcome to JSON Spec
+====================
 
-Json Extensions implements several JSON specification for Python >= 2.7.
+JSON Spec implements several JSON specification for Python >= 2.7.
 These specifications include `JSON Schema`_:
 
 .. code-block:: python
 
-    from json.schema import load
+    from jsonspec.schema import load
 
     # data will validate against this schema
     validator = load_from_file('schema.json')
@@ -22,6 +22,7 @@ These specifications include `JSON Schema`_:
 **Features:**
 
 *   json-pointer
+*   json-reference
 *   json-schema
 
 
@@ -50,7 +51,6 @@ If you can't find the information you're looking for, have a look at the index o
 
 
 -   :ref:`genindex`
--   :ref:`modindex`
 -   :ref:`search`
 
 .. _`JSON Schema`: http://json-schema.org

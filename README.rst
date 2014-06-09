@@ -1,5 +1,5 @@
-Json Extensions
-===============
+Json Spec
+=========
 
 .. image:: https://badge.fury.io/py/json-extensions.png
     :target: http://badge.fury.io/py/json-extensions
@@ -33,7 +33,7 @@ Let say you want to fetch / validate JSON like objects.
 
 You can extract member of an object with `JSON Pointer`_::
 
-    from json.pointer import extract
+    from jsonspec.pointer import extract
 
     obj = {
         'foo': ['bar', 'baz', 'quux']
@@ -43,7 +43,7 @@ You can extract member of an object with `JSON Pointer`_::
 
 You can resolve member of any object with `JSON Reference`_::
 
-    from json.reference import resolve
+    from jsonspec.reference import resolve
 
     obj = {
         'foo': ['bar', 'baz', {
@@ -57,7 +57,7 @@ You can resolve member of any object with `JSON Reference`_::
 
 You can describe you data with `JSON Schema`_::
 
-    from json.schema import load
+    from jsonspec.schema import load
 
     # data will validate against this schema
     validator = load({

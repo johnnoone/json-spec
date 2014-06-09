@@ -4,8 +4,8 @@
 
 """
 
-from json.schema.draft04 import Draft04Validator
-from json.schema.exceptions import ValidationError
+from jsonspec.schema.draft04 import Draft04Validator
+from jsonspec.schema.exceptions import ValidationError
 from . import TestCase
 
 

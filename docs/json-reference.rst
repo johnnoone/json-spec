@@ -1,4 +1,5 @@
-.. module: json.reference
+.. _json-reference:
+.. module: jsonspec.reference
 
 ==============
 Json Reference
@@ -11,7 +12,7 @@ Basic
 
 .. code-block:: python
 
-    from json.reference import resolve
+    from jsonspec.reference import resolve
 
     obj = {
         'foo': ['bar', {'$ref': '#/sub'}, {'$ref': 'obj2#/sub'}],
@@ -36,10 +37,13 @@ Low level
 .. autoclass:: reference.LocalRegistry
     :members:
 
+
 Utils
 -----
 
-.. autofunction:: reference.util.ref
+.. automodule:: reference.util
+   :members:
+
 
 
 Exceptions

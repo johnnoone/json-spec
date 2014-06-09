@@ -1,6 +1,6 @@
 """
-    json.schema.exceptions
-    ~~~~~~~~~~~~~~~~~~~~~~
+    jsonspec.schema.exceptions
+    ~~~~~~~~~~~~~~~~~~~~~~~~~~
 
 """
 

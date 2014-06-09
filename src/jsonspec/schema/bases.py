@@ -1,6 +1,6 @@
 """
-    json.schema.bases
-    ~~~~~~~~~~~~~~~~~
+    jsonspec.schema.bases
+    ~~~~~~~~~~~~~~~~~~~~~
 
 """
 

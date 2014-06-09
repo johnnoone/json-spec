@@ -3,9 +3,7 @@ include CONTRIBUTING.rst
 include Changelog
 include LICENSE
 include README.rst
-include src/json/misc/schemas/*
-include src/json/misc/schemas/*/*
-include src/json/misc/schemas/*/*/*
+recursive-include src/jsonspec/misc/schemas *.json
 
 recursive-include tests *
 recursive-exclude * __pycache__

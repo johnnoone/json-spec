@@ -1,6 +1,6 @@
 """
-    json.schema.draft04
-    ~~~~~~~~~~~~~~~~~~~
+    jsonspec.schema.draft04
+    ~~~~~~~~~~~~~~~~~~~~~~~
 
     Implementation of JSON Schema draft04.
 

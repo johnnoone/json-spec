@@ -1,6 +1,6 @@
 """
-    json.schema.util
-    ~~~~~~~~~~~~~~~~
+    jsonspec.schema.util
+    ~~~~~~~~~~~~~~~~~~~~
 
 """
 

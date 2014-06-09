@@ -1,14 +1,15 @@
 """
-    json.reference.providers
-    ~~~~~~~~~~~~~~~~~~~~~~~~
+    jsonspec.reference.providers
+    ~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
 """
 
 
-__all__ = ['Provider', 'FilesystemProvider', 'PkgProvider']
+__all__ = ['Provider', 'FilesystemProvider', 'PkgProvider', 'SpecProvider']
 
 import json
 import logging
+import os
 import pkg_resources
 from .bases import Provider
 from .exceptions import NotFound
@@ -24,12 +25,12 @@ class PkgProvider(Provider):
     For example, with this setup.cfg::
 
         [entry_points]
-        json.reference.contributions =
-            spec = json.misc.providers:SpecProvider
+        jsonspec.reference.contributions =
+            spec = jsonspec.misc.providers:SpecProvider
 
     """
 
-    namespace = 'json.reference.contributions'
+    namespace = 'jsonspec.reference.contributions'
 
     def __init__(self, namespace=None, configuration=None):
         self.namespace = namespace or self.namespace
@@ -124,3 +125,16 @@ class FilesystemProvider(Provider):
 
     def __len__(self):
         return len(self.data.keys())
+
+
+class SpecProvider(FilesystemProvider):
+    """
+    Provides specs of http://json-schema.org/
+    """
+
+    def __init__(self):
+        from jsonspec.misc import __file__ as misc
+        base = os.path.realpath(os.path.dirname(misc))
+        src = os.path.join(base, 'schemas/')
+        prefix = 'http://json-schema.org/'
+        super(SpecProvider, self).__init__(src, prefix)

@@ -4,9 +4,8 @@
 
 """
 
-from json.misc.providers import SpecProvider
-from json.reference.providers import PkgProvider
-from json.reference import NotFound
+from jsonspec.reference.providers import PkgProvider, SpecProvider
+from jsonspec.reference import NotFound
 from . import TestCase
 import pkg_resources
 
