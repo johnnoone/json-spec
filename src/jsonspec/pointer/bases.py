@@ -9,7 +9,7 @@ __all__ = ['DocumentPointer', 'Pointer', 'PointerToken']
 
 import logging
 from six import string_types
-from .exceptions import ExtractError, RefError, LastElement, OutOfBounds, OutOfRange
+from .exceptions import ExtractError, RefError, LastElement, OutOfBounds, OutOfRange, WrongType
 
 logger = logging.getLogger(__name__)
 

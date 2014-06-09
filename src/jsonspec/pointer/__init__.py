@@ -14,7 +14,7 @@ __all__ = ['extract', 'DocumentPointer', 'Pointer', 'PointerToken',
 
 import logging
 from .bases import DocumentPointer, Pointer, PointerToken
-from .exceptions import ExtractError, RefError, LastElement, OutOfBounds, OutOfRange  # noqa
+from .exceptions import ExtractError, RefError, LastElement, OutOfBounds, OutOfRange, WrongType  # noqa
 
 logger = logging.getLogger(__name__)
 
