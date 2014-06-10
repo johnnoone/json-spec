@@ -19,11 +19,9 @@ This library implements several JSON specs, like `JSON Schema`_,  `JSON Referenc
 Installation
 ------------
 
-This library has no special dependencies. You can simply use pip:
+This library has no special dependencies. You can simply use pip::
 
-.. code-block:: bash
-
-    $ pip install jsonspec
+    $ pip install json-spec
 
 
 Usage

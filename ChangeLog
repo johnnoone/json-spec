@@ -1,6 +1,11 @@
 CHANGES
 =======
 
+0.6.0
+-----
+
+* bumped to 0.6.0
+* small fixes
 * reworked validation
 * changelog
 
