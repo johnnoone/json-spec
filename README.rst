@@ -7,8 +7,8 @@ Json Spec
 .. image:: https://travis-ci.org/johnnoone/jsonspec.png?branch=master
     :target: https://travis-ci.org/johnnoone/jsonspec
 
-.. image:: https://pypip.in/d/jsonspec/badge.png
-    :target: https://pypi.python.org/pypi/jsonspec
+.. image:: https://pypip.in/d/json-spec/badge.png
+    :target: https://pypi.python.org/pypi/json-spec
 
 This library implements several JSON specs, like `JSON Schema`_,  `JSON Reference`_ and `JSON Pointer`_:
 

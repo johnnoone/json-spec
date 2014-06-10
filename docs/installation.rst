@@ -6,7 +6,7 @@ This package can be used by python 2.7, 3.3 and pypi.
 
 Install from the `Cheese shop`_::
 
-    $ pip install jsonspec
+    $ pip install json-spec
 
 Install from the sources_::
 
