@@ -1,7 +1,11 @@
 CHANGES
 =======
 
-* Added JSON Patch
+0.5.0
+-----
+
+* bumped to 0.5.0
+* Added JSON operations
 * small update of json schema
 * more test and docs about json references
 * update doc
