@@ -8,7 +8,7 @@
     * http://json-schema.org/examples.html
 """
 
-from jsonspec.validators import *
+from jsonspec.validators import *  # noqa
 from . import TestCase, fixture
 
 
@@ -18,7 +18,6 @@ class TestFactory(TestCase):
         data1 = fixture('first.data1.json')
         data2 = fixture('first.data2.json')
         schema = fixture('first.schema.json')
-
         validator = load(schema)
         with self.assertRaises(ValidationError):
             validator.validate(data1)
@@ -46,15 +45,14 @@ class TestFactory(TestCase):
         }
 
         with self.assertRaises(ValidationError):
-            res = validator.validate(data1)
-            print('-', res)
+            validator.validate(data1)
 
     def test_four(self):
         data = fixture('four.data.json')
         base_schema = fixture('four.base.schema.json')
         entry_schema = fixture('four.entry.schema.json')
         validator = load(base_schema, provider={
-            'http://some.site.somewhere/entry-schema#': entry_schema
+            'http://some.site.somewhere/entry-schema': entry_schema
         })
         validator.validate(data)
 

@@ -1,6 +1,13 @@
 CHANGES
 =======
 
+* Refactored validators
+
+0.6.3
+-----
+
+* fix ReferenceValidator
+
 0.6.2
 -----
 

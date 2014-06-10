@@ -9,6 +9,10 @@ import os.path
 import unittest
 import json
 
+import logging
+
+logging.basicConfig(level=logging.INFO)
+
 here = os.path.dirname(os.path.abspath(__file__))
 fixture_dirname = os.path.join(here, 'fixtures')
 

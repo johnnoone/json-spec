@@ -46,3 +46,4 @@ docs/_build
 cover/
 xunit.xml
 coverage.xml
+pytestdebug.log

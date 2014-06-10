@@ -21,19 +21,22 @@ class TestErrors(TestCase):
                     'provider': 'visa'
                 }
             })
-        except ValidationError as error:
+        except ValidationError:
             pass
         else:
             self.fail("shouldn't happen")
 
+    def test_check_2(self):
+        validator = load(fixture('five.schema.json'))
+
         try:
-            validator.validate({
+            response = validator.validate({
                 'creditcard': {
                     'provider': 'mastercard',
                     'securitycode': 123
                 }
             })
-        except ValidationError as error:
+        except ValidationError:
             pass
         else:
             self.fail("shouldn't happen")

@@ -38,7 +38,6 @@ class TestPatchMapping(TestCase):
         assert response == {'foo': {'bar': 'baz'}, 'baz': 'quux'}
 
         response = add(obj, '/foo/quux', 42)
-        print(response)
         assert response == {'foo': {'bar': 'baz', 'quux': 42}}
 
     def test_replace(self):

@@ -49,6 +49,15 @@ class DocumentPointer(object):
         """
         return self.document == ''
 
+    def endswith(self, txt):
+        """used by os.path.join"""
+        return str(self).endswith(txt)
+
+    def __iadd__(self, txt):
+        """append fragments"""
+        data = str(self) + txt
+        return DocumentPointer(data)
+
     def __iter__(self):
         """Return document and pointer.
         """
@@ -61,6 +70,9 @@ class DocumentPointer(object):
 
     def __str__(self):
         return '{}#{}'.format(self.document, self.pointer)
+
+    def __repr__(self):
+        return '<DocumentPointer({})'.format(self)
 
 
 class Pointer(object):
