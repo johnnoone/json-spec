@@ -1,8 +1,3 @@
-"""
-    jsonspec.schema.exceptions
-    ~~~~~~~~~~~~~~~~~~~~~~~~~~
-
-"""
 
 __all__ = ['CompilationError', 'ReferenceError', 'ValidationError']
 

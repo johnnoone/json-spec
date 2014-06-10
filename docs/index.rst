@@ -17,7 +17,7 @@ This library implements tools inspired by several cleaver specifications around 
 
     Inspired by `JSON Patch`_, it gives the ability to manipulate the document tree.
 
-:jsonspec.schema:
+:jsonspec.validators:
 
     Implements `JSON Schema`_ draft04, adds the power of document validation.
 
@@ -25,7 +25,7 @@ Of course, it works for Python 2.7, Python 3.3 and Python 3.4.
 
 .. code-block:: python
 
-    from jsonspec.schema import load
+    from jsonspec.validators import load
 
     # data will validate against this schema
     validator = load_from_file('schema.json')
@@ -48,7 +48,7 @@ Documentation
    pointer
    reference
    operations
-   schema
+   validators
 
 Additional Information
 ----------------------

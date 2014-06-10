@@ -1,14 +1,4 @@
-"""
-    jsonspec.schema.draft04
-    ~~~~~~~~~~~~~~~~~~~~~~~
-
-    Implementation of JSON Schema draft04.
-
-"""
-
-from __future__ import absolute_import, print_function, unicode_literals
-
-__all__ = ['compile', 'Draft04Validator']
+__all__ = ['compile']
 
 from copy import deepcopy
 import itertools
@@ -16,43 +6,31 @@ import logging
 import os.path
 import re
 
-from six import integer_types, string_types, binary_type, PY2
-
+from .bases import ReferenceValidator, Validator
+from .collections import Items
 from .exceptions import CompilationError, ValidationError
-from .bases import Validator, ReferenceValidator
+from .factorize import register
 from .util import rfc3339_to_datetime
+
+from six import integer_types, string_types, binary_type, PY2
 
 logger = logging.getLogger(__name__)
 
 
-def absolute(src, dest):
-    if not dest.startswith('#'):
-        return dest
-
-    a, _, b = src.partition('#')
-    c, _, d = dest.partition('#')
-    if not c:
-        return '{}#{}'.format(a, d)
-    return dest
-
-
-def compile(schema, uri, factory):
-    """
-    Compile python object into a Draft04Validator instance.
-    """
-
+@register(spec='http://json-schema.org/draft-04/schema#')
+def compile(schema, pointer, factory, registry):
     if '$ref' in schema:
-        return ReferenceValidator(absolute(uri, schema['$ref']),
+        return ReferenceValidator(schema['$ref'],
                                   factory,
+                                  registry,
                                   'http://json-schema.org/draft-04/schema#')
-
     schema = deepcopy(schema)
     attrs = {}
     attrs['title'] = schema.get('title', None)
     attrs['description'] = schema.get('description', None)
     if 'default' in schema:
         attrs['default'] = schema.get('default')
-    attrs['uri'] = uri
+    attrs['uri'] = pointer
     attrs['type'] = schema.get('type', None)
 
     if 'enum' in schema:
@@ -65,16 +43,16 @@ def compile(schema, uri, factory):
         attr = schema['not']
         if not isinstance(attr, dict):
             raise CompilationError('not must be a dict', schema)
-        attrs['not'] = compile(attr, os.path.join(uri, 'not'), factory)
+        attrs['not'] = compile(attr, os.path.join(pointer, 'not'), factory, registry)
     for name in ('allOf', 'anyOf', 'oneOf'):
         if name in schema:
             attr = schema[name]
             if not isinstance(attr, list):
                 raise CompilationError('{} must be a list'.format(name),
                                        schema)
-            sub_uri = os.path.join(uri, name)
+            sub_uri = os.path.join(pointer, name)
             for i, element in enumerate(attr):
-                attr[i] = compile(element, sub_uri, factory)
+                attr[i] = compile(element, sub_uri, factory, registry)
             attrs[name] = attr
 
     for name in ('items', 'additionalItems'):
@@ -82,13 +60,13 @@ def compile(schema, uri, factory):
             continue
 
         attr = schema[name]
-        sub_uri = os.path.join(uri, name)
+        sub_uri = os.path.join(pointer, name)
         if isinstance(attr, list):
             # each value must be a json schema
-            attr = [compile(attr, sub_uri, factory) for element in attr]
+            attr = [compile(attr, sub_uri, factory, registry) for element in attr]
         elif isinstance(attr, dict):
             # value must be a json schema
-            attr = compile(attr, sub_uri, factory)
+            attr = compile(attr, sub_uri, factory, registry)
         elif not isinstance(attr, bool):
             # should be a boolean
             raise CompilationError('wrong type for {}'.format(name), schema)  # noqa
@@ -125,8 +103,8 @@ def compile(schema, uri, factory):
                                        schema)
             attr = {}
             for subname, subschema in schema[name].items():
-                attr[subname] = compile(subschema, os.path.join(uri, name),
-                                        factory)
+                attr[subname] = compile(subschema, os.path.join(pointer, name),
+                                        factory, registry)
             attrs[name] = attr
 
     for name in ('maxProperties', 'minProperties'):
@@ -143,9 +121,9 @@ def compile(schema, uri, factory):
     if 'additionalProperties' in schema:
         attr = schema['additionalProperties']
         if isinstance(attr, dict):
-            attr = compile(attr, os.path.join(uri, name), factory)
+            attr = compile(attr, os.path.join(pointer, name), factory, registry)
         elif attr is True:
-            attr = compile({}, os.path.join(uri, name), factory)
+            attr = compile({}, os.path.join(pointer, name), factory, registry)
         elif not isinstance(schema['additionalProperties'], bool):
             raise CompilationError('additionalProperties must be '
                                    'a dict or a bool', schema)
@@ -221,29 +199,11 @@ def compile(schema, uri, factory):
     return Draft04Validator(**attrs)
 
 
-class Items(object):
-    """
-    Describes items and additionalItems rules
-    """
-
-    def __init__(self, key):
-        self.key = key
-
-    def __get__(self, obj, type=None):
-        iterable = getattr(obj, self.key, [])
-        if isinstance(iterable, Validator):
-            return itertools.cycle([iterable])
-        if not iterable:
-            return []
-        return iterable
-
-    def __set__(self, obj, value):
-        setattr(obj, self.key, value)
-
-
 class Draft04Validator(Validator):
     """
-    Implements a draft04 validator.
+    Validates againts draft-04_.
+
+    .. _draft-04: http://json-schema.org/schema
     """
 
     items = Items('_items')
@@ -304,15 +264,15 @@ class Draft04Validator(Validator):
         return self.type and (self.type == type or type in self.type)
 
     def validate(self, obj):
-        """
-        Validates obj.
+        """Validates an object against the current schema.
 
-        Note that the returned object is not the same as object.
-        It may contains default values.
-
-        :param obj: The object to validate
-        :return: the validated obj
+        :param obj: the object to validate
+        :return: the validated object
         :raises ValidationError: Whole or part of obj does not validate.
+
+        .. note::
+
+            The returned object is a copy + default values.
         """
 
         # common
@@ -632,7 +592,7 @@ class Draft04Validator(Validator):
             if len(host) > 255:
                 raise ValueError
             if host[-1] == ".":
-                host = host[:-1] # strip exactly one dot from the right, if present
+                host = host[:-1]  # strip exactly one dot from the right, if present
             allowed = re.compile("(?!-)[A-Z\d-]{1,63}(?<!-)$", re.IGNORECASE)
             if not all(allowed.match(x) for x in host.split(".")):
                 raise ValueError

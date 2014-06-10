@@ -4,7 +4,7 @@
 
 """
 
-from jsonspec.schema.util import rfc3339_to_datetime
+from jsonspec.validators.util import rfc3339_to_datetime
 from . import TestCase
 
 

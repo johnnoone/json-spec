@@ -57,7 +57,7 @@ You can resolve member of any object with `JSON Reference`_::
 
 You can describe you data with `JSON Schema`_::
 
-    from jsonspec.schema import load
+    from jsonspec.validators import load
 
     # data will validate against this schema
     validator = load({

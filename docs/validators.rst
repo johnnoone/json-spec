@@ -1,11 +1,11 @@
 .. _schema:
-.. module: jsonspec.schema
+.. module: jsonspec.validators
 
-===========
-JSON Schema
-===========
+==========
+Validators
+==========
 
-This document describes use to use Json Schema in this library and not the specification_ itself.
+This document describes use to use Json Schema in this library, not the specification_ itself.
 
 
 Basic
@@ -13,7 +13,7 @@ Basic
 
 .. code-block:: python
 
-    from jsonspec.schema import load
+    from jsonspec.validators import load
 
     # data will validate against this schema
     validator = load({
@@ -49,32 +49,26 @@ Basic
 Low level
 ---------
 
-.. autofunction:: schema.load
+.. autofunction:: validators.load
 
-.. autofunction:: schema.load_from_file
+.. autoclass:: validators.Draft04Validator
+    :members:
 
-.. autofunction:: schema.factory
-
-
-.. autoclass:: schema.Draft04Validator
-
-.. autoclass:: schema.ReferenceValidator
+.. autoclass:: validators.ReferenceValidator
+    :members:
 
 
 Exceptions
 ----------
 
-.. autoclass:: schema.exceptions.CompilationError
+.. autoclass:: validators.CompilationError
+    :members:
 
-.. autoclass:: schema.exceptions.ReferenceError
+.. autoclass:: validators.ReferenceError
+    :members:
 
-.. autoclass:: schema.exceptions.ValidationError
+.. autoclass:: validators.ValidationError
+    :members:
 
-
-Utils
------
-
-.. automodule:: schema.util
-   :members:
 
 .. _`specification`: http://json-schema.org

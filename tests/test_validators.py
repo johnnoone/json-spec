@@ -1,6 +1,6 @@
 """
-    tests.tests_schemas
-    ~~~~~~~~~~~~~~~~~~~
+    tests.tests_validators
+    ~~~~~~~~~~~~~~~~~~~~~~
 
     examples are taken from:
 
@@ -8,12 +8,11 @@
     * http://json-schema.org/examples.html
 """
 
-from jsonspec.schema import load
-from jsonspec.schema.exceptions import ValidationError
+from jsonspec.validators import *
 from . import TestCase, fixture
 
 
-class TestSchema(TestCase):
+class TestFactory(TestCase):
 
     def test_first(self):
         data1 = fixture('first.data1.json')
@@ -54,7 +53,7 @@ class TestSchema(TestCase):
         data = fixture('four.data.json')
         base_schema = fixture('four.base.schema.json')
         entry_schema = fixture('four.entry.schema.json')
-        validator = load(base_schema, loader={
+        validator = load(base_schema, provider={
             'http://some.site.somewhere/entry-schema#': entry_schema
         })
         validator.validate(data)

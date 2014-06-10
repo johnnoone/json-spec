@@ -1,6 +1,6 @@
 """
-    jsonspec.schema.util
-    ~~~~~~~~~~~~~~~~~~~~
+    jsonspec.validators.util
+    ~~~~~~~~~~~~~~~~~~~~~~~~
 
 """
 
@@ -28,7 +28,7 @@ def rfc3339_to_datetime(data):
     try:
         ts = time.strptime(data, '%Y-%m-%d')
         return date(*ts[:3])
-    except ValueError as error:
+    except ValueError:
         pass
 
     try:

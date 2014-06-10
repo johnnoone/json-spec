@@ -5,8 +5,8 @@
 """
 
 
-from jsonspec.schema import load
-from jsonspec.schema.exceptions import ValidationError
+from jsonspec.validators import load
+from jsonspec.validators.exceptions import ValidationError
 from . import TestCase, fixture
 
 
