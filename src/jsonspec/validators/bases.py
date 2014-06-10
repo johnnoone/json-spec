@@ -27,3 +27,20 @@ class ReferenceValidator(Validator):
         self.factory = factory
         self.registry = registry
         self.spec = spec
+
+    @property
+    def validator(self):
+        if not hasattr(self, '_validator'):
+            self._validator = self.factory(self.registry.resolve(self.pointer), self.spec)
+
+        return self._validator
+
+    def has_default(self):
+        return self.validator.has_default()
+
+    @property
+    def default(self):
+        return self.validator.default
+
+    def validate(self, obj):
+        return self.validator.validate(obj)
