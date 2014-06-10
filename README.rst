@@ -1,8 +1,8 @@
 Json Spec
 =========
 
-.. image:: https://badge.fury.io/py/jsonspec.png
-    :target: http://badge.fury.io/py/jsonspec
+.. image:: https://badge.fury.io/py/json-spec.png
+    :target: http://badge.fury.io/py/json-spec
 
 .. image:: https://travis-ci.org/johnnoone/jsonspec.png?branch=master
     :target: https://travis-ci.org/johnnoone/jsonspec
