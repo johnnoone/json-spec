@@ -54,7 +54,7 @@ class TestFactory(TestCase):
         base_schema = fixture('four.base.schema.json')
         entry_schema = fixture('four.entry.schema.json')
         validator = load(base_schema, provider={
-            'http://some.site.somewhere/entry-schema#': entry_schema
+            'http://some.site.somewhere/entry-schema': entry_schema
         })
         validator.validate(data)
 
