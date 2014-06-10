@@ -1,6 +1,9 @@
 CHANGES
 =======
 
+* Added JSON Patch
+* small update of json schema
+* more test and docs about json references
 * update doc
 * update doc
 * more json-pointer tests

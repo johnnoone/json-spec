@@ -20,7 +20,7 @@ logger = logging.getLogger(__name__)
 
 
 def extract(obj, pointer, bypass_ref=False):
-    """Extract member or element of obj accordind to pointer.
+    """Extract member or element of obj according to pointer.
 
     :param obj: the object source
     :param pointer: the pointer

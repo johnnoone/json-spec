@@ -1,6 +1,6 @@
 """
     jsonspec.pointer.bases
-    ~~~~~~~~~~~~~~~~~~
+    ~~~~~~~~~~~~~~~~~~~~~~
 
 """
 
@@ -9,7 +9,7 @@ __all__ = ['DocumentPointer', 'Pointer', 'PointerToken']
 
 import logging
 from six import string_types
-from .exceptions import ExtractError, RefError, LastElement, OutOfBounds, OutOfRange, WrongType
+from .exceptions import ExtractError, RefError, LastElement, OutOfBounds, OutOfRange, WrongType  # noqa
 
 logger = logging.getLogger(__name__)
 
@@ -85,8 +85,13 @@ class Pointer(object):
             for part in pointer[1:].split('/'):
                 part = part.replace('~1', '/')
                 part = part.replace('~0', '~')
-                tokens.append(PointerToken(part))
+                token = PointerToken(part)
+                token.last = False
+                tokens.append(token)
         self.tokens = tokens
+
+        if self.tokens:
+            self.tokens[-1].last = True
 
     def extract(self, obj, bypass_ref=False):
         """
@@ -125,7 +130,6 @@ class PointerToken(str):
     """
     A single token
     """
-
     def extract(self, obj, bypass_ref=False):
         """
         Extract subelement from obj, according to current token.

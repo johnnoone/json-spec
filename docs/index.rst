@@ -1,8 +1,27 @@
 Welcome to JSON Spec
 ====================
 
-JSON Spec implements several JSON specification for Python >= 2.7.
-These specifications include `JSON Schema`_:
+This library implements tools inspired by several cleaver specifications around JSON.
+
+**Features:**
+
+:jsonspec.pointer:
+
+    Implements `JSON Pointer`_ and offers a way to target a subelement.
+
+:jsonspec.reference:
+
+    Implements `JSON Reference`_ and offers a way to cross reference json documents.
+
+:jsonspec.operations:
+
+    Inspired by `JSON Patch`_, it gives the ability to manipulate the document tree.
+
+:jsonspec.schema:
+
+    Implements `JSON Schema`_ draft04, adds the power of document validation.
+
+Of course, it works for Python 2.7, Python 3.3 and Python 3.4.
 
 .. code-block:: python
 
@@ -19,13 +38,6 @@ These specifications include `JSON Schema`_:
     })
 
 
-**Features:**
-
-*   json-pointer
-*   json-reference
-*   json-schema
-
-
 Documentation
 -------------
 
@@ -33,9 +45,10 @@ Documentation
    :maxdepth: 2
 
    installation
-   json-pointer
-   json-reference
-   json-schema
+   pointer
+   reference
+   operations
+   schema
 
 Additional Information
 ----------------------
@@ -53,4 +66,7 @@ If you can't find the information you're looking for, have a look at the index o
 -   :ref:`genindex`
 -   :ref:`search`
 
+.. _`JSON Pointer`: http://tools.ietf.org/html/rfc6901
+.. _`JSON Reference`: http://tools.ietf.org/html/draft-pbryan-zyp-json-ref-03
+.. _`JSON Patch`: http://tools.ietf.org/html/rfc6902
 .. _`JSON Schema`: http://json-schema.org

@@ -1,4 +1,4 @@
-.. _json-schema:
+.. _schema:
 .. module: jsonspec.schema
 
 ===========

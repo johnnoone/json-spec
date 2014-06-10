@@ -1,4 +1,4 @@
-.. _json-reference:
+.. _reference:
 .. module: jsonspec.reference
 
 ==============
@@ -10,7 +10,7 @@ This module implements utilities for exploring these objects.
 
 .. note::
 
-    A JSON Reference is a mapping with a unique key ``$ref``, which value is a :doc:`json-pointer`. For example, this object:
+    A JSON Reference is a mapping with a unique key ``$ref``, which value is a :doc:`pointer`. For example, this object:
 
     .. code-block:: javascript
 
@@ -120,4 +120,4 @@ Defining providers
 .. autoclass:: reference.providers.SpecProvider
     :members:
 
-.. _`JSON Reference`: http://tools.ietf.org/html/draft-pbryan-zyp-json-ref-03
+.. _`JSON Reference`: http://tools.ietf.org/html/draft-pbryan-zyp-ref-03

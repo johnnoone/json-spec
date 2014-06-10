@@ -1,4 +1,4 @@
-.. _json-pointer:
+.. _pointer:
 .. module: jsonspec.pointer
 
 ============
@@ -55,7 +55,7 @@ This behavior can be desactivated by setting ``bypass_ref=True``.
 
     assert 'obj2#/sub' == extract(document, '/foo/2/$ref', bypass_ref=True)
 
-If you need to resolve JSON Reference, use can that a look at :doc:`json-reference`.
+If you need to resolve JSON Reference, use can that a look at :doc:`reference`.
 
 API
 ---
