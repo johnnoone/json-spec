@@ -61,9 +61,14 @@ class EnumValidator(DataValidator):
 class TypeValidator(DataValidator):
     def __init__(self, **attrs):
         super(TypeValidator, self).__init__(**attrs)
-        if 'default' in attrs:
-            self.default = attrs.pop('default')
         self._has_default = 'default' in attrs
+        self._default = attrs.pop('default', None)
+
+    @property
+    def default(self):
+        if self._has_default:
+            return self._default
+        raise AttributeError('default is not defined')
 
     def has_default(self):
         return self._has_default
@@ -105,7 +110,6 @@ class StringValidator(TypeValidator):
         Formats are loaded with pkg_resources
         under `jsonspec.schema.formats` namespace
         """
-        print('LOAD FORMATS')
         if not hasattr(self, '_formats'):
             data = {}
             ns = 'jsonspec.validators.formats'
@@ -231,7 +235,6 @@ class IntegerValidator(NumberValidator):
 class BooleanValidator(TypeValidator):
     """Validate against boolean
     """
-
     def validate_type(self, obj):
         logger.debug('%s validates %s', self, obj)
         if isinstance(obj, bool):
@@ -380,6 +383,7 @@ class ObjectValidator(TypeValidator):
                     raise
             elif validator.has_default():
                 obj[member] = deepcopy(validator.default)
+                missing.discard(member)
         if errors:
             raise ValidationError(errors)
         for pattern, validator in self.pattern_properties.items():

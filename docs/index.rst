@@ -28,7 +28,21 @@ Of course, it works for Python 2.7, Python 3.3 and Python 3.4.
     from jsonspec.validators import load
 
     # data will validate against this schema
-    validator = load_from_file('schema.json')
+    validator = load({
+        'type': 'object',
+        'properties': {
+            'firstName': {
+                'type': 'string',
+            },
+            'lastName': {
+                'type': 'string',
+            },
+            'age': {
+                'type': 'integer'
+            }
+        },
+        'required': ['firstName', 'lastName', 'age']
+    })
 
     # validate this data
     validator.validate({

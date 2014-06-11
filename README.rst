@@ -4,8 +4,8 @@ Json Spec
 .. image:: https://badge.fury.io/py/json-spec.png
     :target: http://badge.fury.io/py/json-spec
 
-.. image:: https://travis-ci.org/johnnoone/jsonspec.png?branch=master
-    :target: https://travis-ci.org/johnnoone/jsonspec
+.. image:: https://travis-ci.org/johnnoone/json-spec.png?branch=master
+    :target: https://travis-ci.org/johnnoone/json-spec
 
 .. image:: https://pypip.in/d/json-spec/badge.png
     :target: https://pypi.python.org/pypi/json-spec
