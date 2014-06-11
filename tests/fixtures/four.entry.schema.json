@@ -68,7 +68,8 @@
                 "type",
                 "server",
                 "remotePath"
-            ]
+            ],
+            "type": "object"
         },
         "tmpfs": {
             "additionalProperties": false,

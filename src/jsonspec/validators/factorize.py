@@ -4,7 +4,7 @@
 
 """
 
-__all__ = ['Factory', 'register']
+__all__ = ['Context', 'Factory', 'register']
 
 from functools import partial
 from jsonspec.pointer import DocumentPointer
@@ -12,11 +12,30 @@ from jsonspec.reference import LocalRegistry
 from .exceptions import CompilationError
 
 
+class Context(object):
+    """
+
+    :ivar factory: global factory
+    :ivar registry: the current registry
+    :ivar spec: the current spec
+    """
+    def __init__(self, factory, registry, spec=None):
+        self.factory = factory
+        self.registry = registry
+        self.spec = spec
+
+    def __call__(self, schema, pointer):
+        return self.factory(schema, pointer, self.spec)
+
+    def resolve(self, pointer):
+        return self.factory(self.registry.resolve(pointer), pointer, self.spec)
+
+
 class Factory(object):
     """
 
-    :ivar provider: the registry
-    :ivar spec: the default spec
+    :ivar provider: global registry
+    :ivar spec: default spec
     """
 
     spec = 'http://json-schema.org/draft-04/schema#'
@@ -39,8 +58,8 @@ class Factory(object):
         if local.document:
             registry[local.document] = schema
         local.document = '<local>'
-
-        return compiler(schema, pointer, self, registry)
+        context = Context(self, registry, spec)
+        return compiler(schema, pointer, context)
 
     @classmethod
     def register(cls, spec, compiler):
@@ -49,6 +68,30 @@ class Factory(object):
 
 
 def register(compiler=None, spec=None):
+    """
+    Expose compiler to factory.
+
+    :param compiler: the callable to expose
+    :type compiler: callable
+    :param spec: name of the spec
+    :type spec: str
+
+    It can be used as a decorator::
+
+        @register(spec='my:first:spec')
+        def my_compiler(schema, pointer, context):
+            return ObjectValidator(schema)
+
+    or as a function::
+
+        def my_compiler(schema, pointer, context):
+            return ObjectValidator(schema)
+
+        register(my_compiler, 'my:second:spec')
+
+    """
+    if not spec:
+        raise CompilationError('Spec is required')
     if not compiler:
         return partial(register, spec=spec)
     return Factory.register(spec, compiler)

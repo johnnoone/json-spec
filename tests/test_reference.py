@@ -62,6 +62,4 @@ class TestReference(TestCase):
             'foo': {'$ref': 'test:first.data1#/address'}
         }
         provider = FilesystemProvider(fixture_dirname, prefix='test:')
-        for t in provider:
-            print(t)
-        assert 'Mount Vernon, Virginia, United States' == resolve(obj, '#/foo', registry=provider)
+        assert 'Mount Vernon, Virginia, United States' == resolve(obj, '#/foo', registry=provider)  # noqa
