@@ -45,6 +45,26 @@ Basic
         'age': 33,
     })
 
+About format
+~~~~~~~~~~~~
+
+`Formats`_ are registered via ``entry_points`` in ``setup.py``:
+
+
+.. code-block:: ini
+
+    [entry_points]
+
+    jsonspec.validators.formats =
+        date-time = jsonspec.validators.util:validate_datetime
+        email = jsonspec.validators.util:validate_email
+        hostname = jsonspec.validators.util:validate_hostname
+        ipv4 = jsonspec.validators.util:validate_ipv4
+        ipv6 = jsonspec.validators.util:validate_ipv6
+        uri = jsonspec.validators.util:validate_uri
+
+You can expose yours with this technic.
+
 
 API
 ---
@@ -117,3 +137,4 @@ Exceptions
 
 
 .. _`specification`: http://json-schema.org
+.. _`formats`: http://json-schema.org/latest/json-schema-validation.html#rfc.section.7

@@ -143,8 +143,8 @@ class CompoundValidator(Validator):
 
     def __init__(self, validators, **attrs):
         super(CompoundValidator, self).__init__(**attrs)
-        self.validators = set()
-        self.validators.update(validators)
+        self.validators = []
+        self.validators.extend(validators)
 
     def has_default(self):
         for validator in self.validators:
@@ -220,10 +220,11 @@ class OneValidator(CompoundValidator):
     @error
     def validate(self, obj):
         logger.debug('%s validates %s', self, obj)
-        response, count, errors = None, 0, []
+        response, count, matches, errors = None, 0, [], []
         for validator in self.validators:
             try:
                 response = validator.validate(obj)
+                matches.append(validator.uri)
                 count += 1
             except ValidationError as error:
                 errors.append(error)
@@ -233,7 +234,7 @@ class OneValidator(CompoundValidator):
         if count == 1:
             return response
         if count:
-            raise ValidationError('Matchs more than one validator')
+            raise ValidationError('Matchs more than one validator', rule=matches)
         raise ValidationError('No match', error=errors)
 
     def __xor__(self, validator):

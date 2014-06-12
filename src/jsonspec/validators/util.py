@@ -12,6 +12,10 @@ import re
 import time
 from .exceptions import ValidationError
 
+HOSTNAME_TOKENS = re.compile('(?!-)[a-z\d-]{1,63}(?<!-)$', re.IGNORECASE)
+HOSTNAME_LAST_TOKEN = re.compile('[a-z]+$', re.IGNORECASE)
+EMAIL = re.compile('[^@]+@[^@]+\.[^@]+')
+
 
 class offset(tzinfo):
     def __init__(self, value):
@@ -54,9 +58,9 @@ def validate_datetime(obj):
 
 
 def validate_email(obj):
-    pattern = re.compile('[^@]+@[^@]+\.[^@]+')
-    if not pattern.match(obj):
+    if not EMAIL.match(obj):
         raise ValidationError('{!r} is not defined')
+    return obj
 
 
 def validate_hostname(obj):
@@ -64,14 +68,16 @@ def validate_hostname(obj):
         host = deepcopy(obj)
         if len(host) > 255:
             raise ValueError
-        if host[-1] == ".":
+        if host[-1] == '.':
             host = host[:-1]  # strip exactly one dot from the right, if present
-        allowed = re.compile("(?!-)[A-Z\d-]{1,63}(?<!-)$", re.IGNORECASE)
-        if not all(allowed.match(x) for x in host.split(".")):
+        tokens = host.split('.')
+        if not all(HOSTNAME_TOKENS.match(x) for x in tokens):
             raise ValueError
-        return obj
+        if not HOSTNAME_LAST_TOKEN.search(tokens[-1]):
+            raise ValueError
     except ValueError:
         raise ValidationError('{!r} is not a valid hostname')
+    return obj
 
 
 def validate_ipv4(obj):
@@ -79,10 +85,11 @@ def validate_ipv4(obj):
         parts = obj.split('.', 3)
         for part in parts:
             part = int(part)
-            if part > 127 or part < 0:
+            if part > 255 or part < 0:
                 raise ValueError
     except ValueError:
         raise ValidationError('{!r} is not an ipv4')
+    return obj
 
 
 def validate_ipv6(obj):
