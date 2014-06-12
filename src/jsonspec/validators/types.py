@@ -370,7 +370,6 @@ class ObjectValidator(TypeValidator):
     def validate_properties(self, obj):
         logger.debug('%s properties %s %s', self, obj.keys(), self.required)
         errors, missing = [], set(obj.keys())
-        missing.update(self.required)
         missing.update(self.properties.keys())
         for member, validator in self.properties.items():
             if member in obj:
@@ -403,10 +402,11 @@ class ObjectValidator(TypeValidator):
                 missing.clear()
             elif self.additional_properties:
                 validator = self.additional_properties
-                for member in missing:
+                for member in set(missing):
                     try:
-                        obj[member] = validator(obj[member])
-                        missing.discard(member)
+                        if member in obj:
+                            obj[member] = validator(obj[member])
+                            missing.discard(member)
                     except ValidationError as error:
                         errors.append(error)
         for member in self.required:
