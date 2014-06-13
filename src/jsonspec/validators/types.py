@@ -19,9 +19,9 @@ import logging
 import pkg_resources
 import re
 
-from .bases import error, Validator
 from .collections import Items
 from .exceptions import ValidationError
+from .bases import error, Validator
 
 logger = logging.getLogger(__name__)
 
@@ -263,7 +263,7 @@ class ArrayValidator(TypeValidator):
     """
 
     items = Items('_items')
-    additionalItems = Items('_additionalItems')
+    additional_items = Items('_additional_items')
 
     def __init__(self, **attrs):
         super(ArrayValidator, self).__init__(**attrs)
@@ -336,15 +336,17 @@ class ObjectValidator(TypeValidator):
     :ivar additional_properties:
     :ivar max_properties:
     :ivar min_properties:
+    :ivar dependencies: dict of member -> list of members
     """
 
     def __init__(self, **attrs):
         super(ObjectValidator, self).__init__(**attrs)
         self.properties = attrs.pop('properties', {})
         self.pattern_properties = attrs.pop('pattern_properties', {})
-        self.additional_properties = attrs.pop('additional_properties', {})
+        self.additional_properties = attrs.pop('additional_properties', True)
         self.max_properties = attrs.pop('max_properties', None)
         self.min_properties = attrs.pop('min_properties', None)
+        self.dependencies = attrs.pop('dependencies', {})
         self.required = attrs.pop('required', [])
 
     def validate_type(self, obj):
@@ -354,6 +356,7 @@ class ObjectValidator(TypeValidator):
         obj = deepcopy(obj)
         obj = self.validate_total_properties(obj)
         obj = self.validate_properties(obj)
+        obj = self.validate_dependencies(obj)
         return obj
 
     def validate_total_properties(self, obj):
@@ -368,53 +371,89 @@ class ObjectValidator(TypeValidator):
         return obj
 
     def validate_properties(self, obj):
-        logger.debug('%s properties %s %s', self, obj.keys(), self.required)
-        errors, missing = [], set(obj.keys())
+        logger.info('%s properties %s %s',
+                    self,
+                    list(obj.keys()),
+                    list(self.required))
+        errors, validated, errored = [], set(), set()
+        properties = set(obj.keys())
+
+        def ok(key):
+            properties.discard(key)
+            errored.discard(key)
+            validated.add(key)
+
+        def ko(key, error):
+            properties.discard(key)
+            validated.discard(key)
+            errored.add(key)
+            errors.append(error)
+
+        missing = set(self.required) - properties
+        if missing:
+            logger.error('missing %s %s %s',
+                         list(missing),
+                         list(properties),
+                         list(self.required))
+            errors.append(ValidationError('required '
+                                          '{}'.format(', '.join(missing))))
+
         for member, validator in self.properties.items():
-            if member in obj:
+            if member in properties:
+                logger.info('do property %s', member)
                 try:
-                    validator(obj[member])
-                    missing.discard(member)
+                    obj[member] = validator(obj[member])
+                    ok(member)
+                    logger.info('ok property %s', member)
                 except ValidationError as error:
-                    errors.append(error)
-                except AttributeError:
-                    raise
+                    ko(member, error)
+                    logger.info('ko property %s', member)
             elif validator.has_default():
                 obj[member] = deepcopy(validator.default)
-                missing.discard(member)
-        if errors:
-            raise ValidationError(errors)
+                ok(member)
         for pattern, validator in self.pattern_properties.items():
             regex = re.compile(pattern)
-            for member, value in obj.items():
-                if regex.match(member):
+            for member in list(properties):
+                if regex.search(member):
+                    logger.info('do patternProperty %s', member)
                     try:
-                        validator(value)
-                        missing.discard(member)
+                        obj[member] = validator(obj[member])
+                        ok(member)
+                        logger.info('ok patternProperty %s', member)
                     except ValidationError as error:
-                        errors.append(error)
+                        ko(member, error)
+                        logger.info('ko patternProperty %s', member)
+
+        if properties and not self.additional_properties:
+            errors.append(ValidationError('Missing definitions for'
+                                          ' {}'.format(missing)))
+        elif properties and isinstance(self.additional_properties, Validator):
+            validator = self.additional_properties
+            for member in list(properties):
+                try:
+                    obj[member] = validator(obj[member])
+                    ok(member)
+                except ValidationError as error:
+                    ko(member, error)
+
         if errors:
             raise ValidationError('Properties does not validate', error=errors)
 
-        if missing:
-            if self.additional_properties in ({}, True):
-                missing.clear()
-            elif self.additional_properties:
-                validator = self.additional_properties
-                for member in set(missing):
-                    try:
-                        if member in obj:
-                            obj[member] = validator(obj[member])
-                            missing.discard(member)
-                    except ValidationError as error:
-                        errors.append(error)
-        for member in self.required:
-            if member not in obj:
-                missing.add(member)
-        if errors:
-            raise ValidationError('Properties does not validate', error=errors)
+        return obj
 
-        if missing:
-            raise ValidationError('Missing definitions for {}'.format(missing))
+    def validate_dependencies(self, obj):
+        if not self.dependencies:
+            return obj
+        members = set(obj.keys())
+        for key in (key for key in self.dependencies if key in members):
+            dep = self.dependencies[key]
 
+            if isinstance(dep, Validator):
+                dep(obj)
+                continue
+
+            missing = set(dep) - members
+            if missing:
+                raise ValidationError('Property {} '
+                                      'misses {}'.format(key, list(missing)))
         return obj

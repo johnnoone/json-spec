@@ -173,22 +173,6 @@ class TestArray(TestCase):
         pass
 
 
-class TestObject(TestCase):
-    def test_type(self):
-        validator = ObjectValidator()
-        assert validator({}) == {}
-        with self.assertRaises(ValidationError):
-            validator('foo')
-        with self.assertRaises(ValidationError):
-            validator(42.0)
-
-    # def test_minimum(self):
-    #     validator = ArrayValidator(min_items=2)
-    #     assert validator(['foo', 'bar']) == ['foo', 'bar']
-    #     with self.assertRaises(ValidationError):
-    #         validator(['foo'])
-
-
 class TestCompound(TestCase):
     def test_any(self):
         str_validator = StringValidator()

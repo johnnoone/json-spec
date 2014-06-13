@@ -82,8 +82,6 @@ def compile(schema, pointer, context):
         attrs['enum'] = attr
         return EnumValidator(**attrs)
 
-    if 'type' not in schema:
-        logger.warn('you should set type %s', schema)
     attrs['type'] = schema.pop('type', None)
 
     for name in ('items', 'additionalItems'):
@@ -150,12 +148,31 @@ def compile(schema, pointer, context):
         attr = schema.pop('additionalProperties')
         if isinstance(attr, dict):
             attr = compile(attr, os.path.join(pointer, name), context)
-        elif attr is True:
-            attr = compile({}, os.path.join(pointer, name), context)
         elif not isinstance(attr, bool):
             raise CompilationError('additionalProperties must be '
                                    'a dict or a bool', schema)
         attrs['additional_properties'] = attr
+
+    if 'dependencies' in schema:
+        attr = schema.pop('dependencies')
+        if not isinstance(attr, dict):
+            raise CompilationError('dependencies must be '
+                                   'a dict', schema)
+        for k, v in attr.items():
+            if isinstance(v, string_types):
+                attr[k] = set([v])
+            elif isinstance(v, (list, tuple)):
+                attr[k] = set(v)
+            elif isinstance(v, dict):
+                for subname, subschema in v.items():
+                    subschema['type'] = 'object'
+                    [subname] = compile(subschema,
+                                        os.path.join(pointer, 'dependencies', subname),
+                                        context)
+            elif not isinstance(v, set):
+                raise CompilationError('dependencies must be '
+                                       'a dict of str -> []', schema)
+        attrs['dependencies'] = attr
 
     if 'required' in schema:
         attrs['required'] = schema.pop('required')
