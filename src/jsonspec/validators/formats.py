@@ -1,0 +1,119 @@
+"""
+    jsonspec.validators.formats
+    ~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+"""
+
+__all__ = ['register', 'FormatRegistry']
+
+from functools import partial
+from pkg_resources import iter_entry_points
+from .exceptions import CompilationError
+
+
+class FormatRegistry(object):
+    """
+    Declare callables that must validate strings.
+
+    Callables are be injected in two ways:
+
+    -   Using the instance register method:
+
+        .. code-block:: python
+
+            registry = FormatRegistry()
+            registry.register('foo', bar)
+
+    -   Using the class register method:
+
+        .. code-block:: python
+
+            FormatRegistry.register('foo', bar)
+            registry = FormatRegistry()
+            assert 'foo' in registry
+
+    -   Every callables declared into setuptools ``entry_points``
+        are automatically loaded.
+
+        For example, with this setup.cfg:
+
+        .. code-block:: ini
+
+            [entry_points]
+            jsonspec.validators.formats =
+                date-time = jsonspec.validators.util:validate_datetime
+                email = jsonspec.validators.util:validate_email
+                hostname = jsonspec.validators.util:validate_hostname
+                ipv4 = jsonspec.validators.util:validate_ipv4
+                ipv6 = jsonspec.validators.util:validate_ipv6
+                uri = jsonspec.validators.util:validate_uri
+
+        .. code-block:: python
+
+            registry = FormatRegistry()
+            assert 'date-time' in registry
+
+    """
+
+    namespace = 'jsonspec.validators.formats'
+    custom = {}
+
+    def __init__(self, data=None, namespace=None):
+        self.custom = data or {}
+        self.namespace = namespace or self.namespace
+
+    def __getitem__(self, name):
+        try:
+            self.custom[name]
+        except KeyError:
+            return self.loaded[name]
+
+    def __contains__(self, name):
+        return name in self.custom or name in self.loaded
+
+    @property
+    def loaded(self):
+        if not hasattr(self, '_loaded'):
+            data = {}
+            for entrypoint in iter_entry_points(self.namespace):
+                data[entrypoint.name] = entrypoint.load()
+            self._loaded = data
+        return self._loaded
+
+    @classmethod
+    def register(cls, name, func):
+        cls.custom[name] = func
+
+
+def register(func=None, name=None):
+    """
+    Expose compiler to factory.
+
+    :param func: the callable to expose
+    :type func: callable
+    :param name: name of format
+    :type name: str
+
+    It can be used as a decorator::
+
+        @register(name='my:validator')
+        def my_validator(obj):
+            if obj is True:
+                return obj
+            raise ValidationError('obj is not true')
+
+    or as a function::
+
+        def my_validator(obj):
+            if obj is True:
+                return obj
+            raise ValidationError('obj is not true')
+
+        @register(name='my:validator')
+
+    """
+    if not name:
+        raise CompilationError('Name is required')
+    if not func:
+        return partial(register, name=name)
+    return FormatRegistry.register(name, func)
