@@ -16,7 +16,6 @@ from six import string_types
 
 import itertools
 import logging
-import pkg_resources
 import re
 
 from .collections import Items
@@ -97,27 +96,13 @@ class StringValidator(TypeValidator):
         self.max_length = attrs.pop('max_length', None)
         self.pattern = attrs.pop('pattern', None)
         self.format = attrs.pop('format', None)
+        self.formats = attrs.pop('formats', {})
 
     @property
     def regex(self):
         if not hasattr(self, '_regex'):
             setattr(self, '_regex', re.compile(self.pattern))
         return self._regex
-
-    @property
-    def formats(self):
-        """
-        Formats are loaded with pkg_resources
-        under `jsonspec.schema.formats` namespace
-        """
-        if not hasattr(self, '_formats'):
-            data = {}
-            ns = 'jsonspec.validators.formats'
-            entrypoints = pkg_resources.iter_entry_points(ns)
-            for entrypoint in entrypoints:
-                data[entrypoint.name] = entrypoint.load()
-            self._formats = data
-        return self._formats
 
     def validate_type(self, obj):
         logger.debug('%s validates %s', self, obj)
@@ -150,8 +135,9 @@ class StringValidator(TypeValidator):
         try:
             return self.formats[self.format](obj)
         except KeyError:
-            raise ValidationError('format {} is not '
-                                  'defined.'.format(self.format))
+            logger.warning('format {} is not '
+                           'defined.'.format(self.format))
+            return obj
 
 
 class NumberValidator(TypeValidator):

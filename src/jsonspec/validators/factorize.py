@@ -10,6 +10,7 @@ from functools import partial
 from jsonspec.pointer import DocumentPointer
 from jsonspec.reference import LocalRegistry
 from .exceptions import CompilationError
+from .formats import FormatRegistry
 
 
 class Context(object):
@@ -18,11 +19,13 @@ class Context(object):
     :ivar factory: global factory
     :ivar registry: the current registry
     :ivar spec: the current spec
+    :ivar formats: the current formats exposed
     """
-    def __init__(self, factory, registry, spec=None):
+    def __init__(self, factory, registry, spec=None, formats=None):
         self.factory = factory
         self.registry = registry
         self.spec = spec
+        self.formats = formats
 
     def __call__(self, schema, pointer):
         return self.factory(schema, pointer, self.spec)
@@ -41,9 +44,12 @@ class Factory(object):
     spec = 'http://json-schema.org/draft-04/schema#'
     compilers = {}
 
-    def __init__(self, provider=None, spec=None):
+    def __init__(self, provider=None, spec=None, formats=None):
         self.provider = provider or {}
         self.spec = spec or self.spec
+        if not isinstance(formats, FormatRegistry):
+            formats = FormatRegistry(formats)
+        self.formats = formats
 
     def __call__(self, schema, pointer, spec=None):
         try:
@@ -58,7 +64,7 @@ class Factory(object):
         if local.document:
             registry[local.document] = schema
         local.document = '<local>'
-        context = Context(self, registry, spec)
+        context = Context(self, registry, spec, self.formats)
         return compiler(schema, pointer, context)
 
     @classmethod

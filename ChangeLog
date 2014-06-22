@@ -1,6 +1,7 @@
 CHANGES
 =======
 
+* fix rtd doc
 * ObjectValidator refacto
 * another update about properties
 * fix missing properties

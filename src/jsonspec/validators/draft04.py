@@ -128,9 +128,12 @@ def compile(schema, pointer, context):
                 raise CompilationError('{} must be a dict'.format(name),
                                        schema)
             for subname, subschema in attr.items():
-                attr[subname] = compile(subschema, os.path.join(pointer, name, subname),
+                attr[subname] = compile(subschema,
+                                        os.path.join(pointer, name, subname),
                                         context)
-            attrs[{'patternProperties': 'pattern_properties'}.get(name, name)] = attr
+            attrs[{
+                'patternProperties': 'pattern_properties'
+            }.get(name, name)] = attr
 
     for name in ('maxProperties', 'minProperties'):
         if name in schema:
@@ -167,7 +170,7 @@ def compile(schema, pointer, context):
                 for subname, subschema in v.items():
                     subschema['type'] = 'object'
                     [subname] = compile(subschema,
-                                        os.path.join(pointer, 'dependencies', subname),
+                                        os.path.join(pointer, 'dependencies', subname),  # noqa
                                         context)
             elif not isinstance(v, set):
                 raise CompilationError('dependencies must be '
@@ -238,7 +241,7 @@ def compile(schema, pointer, context):
         if name in schema:
             attr = schema.pop(name)
             if not isinstance(attr, string_types):
-                raise CompilationError('{} must be a string'.format(name), schema)
+                raise CompilationError('{} must be a string'.format(name), schema)  # noqa
             attrs[name] = attr
 
     if not attrs['type']:
@@ -247,6 +250,10 @@ def compile(schema, pointer, context):
         t = attrs['type']
     else:
         t = [attrs['type']]
+
+    if 'string' in t:
+        # inject formats
+        attrs['formats'] = context.formats
 
     validators = set()
     for s in t:
