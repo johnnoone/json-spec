@@ -4,7 +4,8 @@
 
 """
 
-from jsonspec.pointer import extract, ExtractError, RefError, DocumentPointer, Pointer
+from jsonspec.pointer import extract, stage
+from jsonspec.pointer import RefError, DocumentPointer, Pointer
 from jsonspec.pointer import exceptions as events
 from . import TestCase
 
@@ -123,3 +124,42 @@ class TestMapping(TestCase):
             self.fail('out of bound')
         except events.OutOfBounds as event:
             assert self.document == event.obj
+
+
+class TestRelative(object):
+    document = stage({
+        'foo': ['bar', 'baz'],
+        'highly': {
+            'nested': {
+                'objects': True
+            }
+        }
+    })
+
+    def test_relative_1(self):
+        baz_relative = extract(self.document, '/foo/1')
+        # staged
+        assert extract(baz_relative, '0') == 'baz'
+        assert extract(baz_relative, '1/0') == 'bar'
+        assert extract(baz_relative, '2/highly/nested/objects') == True
+
+        # keys
+        assert extract(baz_relative, '0#') == 1
+        assert extract(baz_relative, '1#') == 'foo'
+
+        # unstage
+        assert extract(baz_relative, '0').obj == 'baz'
+        assert extract(baz_relative, '1/0').obj == 'bar'
+        assert extract(baz_relative, '2/highly/nested/objects').obj is True
+
+    def test_relative_2(self):
+        nested_relative = extract(self.document, '/highly/nested')
+        assert extract(nested_relative, '0/objects') == True
+        assert extract(nested_relative, '1/nested/objects') == True
+        assert extract(nested_relative, '2/foo/0') == 'bar'
+        assert extract(nested_relative, '0#') == 'nested'
+        assert extract(nested_relative, '1#') == 'highly'
+
+        assert extract(nested_relative, '0/objects').obj is True
+        assert extract(nested_relative, '1/nested/objects').obj is True
+        assert extract(nested_relative, '2/foo/0').obj == 'bar'

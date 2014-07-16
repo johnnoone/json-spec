@@ -4,7 +4,8 @@
 
 """
 
-__all__ = ['ExtractError', 'RefError', 'LastElement', 'OutOfBounds', 'OutOfRange', 'WrongType']
+__all__ = ['ExtractError', 'RefError', 'LastElement', 'OutOfBounds',
+           'OutOfRange', 'WrongType', 'UnstagedError']
 
 
 class ExtractError(Exception):
@@ -48,6 +49,13 @@ class OutOfRange(ExtractError, IndexError):
 
 class LastElement(ExtractError):
     """Raised when refers to the last element of a sequence.
+
+    :ivar obj: the object that raised this event
+    """
+
+
+class UnstagedError(ExtractError, ValueError):
+    """Raised when obj is not staged.
 
     :ivar obj: the object that raised this event
     """

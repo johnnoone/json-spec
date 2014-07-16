@@ -8,8 +8,9 @@
 __all__ = ['DocumentPointer', 'Pointer', 'PointerToken']
 
 import logging
-from six import string_types
-from .exceptions import ExtractError, RefError, LastElement, OutOfBounds, OutOfRange, WrongType  # noqa
+from abc import abstractmethod, ABCMeta
+from six import add_metaclass, string_types
+from .exceptions import ExtractError, RefError, LastElement, OutOfBounds, OutOfRange, WrongType, UnstagedError  # noqa
 
 logger = logging.getLogger(__name__)
 
@@ -85,25 +86,37 @@ class Pointer(object):
         """
         :param pointer: a string or Pointer instance
         """
-        if isinstance(pointer, Pointer):
-            tokens = pointer.tokens[:]
-        elif pointer == '':
-            tokens = []
-        elif not pointer.startswith('/'):
-            raise ValueError('pointer must start with /', pointer)
-        else:
-            # decode now
-            tokens = []
-            for part in pointer[1:].split('/'):
-                part = part.replace('~1', '/')
-                part = part.replace('~0', '~')
-                token = PointerToken(part)
-                token.last = False
-                tokens.append(token)
-        self.tokens = tokens
+        self.tokens = self.parse(pointer)
 
         if self.tokens:
             self.tokens[-1].last = True
+
+    def parse(self, pointer):
+        """parse pointer into tokens"""
+        if isinstance(pointer, Pointer):
+            return pointer.tokens[:]
+        elif pointer == '':
+            return []
+
+        tokens = []
+        staged, _, children = pointer.partition('/')
+        if staged:
+            try:
+                token = StagesToken(staged)
+                token.last = False
+                tokens.append(token)
+            except ValueError:
+                raise ValueError('pointer must start with / or int', pointer)
+
+        if _:
+            for part in children.split('/'):
+                part = part.replace('~1', '/')
+                part = part.replace('~0', '~')
+                token = ChildToken(part)
+                token.last = False
+                tokens.append(token)
+
+        return tokens
 
     def extract(self, obj, bypass_ref=False):
         """
@@ -129,6 +142,9 @@ class Pointer(object):
     def __str__(self):
         output = ''
         for part in self.tokens:
+            if isinstance(part, StagesToken):
+                output += part
+                continue
             part = part.replace('~', '~0')
             part = part.replace('/', '~1')
             output += '/' + part
@@ -138,9 +154,58 @@ class Pointer(object):
         return '<{}({!r})>'.format(self.__class__.__name__, self.__str__())
 
 
+@add_metaclass(ABCMeta)
 class PointerToken(str):
     """
     A single token
+    """
+
+    @abstractmethod
+    def extract(self, obj, bypass_ref=False):
+        """
+        Extract parents or subelement from obj, according to current token.
+
+        :param obj: the object source
+        :param bypass_ref: disable JSON Reference errors
+        """
+        pass
+
+
+class StagesToken(PointerToken):
+    """
+    A parent token
+    """
+
+    def __init__(self, value, *args, **kwargs):
+        value = str(value)
+        member = False
+        if value.endswith('#'):
+            value = value[:-1]
+            member = True
+        self.stages = int(value)
+        self.member = member
+
+    def extract(self, obj, bypass_ref=False):
+        """
+        Extract parent of obj, according to current token.
+
+        :param obj: the object source
+        :param bypass_ref: not used
+        """
+        for i in range(0, self.stages):
+            try:
+                obj = obj.parent_obj
+            except AttributeError:
+                raise UnstagedError(obj, '{!r} must be staged before '
+                                         'exploring its parents'.format(obj))
+        if self.member:
+            return obj.parent_member
+        return obj
+
+
+class ChildToken(PointerToken):
+    """
+    A child token
     """
     def extract(self, obj, bypass_ref=False):
         """

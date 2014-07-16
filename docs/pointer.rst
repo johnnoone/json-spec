@@ -55,7 +55,47 @@ This behavior can be desactivated by setting ``bypass_ref=True``.
 
     assert 'obj2#/sub' == extract(document, '/foo/2/$ref', bypass_ref=True)
 
-If you need to resolve JSON Reference, use can that a look at :doc:`reference`.
+If you need to resolve JSON Reference, you can that a look at :doc:`reference`.
+
+
+**About relative JSON Reference**
+
+`Relative JSON Pointer`_ are still experimental, but this library offers
+an implementation of it.
+
+It implies to convert the whole document into a staged document, and then follow
+these rules:
+
+.. code-block:: python
+
+    from jsonspec.pointer import extract, stage
+
+    staged_doc = stage({
+        'foo': ['bar', 'baz'],
+        'highly': {
+            'nested': {
+                'objects': True
+            }
+        }
+    })
+
+    baz_relative = extract(self.document, '/foo/1')
+
+    # staged objects
+    assert extract(baz_relative, '0') == 'baz'
+    assert extract(baz_relative, '1/0') == 'bar'
+    assert extract(baz_relative, '2/highly/nested/objects') == True  # `foo is True` won't work
+
+    # keys, not staged
+    assert extract(baz_relative, '0#') == 1
+    assert extract(baz_relative, '1#') == 'foo'
+
+    # unstage object
+    assert extract(baz_relative, '0').obj == 'baz'
+    assert extract(baz_relative, '1/0').obj == 'bar'
+    assert extract(baz_relative, '2/highly/nested/objects').obj is True
+
+
 
 API
 ---
@@ -70,6 +110,8 @@ API
 
 .. autoclass:: pointer.PointerToken
     :members:
+
+.. autofunction:: pointer.stage
 
 
 Exceptions
@@ -86,3 +128,4 @@ Exceptions
 .. autoclass:: pointer.OutOfRange
 
 .. _`JSON Pointer`: http://tools.ietf.org/html/rfc6901
+.. _`Relative JSON Pointer`: http://tools.ietf.org/html/draft-luff-relative-json-pointer-00
