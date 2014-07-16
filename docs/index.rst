@@ -7,7 +7,7 @@ This library implements tools inspired by several cleaver specifications around 
 
 :jsonspec.pointer:
 
-    Implements `JSON Pointer`_ and offers a way to target a subelement.
+    Implements `JSON Pointer`_ and `Relative JSON Pointer`_, it offers a way to target a subelement.
 
 :jsonspec.reference:
 
@@ -84,3 +84,4 @@ If you can't find the information you're looking for, have a look at the index o
 .. _`JSON Reference`: http://tools.ietf.org/html/draft-pbryan-zyp-json-ref-03
 .. _`JSON Patch`: http://tools.ietf.org/html/rfc6902
 .. _`JSON Schema`: http://json-schema.org
+.. _`Relative JSON Pointer`: http://tools.ietf.org/html/draft-luff-relative-json-pointer-00

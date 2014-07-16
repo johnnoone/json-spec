@@ -9,12 +9,13 @@
 
 from __future__ import absolute_import, print_function, unicode_literals
 
-__all__ = ['extract', 'DocumentPointer', 'Pointer', 'PointerToken',
+__all__ = ['extract', 'stage', 'DocumentPointer', 'Pointer', 'PointerToken',
            'ExtractError', 'RefError', 'LastElement', 'OutOfBounds', 'OutOfRange']  # noqa
 
 import logging
 from .bases import DocumentPointer, Pointer, PointerToken
-from .exceptions import ExtractError, RefError, LastElement, OutOfBounds, OutOfRange, WrongType  # noqa
+from .exceptions import ExtractError, RefError, LastElement, OutOfBounds, OutOfRange, WrongType, UnstagedError  # noqa
+from .stages import stage
 
 logger = logging.getLogger(__name__)
 
