@@ -4,11 +4,9 @@
 
 """
 
-__all__ = ['load', 'register', 'Factory', 'Validator', 'ReferenceValidator',
-           'CompilationError', 'ReferenceError', 'ValidationError']
+__all__ = ['load', 'register', 'Factory', 'Validator', 'ReferenceValidator']
 
-from .bases import error, Validator, ReferenceValidator, NotValidator
-from .bases import CompoundValidator, AllValidator, AnyValidator, OneValidator
+from .bases import error, Validator, ReferenceValidator
 from .types import EnumValidator, StringValidator, NumberValidator
 from .types import IntegerValidator, IntegerValidator, NullValidator
 from .types import ArrayValidator, ObjectValidator, BooleanValidator

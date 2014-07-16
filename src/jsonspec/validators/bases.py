@@ -4,8 +4,7 @@
 
 """
 
-__all__ = ['error', 'Validator', 'ReferenceValidator', 'NotValidator',
-           'CompoundValidator', 'AllValidator', 'AnyValidator', 'OneValidator']
+__all__ = ['error', 'Validator', 'ReferenceValidator']
 
 import logging
 from abc import abstractmethod, ABCMeta
@@ -37,64 +36,6 @@ class Validator(object):
     @abstractmethod
     def validate(self, obj):
         pass
-
-    def __call__(self, obj):
-        return self.validate(obj)
-
-    def __neg__(self):
-        """-<Validator>"""
-        return NotValidator(self)
-
-    def __or__(self, validator):
-        """<Validator> | <Validator>"""
-        return AnyValidator(validators=[self, validator])
-
-    def __xor__(self, validator):
-        """<Validator> ^ <Validator>"""
-        return OneValidator(validators=[self, validator])
-
-    def __and__(self, validator):
-        """<Validator> & <Validator>"""
-        return AllValidator(validators=[self, validator])
-
-    def __repr__(self):
-        return '<{}(uri={!r})>'.format(
-            self.__class__.__name__,
-            self.uri
-        )
-
-
-class NotValidator(Validator):
-    """Must no match to validator.
-
-    :ivar validator: validator
-    :type validator: Validator
-
-    >>> validator = StringValidator('foo')
-    >>> assert validator('foo')
-    >>> # negate validation
-    >>> assert NotValidate(validator)(42)
-    >>> # works also with the minus sign
-    >>> assert -(validator)(42)
-    """
-    def __init__(self, validator):
-        self.validator = validator
-
-    def has_default(self):
-        return False
-
-    @error
-    def validate(self, obj):
-        logger.debug('%s validates %s', self, obj)
-        try:
-            self.validator.validate(obj)
-        except ValidationError:
-            return obj
-        else:
-            raise ValidationError('Matched validator')
-
-    def __neg__(self):
-        return self.validator
 
 
 class ReferenceValidator(Validator):
@@ -136,108 +77,3 @@ class ReferenceValidator(Validator):
         Validate obj against validator
         """
         return self.validator.validate(obj)
-
-
-class CompoundValidator(Validator):
-    validators = None #: the validators set
-
-    def __init__(self, validators, **attrs):
-        super(CompoundValidator, self).__init__(**attrs)
-        self.validators = []
-        self.validators.extend(validators)
-
-    def has_default(self):
-        for validator in self.validators:
-            if validator.has_default():
-                return True
-
-
-class AnyValidator(CompoundValidator):
-    """Match against any validator.
-
-    :ivar validators: validators set
-    """
-
-    @property
-    def default(self):
-        for validator in self.validators:
-            if validator.has_default():
-                return validator.default
-        raise AttributeError('{!r} object has no attribute {!r}'.format(
-            self.__class_.__name__, 'default'
-        ))
-
-    @error
-    def validate(self, obj):
-        logger.debug('%s validates %s', self, obj)
-        errors = []
-        for validator in self.validators:
-            try:
-                response = validator.validate(obj)
-                logger.debug('%s gets %s', validator, obj)
-                return response
-            except ValidationError as error:
-                logger.debug('%s fails %s', validator, obj)
-                errors.append(error)
-        raise ValidationError('None match', error=errors)
-
-    def __or__(self, validator):
-        """Validator() | Validator()"""
-        self.validators.add(validator)
-        return self
-
-
-class AllValidator(CompoundValidator):
-    """Match against all validator.
-
-    :ivar validators: validators set
-    """
-
-    @error
-    def validate(self, obj):
-        logger.debug('%s validates %s', self, obj)
-        try:
-            for validator in self.validators:
-                obj = validator.validate(obj)
-                logger.debug('%s gets %s', validator, obj)
-        except ValidationError as error:
-            raise ValidationError('One validator failed at least',
-                                  error=error)
-        return obj
-
-    def __and__(self, validator):
-        """<Validator> & <Validator>"""
-        self.validators.add(validator)
-        return self
-
-
-class OneValidator(CompoundValidator):
-    """Match against one validator.
-
-    :ivar validators: validators set
-    """
-
-    @error
-    def validate(self, obj):
-        logger.debug('%s validates %s', self, obj)
-        response, count, matches, errors = None, 0, [], []
-        for validator in self.validators:
-            try:
-                response = validator.validate(obj)
-                matches.append(validator.uri)
-                count += 1
-            except ValidationError as error:
-                errors.append(error)
-            if count > 1:
-                break
-
-        if count == 1:
-            return response
-        if count:
-            raise ValidationError('Matchs more than one validator', rule=matches)
-        raise ValidationError('No match', error=errors)
-
-    def __xor__(self, validator):
-        """<Validator> ^ <Validator>"""
-        self.validators.add(validator)
-        return self

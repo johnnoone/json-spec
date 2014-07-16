@@ -8,10 +8,10 @@ __all__ = ['Context', 'Factory', 'register']
 
 from functools import partial
 from jsonspec.pointer import DocumentPointer
+from jsonspec.pointer.exceptions import ExtractError
 from jsonspec.reference import LocalRegistry
 from .exceptions import CompilationError
 from .formats import FormatRegistry
-
 
 class Context(object):
     """
@@ -31,7 +31,19 @@ class Context(object):
         return self.factory(schema, pointer, self.spec)
 
     def resolve(self, pointer):
-        return self.factory(self.registry.resolve(pointer), pointer, self.spec)
+        try:
+            dp = DocumentPointer(pointer)
+            if dp.is_inner():
+                print('resolve inner', pointer, self.registry.doc)
+                return self.factory.local(self.registry.resolve(pointer),
+                                          pointer,
+                                          self.registry,
+                                          self.spec)
+
+            print('resolve outside', pointer)
+            return self.factory(self.registry.resolve(pointer), pointer, self.spec)
+        except ExtractError as error:
+            raise CompilationError({}, error)
 
 
 class Factory(object):
@@ -64,6 +76,16 @@ class Factory(object):
         if local.document:
             registry[local.document] = schema
         local.document = '<local>'
+        context = Context(self, registry, spec, self.formats)
+        return compiler(schema, pointer, context)
+
+    def local(self, schema, pointer, registry, spec=None):
+        try:
+            spec = schema.get('$schema', spec or self.spec)
+            compiler = self.compilers[spec]
+        except KeyError:
+            raise CompilationError('{!r} not registered'.format(spec))
+
         context = Context(self, registry, spec, self.formats)
         return compiler(schema, pointer, context)
 

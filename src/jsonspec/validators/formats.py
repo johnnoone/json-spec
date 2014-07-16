@@ -10,7 +10,6 @@ from functools import partial
 from pkg_resources import iter_entry_points
 from .exceptions import CompilationError
 
-
 class FormatRegistry(object):
     """
     Declare callables that must validate strings.

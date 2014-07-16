@@ -11,6 +11,16 @@ from datetime import tzinfo, timedelta, datetime, date
 import re
 import time
 from .exceptions import ValidationError
+try:
+    import ipaddress
+except ImportError:
+    ipaddress = None
+
+from six import text_type
+from six.moves.urllib.parse import urlparse
+import logging
+
+logger = logging.getLogger(__name__)
 
 HOSTNAME_TOKENS = re.compile('(?!-)[a-z\d-]{1,63}(?<!-)$', re.IGNORECASE)
 HOSTNAME_LAST_TOKEN = re.compile('[a-z]+$', re.IGNORECASE)
@@ -76,25 +86,54 @@ def validate_hostname(obj):
         if not HOSTNAME_LAST_TOKEN.search(tokens[-1]):
             raise ValueError
     except ValueError:
-        raise ValidationError('{!r} is not a valid hostname')
+        raise ValidationError('{!r} is not a valid hostname'.format(obj))
     return obj
 
 
-def validate_ipv4(obj):
-    try:
-        parts = obj.split('.', 3)
-        for part in parts:
-            part = int(part)
-            if part > 255 or part < 0:
-                raise ValueError
-    except ValueError:
-        raise ValidationError('{!r} is not an ipv4')
-    return obj
+if ipaddress:
+    def validate_ipv4(obj):
+        try:
+            obj = text_type(obj)
+            ipaddress.IPv4Address(obj)
+        except (ipaddress.AddressValueError, ipaddress.NetmaskValueError):
+            raise ValidationError('{!r} does not appear to '
+                                  'be an IPv4 address'.format(obj))
+        return obj
 
 
-def validate_ipv6(obj):
-    raise ValidationError('{!r} is not defined')
+    def validate_ipv6(obj):
+        try:
+            obj = text_type(obj)
+            ipaddress.IPv6Address(obj)
+        except (ipaddress.AddressValueError, ipaddress.NetmaskValueError):
+            raise ValidationError('{!r} does not appear to '
+                                  'be an IPv4 address'.format(obj))
+
+        return obj
+
+else:
+    def validate_ipv4(obj):
+        try:
+            parts = obj.split('.', 3)
+            for part in parts:
+                part = int(part)
+                if part > 255 or part < 0:
+                    raise ValueError
+        except ValueError:
+            raise ValidationError('{!r} is not an ipv4'.format(obj), obj)
+        return obj
+
+
+    def validate_ipv6(obj):
+        raise ValidationError('ipv6 is not defined', obj)
 
 
 def validate_uri(obj):
-    raise ValidationError('{!r} is not defined')
+    try:
+        if ':' not in obj:
+            raise ValueError('missing scheme')
+        urlparse(obj)
+    except Exception as error:
+        logger.exception(error)
+        raise ValidationError('{!r} is not an uri'.format(obj))
+    return obj

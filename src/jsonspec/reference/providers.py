@@ -115,6 +115,7 @@ class FilesystemProvider(Provider):
         return self._data
 
     def __getitem__(self, uri):
+        spec = uri
         if uri.startswith(self.prefix):
             spec = uri[len(self.prefix):]
             if spec.endswith('#'):
@@ -144,3 +145,29 @@ class SpecProvider(FilesystemProvider):
         src = os.path.join(base, 'schemas/')
         prefix = 'http://json-schema.org/'
         super(SpecProvider, self).__init__(src, prefix)
+
+
+class ProxyProvider(Provider):
+    def __init__(self, provider):
+        self.provider = provider
+        self.local = {}
+
+    def __getitem__(self, uri):
+        try:
+            return self.local[uri]
+        except KeyError:
+            return self.provider[uri]
+
+    def __setitem__(self, uri, schema):
+        self.local[uri] = schema
+
+    def __iter__(self):
+        keys = set(self.local.keys())
+        keys.update(self.provider.keys())
+        for key in sorted(keys):
+            yield key
+
+    def __len__(self):
+        keys = set(self.local.keys())
+        keys.update(self.provider.keys())
+        return len(keys)

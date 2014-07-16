@@ -29,7 +29,8 @@ class DocumentPointer(object):
         if isinstance(pointer, DocumentPointer):
             document, path = pointer
         elif '#' not in pointer:
-            raise ValueError('# is missing')
+            logger.debug('# is missing %r', pointer)
+            document, path = pointer, ''
         else:
             document, path = pointer.split('#', 1)
         self.document = document

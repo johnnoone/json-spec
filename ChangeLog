@@ -1,6 +1,10 @@
 CHANGES
 =======
 
+* Make it simple with test suite
+* Implement relative json pointers
+* fix module
+* refactored formats
 * fix rtd doc
 * ObjectValidator refacto
 * another update about properties

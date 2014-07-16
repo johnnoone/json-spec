@@ -55,7 +55,7 @@ class Registry(Provider, MutableMapping):
         try:
             return self.provider[uri]
         except KeyError:
-            return NotFound('{!r} not registered'.format(uri))
+            raise NotFound('{!r} not registered'.format(uri))
 
     def __setitem__(self, uri, obj):
         self.provider[uri] = obj
@@ -97,12 +97,13 @@ class LocalRegistry(Registry):
         try:
             return self.doc if uri == self.key else self.provider[uri]
         except (NotFound, KeyError):
-            return NotFound('{!r} not registered'.format(uri))
+            raise NotFound('{!r} not registered'.format(uri))
 
     def __setitem__(self, uri, obj):
         if uri == self.key:
             raise Forbidden('setting {} is forbidden'.format(self.key))
-        self.provider[uri] = obj
+        if uri not in self.provider:
+            self.provider[uri] = obj
 
     def __delitem__(self, uri):
         if uri == self.key:

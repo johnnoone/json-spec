@@ -24,6 +24,7 @@ from .bases import error, Validator
 
 logger = logging.getLogger(__name__)
 
+import jsonspec.driver as json
 
 class DataValidator(Validator):
     """Common validator
@@ -195,9 +196,11 @@ class NumberValidator(TypeValidator):
         return obj
 
     def validate_multiple(self, obj):
-        if self.multiple_of is not None and obj % self.multiple_of:
-            raise ValidationError('object must be a multiple '
-                                  'of {}'.format(self.multiple_of))
+        from decimal import Decimal
+        if self.multiple_of is not None:
+            if Decimal(str(obj)) % Decimal(str(self.multiple_of)):
+                raise ValidationError('object must be a multiple '
+                                      'of {}'.format(self.multiple_of))
         return obj
 
 
@@ -280,17 +283,16 @@ class ArrayValidator(TypeValidator):
         return obj
 
     def validate_unique_items(self, obj):
-        if self.unique_items and len(set(obj)) != len(obj):
-            raise ValidationError('items must be unique')
+        if self.unique_items:
+            data = set(json.dumps(element) for element in obj)
+            if len(data) != len(obj):
+                raise ValidationError('items must be unique')
         return obj
 
     def validate_items(self, obj):
         if self._items == {}:
             # validation of the instance always succeeds
             # regardless of the value of "additional_items"
-            return obj
-        if self._additional_items in (True, {}):
-            # validation of the instance always succeeds
             return obj
 
         validators = itertools.chain(self.items, self.additional_items)
@@ -309,6 +311,9 @@ class ArrayValidator(TypeValidator):
             raise ValidationError(errors)
 
         if iteration < len(obj):
+            if self._additional_items in (True, {}):
+                # validation of the instance always succeeds
+                return obj
             raise ValidationError('object has too much elements')
 
         return obj
@@ -399,7 +404,7 @@ class ObjectValidator(TypeValidator):
                 ok(member)
         for pattern, validator in self.pattern_properties.items():
             regex = re.compile(pattern)
-            for member in list(properties):
+            for member in obj.keys():
                 if regex.search(member):
                     logger.info('do patternProperty %s', member)
                     try:
