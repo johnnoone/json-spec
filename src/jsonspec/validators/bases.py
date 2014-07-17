@@ -37,6 +37,10 @@ class Validator(object):
     def validate(self, obj):
         pass
 
+    def __call__(self, obj):
+        """shortcut for validate()"""
+        return self.validate(obj)
+
 
 class ReferenceValidator(Validator):
     """
@@ -74,6 +78,8 @@ class ReferenceValidator(Validator):
 
     def validate(self, obj):
         """
-        Validate obj against validator
+        Validate object against validator
+
+        :param obj: the object to validate
         """
         return self.validator.validate(obj)

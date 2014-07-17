@@ -9,11 +9,12 @@
 
 from jsonspec.validators import load, ValidationError, CompilationError
 from jsonspec.reference.providers import SpecProvider, ProxyProvider
+from jsonspec import driver as json
 
 # from jsonspec.validators.exceptions import ValidationError
 from . import TestCase
 
-import json
+import io
 import os
 import pytest
 import logging
@@ -30,7 +31,7 @@ def contents(*paths):
         for filename in filenames:
             if filename.endswith('.json'):
                 filepath = os.path.join(dirpath, filename)
-                with open(filepath, 'r') as file:
+                with io.open(filepath, 'r', encoding='utf-8') as file:
                     yield json.load(file), filepath[d:]
 
 

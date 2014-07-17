@@ -5,9 +5,8 @@
     Implements JSON Schema draft04.
 """
 
-__all__ = ['compile']
+__all__ = ['compile', 'Draft04Validator']
 
-import json
 import logging
 import os.path
 import re
@@ -19,6 +18,8 @@ from .bases import ReferenceValidator, Validator, error
 from .exceptions import CompilationError
 from .factorize import register
 from jsonspec.validators.exceptions import ValidationError
+from jsonspec.validators.util import uncamel
+from jsonspec import driver as json
 
 sequence_types = (list, set, tuple)
 number_types = (integer_types, float, Decimal)
@@ -249,7 +250,23 @@ def compile(schema, pointer, context, scope=None):
 
 
 class Draft04Validator(Validator):
+    """
+    Implements `JSON Schema`_ draft-04 validation.
+
+    :ivar attrs: attributes to validate against
+    :ivar uri: uri of the current validator
+    :ivar formats: mapping of available formats
+
+    >>> validator = Draft04Validator({'min_length': 4})
+    >>> assert validator('this is sparta')
+
+    .. _`JSON Schema`: http://json-schema.org
+    """
+
     def __init__(self, attrs, uri=None, formats=None):
+        # ensure that we use 
+        attrs = {uncamel(k): v for k, v in attrs.items()}
+
         self.formats = formats or {}
         self.attrs = attrs
         self.attrs.setdefault('additional_items', True)
@@ -261,6 +278,11 @@ class Draft04Validator(Validator):
 
     @error
     def validate(self, obj):
+        """
+        Validate object against validator
+
+        :param obj: the object to validate
+        """
         obj = deepcopy(obj)
         obj = self.validate_enum(obj)
         obj = self.validate_type(obj)
@@ -317,7 +339,7 @@ class Draft04Validator(Validator):
     @error
     def validate_all_of(self, obj):
         for validator in self.attrs.get('all_of', []):
-            obj = validator.validate(obj)
+            obj = validator(obj)
         return obj
 
     @error
@@ -325,7 +347,7 @@ class Draft04Validator(Validator):
         if 'any_of' in self.attrs:
             for validator in self.attrs['any_of']:
                 try:
-                    obj = validator.validate(obj)
+                    obj = validator(obj)
                     return obj
                 except ValidationError:
                     pass
@@ -334,9 +356,7 @@ class Draft04Validator(Validator):
 
     @error
     def validate_default_properties(self, obj):
-        """
-        Reinject defaults from properties.
-        """
+        # Reinject defaults from properties.
         for name, validator in self.attrs.get('properties', {}).items():
             if name not in obj and validator.has_default():
                 obj[name] = deepcopy(validator.default)
@@ -350,7 +370,7 @@ class Draft04Validator(Validator):
                     if set(dependencies) - set(obj.keys()):
                         raise ValidationError('Missing dependencies', obj)
                 else:
-                    dependencies.validate(obj)
+                    dependencies(obj)
         return obj
 
     @error
@@ -372,7 +392,7 @@ class Draft04Validator(Validator):
             validated = 0
             for validator in self.attrs['one_of']:
                 try:
-                    validated_obj = validator.validate(obj)
+                    validated_obj = validator(obj)
                     validated += 1
                 except ValidationError:
                     pass
@@ -389,7 +409,7 @@ class Draft04Validator(Validator):
         if 'not' in self.attrs:
             try:
                 validator = self.attrs['not']
-                validator.validate(obj)
+                validator(obj)
             except ValidationError:
                 return obj
             else:
@@ -427,7 +447,7 @@ class Draft04Validator(Validator):
             if isinstance(items, Validator):
                 validator = items
                 for index, element in enumerate(obj):
-                    obj[index] = validator.validate(element)
+                    obj[index] = validator(element)
                 return obj
             elif isinstance(items, (list, tuple)):
                 additionals = self.attrs['additional_items']
@@ -441,7 +461,7 @@ class Draft04Validator(Validator):
                         elif additionals is False:
                             raise ValidationError('Additional elements are forbidden', obj)  # noqa
                         validator = additionals
-                    obj[index] = validator.validate(element)
+                    obj[index] = validator(element)
                 return obj
             else:
                 raise NotImplementedError(items)
@@ -450,43 +470,49 @@ class Draft04Validator(Validator):
     @error
     def validate_max_items(self, obj):
         if 'max_items' in self.attrs:
-            if len(obj) > self.attrs['max_items']:
-                raise ValidationError('Too much elements', obj)
-        return obj
-
-    @error
-    def validate_min_items(self, obj):
-        if 'min_items' in self.attrs:
-            if len(obj) < self.attrs['min_items']:
-                raise ValidationError('Too few elements', obj)
+            count = len(obj)
+            if count > self.attrs['max_items']:
+                raise ValidationError('Too many elements {}'.format(count))
         return obj
 
     @error
     def validate_max_length(self, obj):
         if 'max_length' in self.attrs:
-            if len(text_type(obj)) > self.attrs['max_length']:
-                raise ValidationError('Too long', obj)
+            length = len(obj)
+            if length > self.attrs['max_length']:
+                raise ValidationError('Too long {}'.format(length))
         return obj
 
     @error
     def validate_max_properties(self, obj):
         if 'max_properties' in self.attrs:
-            if len(obj) > self.attrs['max_properties']:
-                raise ValidationError('Too much properties', obj)
+            count = len(obj)
+            if count > self.attrs['max_properties']:
+                raise ValidationError('Too many properties {}'.format(count))
+        return obj
+
+    @error
+    def validate_min_items(self, obj):
+        if 'min_items' in self.attrs:
+            count = len(obj)
+            if count < self.attrs['min_items']:
+                raise ValidationError('Too few elements {}'.format(count))
         return obj
 
     @error
     def validate_min_length(self, obj):
         if 'min_length' in self.attrs:
-            if len(text_type(obj)) < self.attrs['min_length']:
-                raise ValidationError('{!r} is too short'.format(obj))
+            length = len(obj)
+            if length < self.attrs['min_length']:
+                raise ValidationError('Too short {}'.format(length))
         return obj
 
     @error
     def validate_min_properties(self, obj):
         if 'min_properties' in self.attrs:
-            if len(obj) < self.attrs['min_properties']:
-                raise ValidationError('Too few properties', obj)
+            count = len(obj)
+            if count < self.attrs['min_properties']:
+                raise ValidationError('Too few properties {}'.format(count))
         return obj
 
     @error
@@ -517,13 +543,13 @@ class Draft04Validator(Validator):
 
         for name, validator in self.attrs['properties'].items():
             if name in obj:
-                response[name] = validator.validate(obj[name])
+                response[name] = validator(obj[name])
                 validated.add(name)
 
         for pattern, validator in self.attrs['pattern_properties'].items():
             for name in sorted(obj.keys()):
                 if re.search(pattern, name):
-                    response[name] = validator.validate(obj[name])
+                    response[name] = validator(obj[name])
                     validated.add(name)
 
         for name in validated:
@@ -538,7 +564,7 @@ class Draft04Validator(Validator):
             raise ValidationError('Additional properties are forbidden', obj)
         validator = additionals
         for name in sorted(obj.keys()):
-            response[name] = validator.validate(obj.pop(name))
+            response[name] = validator(obj.pop(name))
             validated.add(name)
         return obj
 

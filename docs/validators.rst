@@ -86,43 +86,10 @@ API
 
 .. autofunction:: validators.register
 
-.. autoclass:: validators.NotValidator
-    :members:
-
 .. autoclass:: validators.ReferenceValidator
     :members:
 
-.. autoclass:: validators.AllValidator
-    :members:
-
-.. autoclass:: validators.AnyValidator
-    :members:
-
-.. autoclass:: validators.OneValidator
-    :members:
-
-.. autoclass:: validators.EnumValidator
-    :members:
-
-.. autoclass:: validators.StringValidator
-    :members:
-
-.. autoclass:: validators.NumberValidator
-    :members:
-
-.. autoclass:: validators.IntegerValidator
-    :members:
-
-.. autoclass:: validators.BooleanValidator
-    :members:
-
-.. autoclass:: validators.NullValidator
-    :members:
-
-.. autoclass:: validators.ArrayValidator
-    :members:
-
-.. autoclass:: validators.ObjectValidator
+.. autoclass:: validators.Draft04Validator
     :members:
 
 .. autoclass:: validators.Context

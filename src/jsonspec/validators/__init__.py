@@ -5,13 +5,14 @@
 """
 
 __all__ = ['load', 'register', 'Factory',
-           'Validator', 'ReferenceValidator',
+           'Validator', 'ReferenceValidator', 'Draft04Validator',
            'CompilationError', 'ReferenceError', 'ValidationError']
 
 from .bases import Validator, ReferenceValidator
-from .exceptions import CompilationError, ReferenceError, ValidationError
-from .factorize import register, Factory
+from .exceptions import error, CompilationError, ReferenceError, ValidationError
+from .factorize import register, Factory, Context
 from . import draft04  # noqa
+from .draft04 import Draft04Validator  # noqa
 
 
 def load(schema, uri=None, spec=None, provider=None):
