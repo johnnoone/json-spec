@@ -85,12 +85,13 @@ class Target(object):
             member already exists, it is replaced by the specified value.
 
         -   An element to add to an existing sequence - whereupon the supplied
-            value is added to the sequence at the indicated location.  Any
-            elements at or above the specified index are shifted one position
-            to the right.  The specified index must no be greater than the
-            number of elements in the sequence.  If the "-" character is used to
-            index the end of the sequence, this has the effect of
-            appending the value to the sequence.
+            value is added to the sequence at the indicated location.
+            Any elements at or above the specified index are shifted one
+            position to the right.
+            The specified index must no be greater than the number of elements
+            in the sequence.
+            If the "-" character is used to index the end of the sequence, this
+            has the effect of appending the value to the sequence.
 
         """
         doc = deepcopy(self.document)
@@ -161,7 +162,7 @@ class Target(object):
             the target location with the value that was just removed.
 
             The "from" location MUST NOT be a proper prefix of the "path"
-            location; i.e., a location cannot be moved into one of its children.
+            location; i.e., a location cannot be moved into one of its children
 
         """
 

@@ -94,6 +94,7 @@ class FormatRegistry(object):
             logger.warn('Unable to load %s: %s is missing', name, error)
         else:
             logger.warn('%s is not defined', name)
+
         def fallback(obj):
             logger.info('Unable to validate %s: %s is missing', name, error)
             return obj

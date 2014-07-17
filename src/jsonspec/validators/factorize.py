@@ -6,12 +6,16 @@
 
 __all__ = ['Context', 'Factory', 'register']
 
+import logging
 from functools import partial
 from jsonspec.pointer import DocumentPointer
 from jsonspec.pointer.exceptions import ExtractError
 from jsonspec.reference import LocalRegistry
 from .exceptions import CompilationError
 from .formats import FormatRegistry
+
+logger = logging.getLogger(__name__)
+
 
 class Context(object):
     """
@@ -34,14 +38,16 @@ class Context(object):
         try:
             dp = DocumentPointer(pointer)
             if dp.is_inner():
-                print('resolve inner', pointer, self.registry.doc)
+                logger.debug('resolve inner %s', pointer)
                 return self.factory.local(self.registry.resolve(pointer),
                                           pointer,
                                           self.registry,
                                           self.spec)
 
-            print('resolve outside', pointer)
-            return self.factory(self.registry.resolve(pointer), pointer, self.spec)
+            logger.debug('resolve outside %s', pointer)
+            return self.factory(self.registry.resolve(pointer),
+                                pointer,
+                                self.spec)
         except ExtractError as error:
             raise CompilationError({}, error)
 

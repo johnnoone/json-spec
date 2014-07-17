@@ -3,6 +3,7 @@ __all__ = ['error', 'CompilationError', 'ReferenceError', 'ValidationError']
 
 from six import wraps
 
+
 def error(meth):
     @wraps(meth)
     def wrapper(self, obj, *args, **kwargs):

@@ -48,7 +48,6 @@ class PkgProvider(Provider):
         self.providers = providers
         self.loaded = True
 
-
     def __getitem__(self, uri):
         if not self.loaded:
             self.load()

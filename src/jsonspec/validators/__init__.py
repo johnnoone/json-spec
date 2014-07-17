@@ -4,11 +4,13 @@
 
 """
 
-__all__ = ['load', 'register', 'Factory', 'Validator', 'ReferenceValidator']
+__all__ = ['load', 'register', 'Factory',
+           'Validator', 'ReferenceValidator',
+           'CompilationError', 'ReferenceError', 'ValidationError']
 
-from .bases import error, Validator, ReferenceValidator
+from .bases import Validator, ReferenceValidator
 from .exceptions import CompilationError, ReferenceError, ValidationError
-from .factorize import register, Context, Factory
+from .factorize import register, Factory
 from . import draft04  # noqa
 
 

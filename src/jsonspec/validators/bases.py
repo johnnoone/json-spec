@@ -4,7 +4,7 @@
 
 """
 
-__all__ = ['error', 'Validator', 'ReferenceValidator']
+__all__ = ['error', 'ValidationError', 'Validator', 'ReferenceValidator']
 
 import logging
 from abc import abstractmethod, ABCMeta
