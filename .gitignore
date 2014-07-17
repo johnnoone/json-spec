@@ -47,3 +47,4 @@ cover/
 xunit.xml
 coverage.xml
 pytestdebug.log
+*~

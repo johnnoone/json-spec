@@ -7,9 +7,6 @@
 __all__ = ['load', 'register', 'Factory', 'Validator', 'ReferenceValidator']
 
 from .bases import error, Validator, ReferenceValidator
-from .types import EnumValidator, StringValidator, NumberValidator
-from .types import IntegerValidator, IntegerValidator, NullValidator
-from .types import ArrayValidator, ObjectValidator, BooleanValidator
 from .exceptions import CompilationError, ReferenceError, ValidationError
 from .factorize import register, Context, Factory
 from . import draft04  # noqa

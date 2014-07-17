@@ -15,7 +15,7 @@ from copy import deepcopy
 from decimal import Decimal
 from six import integer_types, string_types, text_type
 from six.moves.urllib.parse import urljoin
-from .bases import ReferenceValidator, Validator
+from .bases import ReferenceValidator, Validator, error
 from .exceptions import CompilationError
 from .factorize import register
 from jsonspec.validators.exceptions import ValidationError
@@ -86,6 +86,8 @@ def compile(schema, pointer, context, scope=None):
         else:
             # should be a boolean
             raise CompilationError('wrong type for {}'.format('anyOf'), schema)  # noqa
+    if 'default' in schm:
+        attrs['default'] = schm.pop('default')
     if 'dependencies' in schm:
         attrs['dependencies'] = schm.pop('dependencies')
         if not isinstance(attrs['dependencies'], dict):
@@ -219,8 +221,11 @@ class Draft04Validator(Validator):
         self.formats = formats or {}
         self.attrs = attrs
         self.uri = uri
+        self.default = self.attrs.get('default', None)
 
+    @error
     def validate(self, obj):
+        obj = deepcopy(obj)
         obj = self.validate_enum(obj)
         obj = self.validate_type(obj)
         obj = self.validate_not(obj)
@@ -241,8 +246,9 @@ class Draft04Validator(Validator):
             obj = self.validate_required(obj)
             obj = self.validate_max_properties(obj)
             obj = self.validate_min_properties(obj)
-            obj = self.validate_properties(obj)
             obj = self.validate_dependencies(obj)
+            obj = self.validate_properties(obj)
+            obj = self.validate_default_properties(obj)
         elif self.is_string(obj):
             obj = self.validate_max_length(obj)
             obj = self.validate_min_length(obj)
@@ -270,13 +276,15 @@ class Draft04Validator(Validator):
         return isinstance(obj, string_types)
 
     def has_default(self):
-        raise NotImplementedError
+        return 'default' in self.attrs
 
+    @error
     def validate_all_of(self, obj):
         for validator in self.attrs.get('all_of', []):
             obj = validator.validate(obj)
         return obj
 
+    @error
     def validate_any_of(self, obj):
         if 'any_of' in self.attrs:
             for validator in self.attrs['any_of']:
@@ -288,22 +296,35 @@ class Draft04Validator(Validator):
             raise ValidationError('{!r} not in any_of'.format(obj))
         return obj
 
+    @error
+    def validate_default_properties(self, obj):
+        """
+        Reinject defaults from properties.
+        """
+        for name, validator in self.attrs.get('properties', {}).items():
+            if name not in obj and validator.has_default():
+                obj[name] = deepcopy(validator.default)
+        return obj
+
+    @error
     def validate_dependencies(self, obj):
         for key, dependencies in self.attrs.get('dependencies', {}).items():
             if key in obj:
                 if isinstance(dependencies, sequence_types):
                     if set(dependencies) - set(obj.keys()):
-                        raise ValidationError('{!r} missing dependencies'.format(obj))
+                        raise ValidationError('{!r} missing dependencies {}'.format(obj, dependencies))
                 else:
                     dependencies.validate(obj)
         return obj
 
+    @error
     def validate_enum(self, obj):
         if 'enum' in self.attrs:
             if obj not in self.attrs['enum']:
                 raise ValidationError('{!r} not in enum {}'.format(obj, self.attrs['enum']))
         return obj
 
+    @error
     def validate_format(self, obj):
         if 'format' in self.attrs:
             try:
@@ -315,6 +336,7 @@ class Draft04Validator(Validator):
             #     raise ValidationError('{!r} not in format {}'.format(obj, self.attrs['format']))
         return obj
 
+    @error
     def validate_one_of(self, obj):
         if 'one_of' in self.attrs:
             validated = 0
@@ -332,6 +354,7 @@ class Draft04Validator(Validator):
                 raise ValidationError('{!r} validates too much one_of'.format(obj))
         return obj
 
+    @error
     def validate_not(self, obj):
         if 'not' in self.attrs:
             try:
@@ -343,6 +366,7 @@ class Draft04Validator(Validator):
                 raise ValidationError('{!r} is forbidden'.format(obj))
         return obj
 
+    @error
     def validate_maximum(self, obj):
         if 'maximum' in self.attrs:
             m = self.attrs['maximum']
@@ -354,6 +378,7 @@ class Draft04Validator(Validator):
             raise ValidationError(m, obj)
         return obj
 
+    @error
     def validate_minimum(self, obj):
         if 'minimum' in self.attrs:
             m = self.attrs['minimum']
@@ -365,6 +390,7 @@ class Draft04Validator(Validator):
             raise ValidationError(m, obj)
         return obj
 
+    @error
     def validate_items(self, obj):
         if 'items' in self.attrs:
             items = self.attrs['items']
@@ -391,42 +417,49 @@ class Draft04Validator(Validator):
                 raise NotImplementedError(items)
         return obj
 
+    @error
     def validate_max_items(self, obj):
         if 'max_items' in self.attrs:
             if len(obj) > self.attrs['max_items']:
                 raise ValidationError('{!r} has to much elements'.format(obj))
         return obj
 
+    @error
     def validate_min_items(self, obj):
         if 'min_items' in self.attrs:
             if len(obj) < self.attrs['min_items']:
                 raise ValidationError('{!r} has to few elements'.format(obj))
         return obj
 
+    @error
     def validate_max_length(self, obj):
         if 'max_length' in self.attrs:
             if len(text_type(obj)) > self.attrs['max_length']:
                 raise ValidationError('{!r} is too long'.format(obj))
         return obj
 
+    @error
     def validate_max_properties(self, obj):
         if 'max_properties' in self.attrs:
             if len(obj) > self.attrs['max_properties']:
                 raise ValidationError('{!r} has too much properties'.format(obj))
         return obj
 
+    @error
     def validate_min_length(self, obj):
         if 'min_length' in self.attrs:
             if len(text_type(obj)) < self.attrs['min_length']:
                 raise ValidationError('{!r} is too short'.format(obj))
         return obj
 
+    @error
     def validate_min_properties(self, obj):
         if 'min_properties' in self.attrs:
             if len(obj) < self.attrs['min_properties']:
                 raise ValidationError('{!r} has too few properties'.format(obj))
         return obj
 
+    @error
     def validate_multiple_of(self, obj):
         if 'multiple_of' in self.attrs:
             a, b = Decimal(str(obj)), Decimal(str(self.attrs['multiple_of']))
@@ -434,6 +467,7 @@ class Draft04Validator(Validator):
                 raise ValidationError('{!r} is not a multiple of {}'.format(obj, self.attrs['multiple_of']))
         return obj
 
+    @error
     def validate_pattern(self, obj):
         if 'pattern' in self.attrs:
             pattern = self.attrs['pattern']
@@ -442,6 +476,7 @@ class Draft04Validator(Validator):
             raise ValidationError('{!r} does not match pattern {}'.format(obj, pattern))
         return obj
 
+    @error
     def validate_properties(self, obj):
         validated = set()
         response = {}
@@ -461,7 +496,7 @@ class Draft04Validator(Validator):
                     validated.add(name)
 
         for name in validated:
-            obj.pop(name)
+            obj.pop(name, None)
         if not obj:
             return response
 
@@ -476,6 +511,7 @@ class Draft04Validator(Validator):
             validated.add(name)
         return obj
 
+    @error
     def validate_required(self, obj):
         if 'required' in self.attrs:
             for name in self.attrs['required']:
@@ -483,6 +519,7 @@ class Draft04Validator(Validator):
                     raise ValidationError('{!r} is missing {}'.format(name, obj))
         return obj
 
+    @error
     def validate_type(self, obj):
         if 'type' in self.attrs:
             types = self.attrs['type']
@@ -508,27 +545,9 @@ class Draft04Validator(Validator):
             raise ValidationError('type does not match', types, obj)
         return obj
 
+    @error
     def validate_unique_items(self, obj):
         if self.attrs.get('unique_items'):
             if len(obj) > len(set(json.dumps(element) for element in obj)):
                 raise ValidationError('Elements must be unique! {!r}'.format(obj))
         return obj
-
-def uncamel(name):
-    """converts camelcase to underscore
-    >>> uncamel('fooBar')
-    'foo_bar'
-    >>> uncamel('FooBar')
-    'foo_bar'
-    >>> uncamel('_fooBar')
-    '_foo_bar'
-    >>> uncamel('_FooBar')
-    '__foo_bar'
-    """
-    response, name = name[0].lower(), name[1:]
-    for n in name:
-        if n.isupper():
-            response += '_' + n.lower()
-        else:
-            response += n
-    return response

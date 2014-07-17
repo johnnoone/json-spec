@@ -1,6 +1,11 @@
 CHANGES
 =======
 
+* cleanup on tests, install, etc
+
+0.8.0
+-----
+
 * Make it simple with test suite
 * Implement relative json pointers
 * fix module

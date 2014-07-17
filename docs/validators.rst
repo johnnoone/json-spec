@@ -59,12 +59,23 @@ About format
         date-time = jsonspec.validators.util:validate_datetime
         email = jsonspec.validators.util:validate_email
         hostname = jsonspec.validators.util:validate_hostname
-        ipv4 = jsonspec.validators.util:validate_ipv4
-        ipv6 = jsonspec.validators.util:validate_ipv6
+        ipv4 = jsonspec.validators.util:validate_ipv4 [ip]
+        ipv6 = jsonspec.validators.util:validate_ipv6 [ip]
         uri = jsonspec.validators.util:validate_uri
 
 You can expose yours with this technic.
 
+Some formats rely on external modules, and they are not enabled by default.
+For enabling them, uses these commands:
+
+
+========= =========================
+Format    Install command
+--------- -------------------------
+ipv4      pip install json-spec[ip]
+ipv6      pip install json-spec[ip]
+hostname  pip install json-spec
+========= =========================
 
 API
 ---

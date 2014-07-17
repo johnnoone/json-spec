@@ -6,25 +6,40 @@
 
 __all__ = []
 
-from copy import deepcopy
-from datetime import tzinfo, timedelta, datetime, date
+import logging
 import re
 import time
-from .exceptions import ValidationError
-try:
-    import ipaddress
-except ImportError:
-    ipaddress = None
-
+from copy import deepcopy
+from datetime import tzinfo, timedelta, datetime, date
 from six import text_type
 from six.moves.urllib.parse import urlparse
-import logging
+from .exceptions import ValidationError
 
 logger = logging.getLogger(__name__)
 
 HOSTNAME_TOKENS = re.compile('(?!-)[a-z\d-]{1,63}(?<!-)$', re.IGNORECASE)
 HOSTNAME_LAST_TOKEN = re.compile('[a-z]+$', re.IGNORECASE)
 EMAIL = re.compile('[^@]+@[^@]+\.[^@]+')
+
+
+def uncamel(name):
+    """converts camelcase to underscore
+    >>> uncamel('fooBar')
+    'foo_bar'
+    >>> uncamel('FooBar')
+    'foo_bar'
+    >>> uncamel('_fooBar')
+    '_foo_bar'
+    >>> uncamel('_FooBar')
+    '__foo_bar'
+    """
+    response, name = name[0].lower(), name[1:]
+    for n in name:
+        if n.isupper():
+            response += '_' + n.lower()
+        else:
+            response += n
+    return response
 
 
 class offset(tzinfo):
@@ -79,7 +94,7 @@ def validate_hostname(obj):
         if len(host) > 255:
             raise ValueError
         if host[-1] == '.':
-            host = host[:-1]  # strip exactly one dot from the right, if present
+            host = host[:-1]
         tokens = host.split('.')
         if not all(HOSTNAME_TOKENS.match(x) for x in tokens):
             raise ValueError
@@ -90,42 +105,30 @@ def validate_hostname(obj):
     return obj
 
 
-if ipaddress:
-    def validate_ipv4(obj):
-        try:
-            obj = text_type(obj)
-            ipaddress.IPv4Address(obj)
-        except (ipaddress.AddressValueError, ipaddress.NetmaskValueError):
-            raise ValidationError('{!r} does not appear to '
-                                  'be an IPv4 address'.format(obj))
-        return obj
+def validate_ipv4(obj):
+    try:
+        import ipaddress
+        obj = text_type(obj)
+        ipaddress.IPv4Address(obj)
+    except ImportError:
+        raise ValidationError('IPv4 relies on ipaddress package', obj)
+    except (ipaddress.AddressValueError, ipaddress.NetmaskValueError):
+        raise ValidationError('{!r} does not appear to '
+                              'be an IPv4 address'.format(obj))
+    return obj
 
 
-    def validate_ipv6(obj):
-        try:
-            obj = text_type(obj)
-            ipaddress.IPv6Address(obj)
-        except (ipaddress.AddressValueError, ipaddress.NetmaskValueError):
-            raise ValidationError('{!r} does not appear to '
-                                  'be an IPv4 address'.format(obj))
-
-        return obj
-
-else:
-    def validate_ipv4(obj):
-        try:
-            parts = obj.split('.', 3)
-            for part in parts:
-                part = int(part)
-                if part > 255 or part < 0:
-                    raise ValueError
-        except ValueError:
-            raise ValidationError('{!r} is not an ipv4'.format(obj), obj)
-        return obj
-
-
-    def validate_ipv6(obj):
-        raise ValidationError('ipv6 is not defined', obj)
+def validate_ipv6(obj):
+    try:
+        import ipaddress
+        obj = text_type(obj)
+        ipaddress.IPv6Address(obj)
+    except ImportError:
+        raise ValidationError('IPv6 relies on ipaddress package', obj)
+    except (ipaddress.AddressValueError, ipaddress.NetmaskValueError):
+        raise ValidationError('{!r} does not appear to '
+                              'be an IPv6 address'.format(obj))
+    return obj
 
 
 def validate_uri(obj):

@@ -108,12 +108,12 @@ def register(compiler=None, spec=None):
 
         @register(spec='my:first:spec')
         def my_compiler(schema, pointer, context):
-            return ObjectValidator(schema)
+            return Validator(schema)
 
     or as a function::
 
         def my_compiler(schema, pointer, context):
-            return ObjectValidator(schema)
+            return Validator(schema)
 
         register(my_compiler, 'my:second:spec')
 

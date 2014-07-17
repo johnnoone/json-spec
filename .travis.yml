@@ -1,9 +1,11 @@
 language: python
-
-python:
-  - "3.3"
-  - "2.7"
-  - "pypy"
-
-install: pip install . -r requirements.txt -r test-requirements.txt
-script: py.test
+python: 2.7
+env:
+  - TOX_ENV=py33
+  - TOX_ENV=py27
+  - TOX_ENV=pypy
+install:
+  - pip install --upgrade setuptools
+  - pip install tox
+script:
+  - tox -e $TOX_ENV

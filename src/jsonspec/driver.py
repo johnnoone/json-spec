@@ -6,6 +6,6 @@
 
 
 try:
-    from simplejson import *
+    from simplejson import *  # noqa
 except ImportError:
-    from json import *
+    from json import *  # noqa

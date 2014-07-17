@@ -6,9 +6,13 @@
 
 __all__ = ['register', 'FormatRegistry']
 
+import logging
 from functools import partial
-from pkg_resources import iter_entry_points
+from pkg_resources import iter_entry_points, DistributionNotFound
 from .exceptions import CompilationError
+
+logger = logging.getLogger(__name__)
+
 
 class FormatRegistry(object):
     """
@@ -58,26 +62,44 @@ class FormatRegistry(object):
     custom = {}
 
     def __init__(self, data=None, namespace=None):
-        self.custom = data or {}
+        self.custom = data or self.custom
+        self.loaded = {}
+        self.fallback = {}
         self.namespace = namespace or self.namespace
 
     def __getitem__(self, name):
-        try:
-            self.custom[name]
-        except KeyError:
+        if name in self.custom:
+            return self.custom[name]
+        if name in self.loaded:
             return self.loaded[name]
+        if name in self.fallback:
+            return self.fallback[name]
+        return self.load(name)
 
     def __contains__(self, name):
         return name in self.custom or name in self.loaded
 
-    @property
-    def loaded(self):
-        if not hasattr(self, '_loaded'):
-            data = {}
-            for entrypoint in iter_entry_points(self.namespace):
-                data[entrypoint.name] = entrypoint.load()
-            self._loaded = data
-        return self._loaded
+    def load(self, name):
+        error = None
+
+        for entrypoint in iter_entry_points(self.namespace):
+            try:
+                if entrypoint.name == name:
+                    self.loaded[name] = entrypoint.load()
+                    return self.loaded[name]
+            except DistributionNotFound as error:
+                pass
+
+        if error:
+            logger.warn('Unable to load %s: %s is missing', name, error)
+        else:
+            logger.warn('%s is not defined', name)
+        def fallback(obj):
+            logger.info('Unable to validate %s: %s is missing', name, error)
+            return obj
+        fallback.__doc__ = 'fallback for {!r} validation'.format(name)
+        self.fallback[name] = fallback
+        return self.fallback[name]
 
     @classmethod
     def register(cls, name, func):
