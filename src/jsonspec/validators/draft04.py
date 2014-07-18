@@ -381,8 +381,30 @@ class Draft04Validator(Validator):
 
     @error
     def validate_format(self, obj):
+        """
+        ================= ============
+        Expected draft04  Alias of
+        ----------------- ------------
+        date-time         rfc3339:datetime
+        email             email
+        hostname          hostname
+        ipv4              ipv4
+        ipv6              ipv6
+        uri               uri
+        ================= ============
+
+        """
         if 'format' in self.attrs:
-            return self.formats[self.attrs['format']](obj)
+            substituted = {
+                'date-time': 'rfc3339:datetime',
+                'email': 'email',
+                'hostname': 'hostname',
+                'ipv4': 'ipv4',
+                'ipv6': 'ipv6',
+                'uri': 'uri',
+            }.get(self.attrs['format'], self.attrs['format'])
+            logger.debug('use %s', substituted)
+            return self.formats[substituted](obj)
         return obj
 
     @error

@@ -5,7 +5,7 @@
 Validators
 ==========
 
-This document describes use to use Json Schema in this library, not the specification_ itself.
+This module implements `JSON Schema`_ draft03_ and draft04_.
 
 
 Basic
@@ -45,10 +45,112 @@ Basic
         'age': 33,
     })
 
+Choose specification
+~~~~~~~~~~~~~~~~~~~~
+
+Schemas will be parsed by the draft04_ specification by default.
+You can setup, or even better mix between draft03_ and draft04_.
+
+Show these examples:
+
+.. code-block:: python
+
+    validator = load({
+        'id': 'foo',
+        'properties': {
+            'bar': {
+                'id': 'baz'
+            },
+        },
+    })
+
+:foo schema: parsed with draft04_
+:baz schema: parsed with draft04_
+
+.. code-block:: python
+
+    validator = load({
+        'id': 'foo',
+        'properties': {
+            'bar': {
+                'id': 'baz'
+            },
+        },
+    }, spec='http://json-schema.org/draft-03/schema#')
+
+:foo schema: parsed with draft03_
+:baz schema: parsed with draft03_
+
+.. code-block:: python
+
+    validator = load({
+        'id': 'foo',
+        'properties': {
+            'bar': {
+                '$schema': 'http://json-schema.org/draft-03/schema#',
+                'id': 'baz'
+            },
+        },
+    })
+
+:foo schema: parsed with draft04_
+:baz schema: parsed with draft03_
+
 About format
 ~~~~~~~~~~~~
 
-`Formats`_ are registered via ``entry_points`` in ``setup.py``:
+This module implements a lot of formats, exposed to every draft:
+
+.. list-table::
+    :header-rows: 1
+
+    * - name
+      - description
+      - enabling
+    * - email
+      - validate email
+      - 
+    * - hostname
+      - validate hostname
+      - 
+    * - ipv4
+      - validate ipv4
+      - pip install json-spec[ip]
+    * - ipv6
+      - validate ipv6
+      - pip install json-spec[ip]
+    * - regex
+      - validate regex
+      - 
+    * - uri
+      - validate uri
+      - 
+    * - css:color
+      - validate css color
+      - 
+    * - rfc3339:datetime
+      - see rfc3339_
+      - 
+    * - utc:datetime
+      - YYYY-MM-ddThh:mm:SSZ
+      - 
+    * - utc:date
+      - YYYY-MM-dd
+      - 
+    * - utc:time
+      - hh:mm:SS
+      - 
+    * - utc:millisec
+      - any integer, float
+      - 
+
+
+Some formats rely on external modules, and they are not enabled by default.
+
+Each draft validator aliases they formats to these formats. See :meth:`draft04 <validators.Draft04Validator.validate_format>` and :meth:`draft03 <validators.Draft03Validator.validate_format>` methods for more details.
+
+
+Regarding your needs, you can register your own formats. Use ``entry_points`` in your ``setup.py``. for example:
 
 
 .. code-block:: ini
@@ -56,26 +158,7 @@ About format
     [entry_points]
 
     jsonspec.validators.formats =
-        date-time = jsonspec.validators.util:validate_datetime
-        email = jsonspec.validators.util:validate_email
-        hostname = jsonspec.validators.util:validate_hostname
-        ipv4 = jsonspec.validators.util:validate_ipv4 [ip]
-        ipv6 = jsonspec.validators.util:validate_ipv6 [ip]
-        uri = jsonspec.validators.util:validate_uri
-
-You can expose yours with this technic.
-
-Some formats rely on external modules, and they are not enabled by default.
-For enabling them, uses these commands:
-
-
-========= =========================
-Format    Install command
---------- -------------------------
-ipv4      pip install json-spec[ip]
-ipv6      pip install json-spec[ip]
-hostname  pip install json-spec
-========= =========================
+        my:format = my.module:validate_format
 
 API
 ---
@@ -87,6 +170,9 @@ API
 .. autofunction:: validators.register
 
 .. autoclass:: validators.ReferenceValidator
+    :members:
+
+.. autoclass:: validators.Draft03Validator
     :members:
 
 .. autoclass:: validators.Draft04Validator
@@ -114,5 +200,8 @@ Exceptions
     :members:
 
 
-.. _`specification`: http://json-schema.org
-.. _`formats`: http://json-schema.org/latest/json-schema-validation.html#rfc.section.7
+.. _`JSON Schema`: http://json-schema.org
+.. _`draft03`: http://tools.ietf.org/html/draft-zyp-json-schema-03
+.. _`core draft04`: http://tools.ietf.org/html/draft-zyp-json-schema-04
+.. _`draft04`: http://tools.ietf.org/html/draft-fge-json-schema-validation-00
+.. _rfc3339: http://www.ietf.org/rfc/rfc3339.txt

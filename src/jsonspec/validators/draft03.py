@@ -409,14 +409,45 @@ class Draft03Validator(Validator):
 
     @error
     def validate_format(self, obj):
+        """
+        ================= ============
+        Expected draft03  Alias of
+        ----------------- ------------
+        color             css:color
+        date-time         utc:datetime
+        date              utc:date
+        time              utc:time
+        utc-millisec      utc:millisec
+        regex             regex
+        style             css:style
+        phone             phone
+        uri               uri
+        email             email
+        ip-address        ipv4
+        ipv6              ipv6
+        host-name         hostname
+        ================= ============
+
+        """
+
         if 'format' in self.attrs:
-            if self.attrs['format'] == 'host-name':
-                return self.formats['hostname'](obj)
-            if self.attrs['format'] == 'ip-address':
-                return self.formats['ipv4'](obj)
-            if self.attrs['format'] == 'ip-address':
-                return self.formats['ipv4'](obj)
-            return self.formats[self.attrs['format']](obj)
+            substituted = {
+                'color': 'css:color',
+                'date-time': 'utc:datetime',
+                'date': 'utc:date',
+                'time': 'utc:time',
+                'utc-millisec': 'utc:millisec',
+                'regex': 'regex',
+                'style': 'css:style',
+                'phone': 'phone',
+                'uri': 'uri',
+                'email': 'email',
+                'ip-address': 'ipv4',
+                'ipv6': 'ipv6',
+                'host-name': 'hostname',
+            }.get(self.attrs['format'], self.attrs['format'])
+            logger.debug('use %s', substituted)
+            return self.formats[substituted](obj)
         return obj
 
     @error

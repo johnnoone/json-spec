@@ -122,34 +122,54 @@ def validate_css_color(obj):
     return obj
 
 
-def validate_datetime(obj):
+def validate_rfc3339_datetime(obj):
     try:
-        return rfc3339_to_datetime(obj)
+        rfc3339_to_datetime(obj)
     except ValueError:
         raise ValidationError('{!r} is not a valid datetime', obj)
+    return obj
 
 
-def validate_date(obj):
+def validate_utc_datetime(obj):
+    if not obj.endswith('Z'):
+        raise ValidationError('{!r} is not a valid datetime', obj)
+    obj = obj[:-1]
+    if '.' in obj:
+        obj, milli = obj.split('.', 1)
+        if not milli.isdigit():
+            raise ValidationError('{!r} is not a valid datetime', obj)
+
+    try:
+        time.strptime(obj, '%Y-%m-%dT%H:%M:%S')
+    except ValueError:
+        raise ValidationError('{!r} is not a valid datetime', obj)
+    return obj
+
+
+def validate_utc_date(obj):
     try:
         time.strptime(obj, '%Y-%m-%d')
     except ValueError:
         raise ValidationError('{!r} is not a valid date', obj)
+    return obj
 
 
-def validate_millisec(obj):
+def validate_utc_time(obj):
+    try:
+        time.strptime(obj, '%H:%M:%S')
+    except ValueError:
+        raise ValidationError('{!r} is not a valid time', obj)
+    return obj
+
+
+def validate_utc_millisec(obj):
     try:
         if not isinstance(obj, number_types):
             raise TypeError
         datetime.utcfromtimestamp(obj/1000)
     except (TypeError, ValueError):
         raise ValidationError('{!r} is not a valid utc millis', obj)
-
-
-def validate_time(obj):
-    try:
-        time.strptime(obj, '%H:%M:%S')
-    except ValueError:
-        raise ValidationError('{!r} is not a valid time', obj)
+    return obj
 
 
 def validate_email(obj):

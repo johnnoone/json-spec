@@ -19,7 +19,7 @@ This library implements tools inspired by several cleaver specifications around 
 
 :jsonspec.validators:
 
-    Implements `JSON Schema`_ draft04, adds the power of document validation.
+    Implements `JSON Schema`_, it adds the power of document validation.
 
 Of course, it works for Python 2.7, Python 3.3 and Python 3.4.
 
