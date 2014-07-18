@@ -12,7 +12,7 @@ import os.path
 import re
 from copy import deepcopy
 from decimal import Decimal
-from six import integer_types, string_types, text_type
+from six import integer_types, string_types
 from six.moves.urllib.parse import urljoin
 from .bases import ReferenceValidator, Validator, error
 from .exceptions import CompilationError
@@ -264,7 +264,6 @@ class Draft04Validator(Validator):
     """
 
     def __init__(self, attrs, uri=None, formats=None):
-        # ensure that we use 
         attrs = {uncamel(k): v for k, v in attrs.items()}
 
         self.formats = formats or {}
@@ -387,60 +386,6 @@ class Draft04Validator(Validator):
         return obj
 
     @error
-    def validate_one_of(self, obj):
-        if 'one_of' in self.attrs:
-            validated = 0
-            for validator in self.attrs['one_of']:
-                try:
-                    validated_obj = validator(obj)
-                    validated += 1
-                except ValidationError:
-                    pass
-            if not validated:
-                raise ValidationError('Validates noone', obj)
-            if validated == 1:
-                return validated_obj
-            else:
-                raise ValidationError('Validates more than once', obj)
-        return obj
-
-    @error
-    def validate_not(self, obj):
-        if 'not' in self.attrs:
-            try:
-                validator = self.attrs['not']
-                validator(obj)
-            except ValidationError:
-                return obj
-            else:
-                raise ValidationError('{!r} is forbidden'.format(obj))
-        return obj
-
-    @error
-    def validate_maximum(self, obj):
-        if 'maximum' in self.attrs:
-            m = self.attrs['maximum']
-            if obj < m:
-                return obj
-            exclusive = self.attrs.get('exclusive_maximum', True)
-            if not exclusive and (obj == m):
-                return obj
-            raise ValidationError(m, obj)
-        return obj
-
-    @error
-    def validate_minimum(self, obj):
-        if 'minimum' in self.attrs:
-            m = self.attrs['minimum']
-            if obj > m:
-                return obj
-            exclusive = self.attrs.get('exclusive_minimum', True)
-            if not exclusive and (obj == m):
-                return obj
-            raise ValidationError(m, obj)
-        return obj
-
-    @error
     def validate_items(self, obj):
         if 'items' in self.attrs:
             items = self.attrs['items']
@@ -468,6 +413,18 @@ class Draft04Validator(Validator):
         return obj
 
     @error
+    def validate_maximum(self, obj):
+        if 'maximum' in self.attrs:
+            m = self.attrs['maximum']
+            if obj < m:
+                return obj
+            exclusive = self.attrs.get('exclusive_maximum', True)
+            if not exclusive and (obj == m):
+                return obj
+            raise ValidationError(m, obj)
+        return obj
+
+    @error
     def validate_max_items(self, obj):
         if 'max_items' in self.attrs:
             count = len(obj)
@@ -489,6 +446,18 @@ class Draft04Validator(Validator):
             count = len(obj)
             if count > self.attrs['max_properties']:
                 raise ValidationError('Too many properties {}'.format(count))
+        return obj
+
+    @error
+    def validate_minimum(self, obj):
+        if 'minimum' in self.attrs:
+            m = self.attrs['minimum']
+            if obj > m:
+                return obj
+            exclusive = self.attrs.get('exclusive_minimum', True)
+            if not exclusive and (obj == m):
+                return obj
+            raise ValidationError(m, obj)
         return obj
 
     @error
@@ -522,6 +491,36 @@ class Draft04Validator(Validator):
             orig = Decimal(str(obj))
             if orig % factor != 0:
                 raise ValidationError('Not a multiple of {}'.format(factor))
+        return obj
+
+    @error
+    def validate_not(self, obj):
+        if 'not' in self.attrs:
+            try:
+                validator = self.attrs['not']
+                validator(obj)
+            except ValidationError:
+                return obj
+            else:
+                raise ValidationError('{!r} is forbidden'.format(obj))
+        return obj
+
+    @error
+    def validate_one_of(self, obj):
+        if 'one_of' in self.attrs:
+            validated = 0
+            for validator in self.attrs['one_of']:
+                try:
+                    validated_obj = validator(obj)
+                    validated += 1
+                except ValidationError:
+                    pass
+            if not validated:
+                raise ValidationError('Validates noone', obj)
+            if validated == 1:
+                return validated_obj
+            else:
+                raise ValidationError('Validates more than once', obj)
         return obj
 
     @error
@@ -598,7 +597,7 @@ class Draft04Validator(Validator):
                     return obj
                 if t == 'string' and self.is_string(obj):
                     return obj
-            print('type does not match', types, obj, self.attrs)
+
             raise ValidationError('type does not match', types, obj)
         return obj
 
@@ -608,3 +607,10 @@ class Draft04Validator(Validator):
             if len(obj) > len(set(json.dumps(element) for element in obj)):
                 raise ValidationError('Elements must be unique', obj)
         return obj
+
+    def is_optional(self):
+        """
+        Returns True, beceause it is meaningless in draft04.
+        """
+        logger.warn('asking for is_optional')
+        return True

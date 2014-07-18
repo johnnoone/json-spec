@@ -10,16 +10,49 @@ import logging
 import re
 import time
 from copy import deepcopy
+from decimal import Decimal
 from datetime import tzinfo, timedelta, datetime, date
 from six import text_type
+from six import integer_types
 from six.moves.urllib.parse import urlparse
 from .exceptions import ValidationError
+
+number_types = (integer_types, float, Decimal)
 
 logger = logging.getLogger(__name__)
 
 HOSTNAME_TOKENS = re.compile('(?!-)[a-z\d-]{1,63}(?<!-)$', re.IGNORECASE)
 HOSTNAME_LAST_TOKEN = re.compile('[a-z]+$', re.IGNORECASE)
 EMAIL = re.compile('[^@]+@[^@]+\.[^@]+')
+
+CSS_COLORS = set([
+    'aliceblue', 'antiquewhite', 'aqua', 'aquamarine', 'azure', 'beige',
+    'bisque', 'black', 'blanchedalmond', 'blue', 'blueviolet', 'brown',
+    'burlywood', 'cadetblue', 'chartreuse', 'chocolate', 'coral',
+    'cornflowerblue', 'cornsilk', 'crimson', 'darkblue', 'darkcyan',
+    'darkgoldenrod', 'darkgray', 'darkgreen', 'darkkhaki', 'darkmagenta',
+    'darkolivegreen', 'darkorange', 'darkorchid', 'darkred', 'darksalmon',
+    'darkseagreen', 'darkslateblue', 'darkslategray', 'darkturquoise',
+    'darkviolet', 'deeppink', 'deepskyblue', 'dimgray', 'dodgerblue',
+    'feldspar', 'firebrick', 'floralwhite', 'forestgreen', 'fuchsia',
+    'gainsboro', 'ghostwhite', 'gold', 'goldenrod', 'gray', 'green',
+    'greenyellow', 'honeydew', 'hotpink', 'indianred', 'indigo', 'ivory',
+    'khaki', 'lavender', 'lavenderblush', 'lawngreen', 'lemonchiffon',
+    'lightblue', 'lightcoral', 'lightcyan', 'lightgoldenrodyellow',
+    'lightgreen', 'lightgrey', 'lightpink', 'lightsalmon', 'lightseagreen',
+    'lightskyblue', 'lightslateblue', 'lightslategray', 'lightsteelblue',
+    'lightyellow', 'lime', 'limegreen', 'linen', 'maroon', 'mediumaquamarine',
+    'mediumblue', 'mediumorchid', 'mediumpurple', 'mediumseagreen',
+    'mediumslateblue', 'mediumspringgreen', 'mediumturquoise',
+    'mediumvioletred', 'midnightblue', 'mintcream', 'mistyrose', 'moccasin',
+    'navajowhite', 'navy', 'oldlace', 'olive', 'olivedrab', 'orange',
+    'orangered', 'orchid', 'palegoldenrod', 'palegreen', 'paleturquoise',
+    'palevioletred', 'papayawhip', 'peachpuff', 'peru', 'pink', 'plum',
+    'powderblue', 'purple', 'red', 'rosybrown', 'royalblue', 'saddlebrown',
+    'salmon', 'sandybrown', 'seagreen', 'seashell', 'sienna', 'silver',
+    'skyblue', 'slateblue', 'slategray', 'snow', 'springgreen', 'steelblue',
+    'tan', 'teal', 'thistle', 'tomato', 'turquoise', 'violetred', 'wheat',
+    'white', 'whitesmoke', 'yellow', 'yellowgreen'])
 
 
 def uncamel(name):
@@ -69,17 +102,54 @@ def rfc3339_to_datetime(data):
             tz = offset(tz)
         else:
             tz = offset('00:00')
-        ts = time.strptime(dt, '%Y-%m-%dT%H:%M:%S.%f')
+        if '.' in dt and dt.rsplit('.', 1)[-1].isdigit():
+            ts = time.strptime(dt, '%Y-%m-%dT%H:%M:%S.%f')
+        else:
+            ts = time.strptime(dt, '%Y-%m-%dT%H:%M:%S')
         return datetime(*ts[:6], tzinfo=tz)
     except ValueError:
         raise ValueError('date-time {!r} is not a valid rfc3339 date representation'.format(data))  # noqa
+
+
+def validate_css_color(obj):
+    color = obj.lower()
+    if len(color) == 7 and re.match('^#[0-9a-f]{6}$', color):
+        return obj
+    elif len(color) == 4 and re.match('^#[0-9a-f]{3}$', color):
+        return obj
+    elif color not in CSS_COLORS:
+        raise ValidationError('Not a css color {!r}'.format(obj))
+    return obj
 
 
 def validate_datetime(obj):
     try:
         return rfc3339_to_datetime(obj)
     except ValueError:
-        raise ValidationError('{!r} is not a valid datetime')
+        raise ValidationError('{!r} is not a valid datetime', obj)
+
+
+def validate_date(obj):
+    try:
+        time.strptime(obj, '%Y-%m-%d')
+    except ValueError:
+        raise ValidationError('{!r} is not a valid date', obj)
+
+
+def validate_millisec(obj):
+    try:
+        if not isinstance(obj, number_types):
+            raise TypeError
+        datetime.utcfromtimestamp(obj/1000)
+    except (TypeError, ValueError):
+        raise ValidationError('{!r} is not a valid utc millis', obj)
+
+
+def validate_time(obj):
+    try:
+        time.strptime(obj, '%H:%M:%S')
+    except ValueError:
+        raise ValidationError('{!r} is not a valid time', obj)
 
 
 def validate_email(obj):
@@ -128,6 +198,16 @@ def validate_ipv6(obj):
     except (ipaddress.AddressValueError, ipaddress.NetmaskValueError):
         raise ValidationError('{!r} does not appear to '
                               'be an IPv6 address'.format(obj))
+    return obj
+
+
+def validate_regex(obj):
+    # TODO implement ECMA 262 regex
+    import re
+    try:
+        re.compile(obj)
+    except:
+        raise ValidationError('Not a regex', obj)
     return obj
 
 

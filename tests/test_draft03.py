@@ -39,7 +39,8 @@ for data, src in contents('remotes'):
 
 def scenarios(draft):
     for data, src in contents('tests', draft):
-        skip = []
+        # no ECMA 262 regex parser
+        skip = ['optional/jsregex.json']
         if PY2:
             # json module cannot handle well unicode strings
             skip.extend(('minLength.json', 'maxLength.json'))
@@ -51,10 +52,10 @@ def scenarios(draft):
                 yield block['schema'], test['description'], test['data'], test['valid'], src
 
 
-@pytest.mark.parametrize('schema, description, data, valid, src', scenarios('draft4'))
+@pytest.mark.parametrize('schema, description, data, valid, src', scenarios('draft3'))
 def test_common(schema, description, data, valid, src):
     try:
-        load(schema, provider=provider).validate(data)
+        load(schema, provider=provider, spec='http://json-schema.org/draft-03/schema#').validate(data)
         if not valid:
             assert False, description
     except (ValidationError, CompilationError) as error:

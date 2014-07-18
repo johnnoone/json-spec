@@ -74,7 +74,7 @@ class Factory(object):
             spec = schema.get('$schema', spec or self.spec)
             compiler = self.compilers[spec]
         except KeyError:
-            raise CompilationError('{!r} not registered'.format(spec))
+            raise CompilationError('{!r} not registered'.format(spec), schema)
 
         registry = LocalRegistry(schema, self.provider)
         local = DocumentPointer(pointer)

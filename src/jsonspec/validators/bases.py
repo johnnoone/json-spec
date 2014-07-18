@@ -34,6 +34,13 @@ class Validator(object):
         pass
 
     @abstractmethod
+    def is_optional(self):
+        """
+        Indicates if the instance must be defined.
+        """
+        pass
+
+    @abstractmethod
     def validate(self, obj):
         pass
 
@@ -75,6 +82,9 @@ class ReferenceValidator(Validator):
     @property
     def default(self):
         return self.validator.default
+
+    def is_optional(self):
+        return self.validator.is_optional()
 
     def validate(self, obj):
         """
