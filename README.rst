@@ -19,15 +19,47 @@ This library implements several JSON specs, like `JSON Schema`_,  `JSON Referenc
 Installation
 ------------
 
-This library has no special dependencies. You can simply use pip::
+This library has only weak dependencies. You can simply use pip::
 
     $ pip install json-spec
 
+Regading you needs, you can install more features. For example, this command
+will enable colorated messages::
 
-Usage
------
+    $ pip install json-spec[cli]
 
-Let say you want to fetch / validate JSON like objects.
+This one will enable ip format for json schema::
+
+    $ pip install json-spec[ip]
+
+...
+
+
+CLI Usage
+---------
+
+This module expose 2 cli commands.
+
+
+**json-extract** will extract parts of your json document::
+
+    $ json-extract '#/foo/1' --document-json='{"foo": ["bar", "baz"]}'
+    $ echo '{"foo": ["bar", "baz"]}' | json-extract '#/foo/1'
+    $ json-extract '#/foo/1' --document-file=doc.json
+    $ json-extract '#/foo/1' < doc.json
+
+**json-validate** will validate your document against a schema::
+
+    $ json-validate --schema-file=schema.json --document-json='{"foo": ["bar", "baz"]}'
+    $ echo '{"foo": ["bar", "baz"]}' | json-validate --schema-file=schema.json
+    $ json-validate --schema-file=schema.json --document-file=doc.json
+    $ json-validate --schema-file=schema.json < doc.json
+
+
+Library usage
+-------------
+
+Let say you want to fetch / validate JSON like objects in you python scripts.
 
 You can extract member of an object with `JSON Pointer`_::
 

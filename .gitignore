@@ -48,3 +48,4 @@ xunit.xml
 coverage.xml
 pytestdebug.log
 *~
+tests/.coverage.*

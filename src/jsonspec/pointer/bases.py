@@ -10,7 +10,7 @@ __all__ = ['DocumentPointer', 'Pointer', 'PointerToken']
 import logging
 from abc import abstractmethod, ABCMeta
 from six import add_metaclass, string_types
-from .exceptions import ExtractError, RefError, LastElement, OutOfBounds, OutOfRange, WrongType, UnstagedError  # noqa
+from .exceptions import ExtractError, RefError, LastElement, OutOfBounds, OutOfRange, WrongType, UnstagedError, ParseError  # noqa
 
 logger = logging.getLogger(__name__)
 
@@ -107,7 +107,7 @@ class Pointer(object):
                 token.last = False
                 tokens.append(token)
             except ValueError:
-                raise ValueError('pointer must start with / or int', pointer)
+                raise ParseError('pointer must start with / or int', pointer)
 
         if _:
             for part in children.split('/'):

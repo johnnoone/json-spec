@@ -14,7 +14,7 @@ __all__ = ['extract', 'stage', 'DocumentPointer', 'Pointer', 'PointerToken',
 
 import logging
 from .bases import DocumentPointer, Pointer, PointerToken
-from .exceptions import ExtractError, RefError, LastElement, OutOfBounds, OutOfRange, WrongType, UnstagedError  # noqa
+from .exceptions import ExtractError, RefError, LastElement, OutOfBounds, OutOfRange, WrongType, UnstagedError, ParseError  # noqa
 from .stages import stage
 
 logger = logging.getLogger(__name__)

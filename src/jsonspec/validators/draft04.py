@@ -594,7 +594,7 @@ class Draft04Validator(Validator):
         if 'required' in self.attrs:
             for name in self.attrs['required']:
                 if name not in obj:
-                    raise ValidationError('missing {!r} property'.format(name), obj)  # noqa
+                    raise ValidationError('missing {!r} property'.format(name), obj, rule=os.path.join(self.uri, 'required'))  # noqa
         return obj
 
     @error
@@ -620,7 +620,9 @@ class Draft04Validator(Validator):
                 if t == 'string' and self.is_string(obj):
                     return obj
 
-            raise ValidationError('type does not match', types, obj)
+            raise ValidationError('type does not match',
+                                  obj,
+                                  rule=os.path.join(self.uri, 'required'))
         return obj
 
     @error

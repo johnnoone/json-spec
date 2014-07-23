@@ -8,6 +8,17 @@ __all__ = ['ExtractError', 'RefError', 'LastElement', 'OutOfBounds',
            'OutOfRange', 'WrongType', 'UnstagedError']
 
 
+class ParseError(ValueError):
+    """Raised when pointer is not well formatted.
+
+    :ivar pointer: the faulty pointer
+    """
+
+    def __init__(self, pointer, *args):
+        super(ParseError, self).__init__(*args)
+        self.pointer = pointer
+
+
 class ExtractError(Exception):
     """Raised for any errors.
 

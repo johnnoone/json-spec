@@ -5,6 +5,15 @@ This library implements tools inspired by several cleaver specifications around 
 
 **Features:**
 
+:jsonspec.cli:
+
+    Expose `JSON Pointer`_ and `JSON Schema`_ to your console:
+
+    .. code-block:: bash
+
+        json-extract '#/foo/1' --document-json='{"foo": ["bar", "baz"]}'
+        json-validate --schema-file=schema.json < doc.json
+
 :jsonspec.pointer:
 
     Implements `JSON Pointer`_ and `Relative JSON Pointer`_, it offers a way to target a subelement.
@@ -59,6 +68,7 @@ Documentation
    :maxdepth: 2
 
    installation
+   cli
    pointer
    reference
    operations
