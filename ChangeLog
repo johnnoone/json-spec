@@ -1,17 +1,23 @@
 CHANGES
 =======
 
-* added cli commands.
+0.9.6
+-----
+
+* started cli commands
 
 0.9.5
 -----
 
+* document draft03
 * implements JSON Schema draft03
 
 0.9.0
 -----
 
-* cleanup
+* more cleanup
+* latest cleanup
+* cleanup on tests, install, etc
 
 0.8.0
 -----
