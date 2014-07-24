@@ -14,11 +14,12 @@ from copy import deepcopy
 from decimal import Decimal
 from six import integer_types, string_types
 from six.moves.urllib.parse import urljoin
-from .bases import ReferenceValidator, Validator, error
+from .bases import ReferenceValidator, Validator
 from .exceptions import CompilationError
 from .factorize import register
 from jsonspec.validators.exceptions import ValidationError
 from jsonspec.validators.util import uncamel
+from jsonspec.validators.pointer_util import pointer_join
 from jsonspec import driver as json
 
 sequence_types = (list, set, tuple)
@@ -108,7 +109,7 @@ def compile(schema, pointer, context, scope=None):
     if 'divisibleBy' in schm:
         attrs['divisible_by'] = schm.pop('divisibleBy')
         if not isinstance(attrs['divisible_by'], number_types):
-            raise CompilationError('divisibleBy must be a number')
+            raise CompilationError('divisibleBy must be a number', schema)
 
     if 'enum' in schm:
         attrs['enum'] = schm.pop('enum')
@@ -145,7 +146,7 @@ def compile(schema, pointer, context, scope=None):
     if 'format' in schm:
         attrs['format'] = schm.pop('format')
         if not isinstance(attrs['format'], string_types):
-            raise CompilationError('format must be a string')
+            raise CompilationError('format must be a string', schema)
 
     if 'items' in schm:
         subpointer = os.path.join(pointer, 'items')
@@ -173,7 +174,7 @@ def compile(schema, pointer, context, scope=None):
     if 'maxLength' in schm:
         attrs['max_length'] = schm.pop('maxLength')
         if not isinstance(attrs['max_length'], integer_types):
-            raise CompilationError('maxLength must be integer')
+            raise CompilationError('maxLength must be integer', schema)
 
     if 'minimum' in schm:
         attrs['minimum'] = schm.pop('minimum')
@@ -188,7 +189,7 @@ def compile(schema, pointer, context, scope=None):
     if 'minLength' in schm:
         attrs['min_length'] = schm.pop('minLength')
         if not isinstance(attrs['min_length'], integer_types):
-            raise CompilationError('minLength must be integer')
+            raise CompilationError('minLength must be integer', schema)
 
     if 'pattern' in schm:
         attrs['pattern'] = schm.pop('pattern')
@@ -240,7 +241,7 @@ def compile(schema, pointer, context, scope=None):
     if 'uniqueItems' in schm:
         attrs['unique_items'] = schm.pop('uniqueItems')
         if not isinstance(attrs['unique_items'], bool):
-            raise CompilationError('type must be boolean')
+            raise CompilationError('type must be boolean', schema)
 
     return Draft03Validator(attrs, scope, context.formats)
 
@@ -264,11 +265,16 @@ class Draft03Validator(Validator):
 
         self.attrs = attrs
         self.attrs.setdefault('additional_items', True)
+        self.attrs.setdefault('pattern_properties', {})
         self.attrs.setdefault('exclusive_maximum', False)
         self.attrs.setdefault('exclusive_minimum', False)
+        self.attrs.setdefault('additional_properties', True)
+        self.attrs.setdefault('properties', {})
         self.uri = uri
         self.formats = formats or {}
         self.default = self.attrs.get('default', None)
+        self.fail_fast = True
+        self.errors = []
 
     def is_array(self, obj):
         return isinstance(obj, sequence_types)
@@ -291,43 +297,54 @@ class Draft03Validator(Validator):
     def is_string(self, obj):
         return isinstance(obj, string_types)
 
-    @error
-    def validate(self, obj):
+    def validate(self, obj, pointer=None):
         """
         Validate object against validator
 
         :param obj: the object to validate
         """
+
+        pointer = pointer or '#'
+
+        validator = deepcopy(self)
+        validator.errors = []
+        validator.fail_fast = False
+
         obj = deepcopy(obj)
-        obj = self.validate_enum(obj)
-        obj = self.validate_type(obj)
-        obj = self.validate_disallow(obj)
-        obj = self.validate_extends(obj)
+        obj = validator.validate_enum(obj, pointer)
+        obj = validator.validate_type(obj, pointer)
+        obj = validator.validate_disallow(obj, pointer)
+        obj = validator.validate_extends(obj, pointer)
 
-        if self.is_array(obj):
-            obj = self.validate_max_items(obj)
-            obj = self.validate_min_items(obj)
-            obj = self.validate_items(obj)
-            obj = self.validate_unique_items(obj)
+        if validator.is_array(obj):
+            obj = validator.validate_max_items(obj, pointer)
+            obj = validator.validate_min_items(obj, pointer)
+            obj = validator.validate_items(obj, pointer)
+            obj = validator.validate_unique_items(obj, pointer)
 
-        if self.is_number(obj):
-            obj = self.validate_maximum(obj)
-            obj = self.validate_minimum(obj)
-            obj = self.validate_divisible_by(obj)
+        if validator.is_number(obj):
+            obj = validator.validate_maximum(obj, pointer)
+            obj = validator.validate_minimum(obj, pointer)
+            obj = validator.validate_divisible_by(obj, pointer)
 
-        if self.is_object(obj):
-            obj = self.validate_dependencies(obj)
-            obj = self.validate_properties(obj)
+        if validator.is_object(obj):
+            obj = validator.validate_dependencies(obj, pointer)
+            obj = validator.validate_properties(obj, pointer)
 
-        if self.is_string(obj):
-            obj = self.validate_max_length(obj)
-            obj = self.validate_min_length(obj)
-            obj = self.validate_pattern(obj)
-            obj = self.validate_format(obj)
+        if validator.is_string(obj):
+            obj = validator.validate_max_length(obj, pointer)
+            obj = validator.validate_min_length(obj, pointer)
+            obj = validator.validate_pattern(obj, pointer)
+            obj = validator.validate_format(obj, pointer)
+
+        if validator.errors:
+            raise ValidationError('multiple errors',
+                                  obj,
+                                  errors=validator.errors)
+
         return obj
 
-    @error
-    def validate_dependencies(self, obj):
+    def validate_dependencies(self, obj, pointer=None):
         if 'dependencies' in self.attrs:
             missings = set()
             for name, dependencies in self.attrs['dependencies'].items():
@@ -343,11 +360,10 @@ class Draft03Validator(Validator):
                     missings.add(dependencies)
             if missings:
                 missings = sorted(missings)
-                raise ValidationError('Missing properties {}'.format(missings))
+                self.fail('Missing properties', obj, pointer)
         return obj
 
-    @error
-    def validate_disallow(self, obj):
+    def validate_disallow(self, obj, pointer=None):
         if 'disallow' in self.attrs:
             disallows = self.attrs['disallow']
             if not isinstance(disallows, sequence_types):
@@ -378,27 +394,24 @@ class Draft03Validator(Validator):
                     # let it, it may be good
                     pass
             if disallowed:
-                raise ValidationError('Wrong type', obj)
+                self.fail('Wrong type', obj, pointer)
         return obj
 
-    @error
-    def validate_divisible_by(self, obj):
+    def validate_divisible_by(self, obj, pointer=None):
         if 'divisible_by' in self.attrs:
             factor = Decimal(str(self.attrs['divisible_by']))
             orig = Decimal(str(obj))
             if orig % factor != 0:
-                raise ValidationError('Not a multiple of {}'.format(factor))
+                self.fail('Not a multiple of {}', obj, pointer)
         return obj
 
-    @error
-    def validate_enum(self, obj):
+    def validate_enum(self, obj, pointer=None):
         if 'enum' in self.attrs:
             if not obj in self.attrs['enum']:
-                raise ValidationError('Forbidden value')
+                self.fail('Forbidden value', obj, pointer)
         return obj
 
-    @error
-    def validate_extends(self, obj):
+    def validate_extends(self, obj, pointer=None):
         if 'extends' in self.attrs:
             extends = self.attrs['extends']
             if not isinstance(extends, sequence_types):
@@ -407,8 +420,7 @@ class Draft03Validator(Validator):
                 obj = type(obj)
         return obj
 
-    @error
-    def validate_format(self, obj):
+    def validate_format(self, obj, pointer=None):
         """
         ================= ============
         Expected draft03  Alias of
@@ -450,127 +462,132 @@ class Draft03Validator(Validator):
             return self.formats[substituted](obj)
         return obj
 
-    @error
-    def validate_items(self, obj):
+    def validate_items(self, obj, pointer=None):
         if 'items' in self.attrs:
             items = self.attrs['items']
             if isinstance(items, Validator):
                 validator = items
                 for index, element in enumerate(obj):
-                    obj[index] = validator(element)
+                    with self.catch_fail():
+                        obj[index] = validator(element, pointer_join(pointer, index))  # noqa
                 return obj
             elif isinstance(items, (list, tuple)):
                 additionals = self.attrs['additional_items']
                 validators = items
                 for index, element in enumerate(obj):
-                    try:
-                        validator = validators[index]
-                    except IndexError:
-                        if additionals is True:
-                            return obj
-                        elif additionals is False:
-                            raise ValidationError('Additional elements are forbidden', obj)  # noqa
-                        validator = additionals
-                    obj[index] = validator(element)
+                    with self.catch_fail():
+                        try:
+                            validator = validators[index]
+                        except IndexError:
+                            if additionals is True:
+                                return obj
+                            elif additionals is False:
+                                self.fail('Additional elements are forbidden',
+                                          obj,
+                                          pointer_join(pointer, index))
+                                continue
+                            validator = additionals
+                        obj[index] = validator(element, pointer_join(pointer, index))  # noqa
                 return obj
             else:
                 raise NotImplementedError(items)
         return obj
 
-    @error
-    def validate_max_items(self, obj):
+    def validate_max_items(self, obj, pointer=None):
         if 'max_items' in self.attrs:
             count = len(obj)
             if count > self.attrs['max_items']:
-                raise ValidationError('Too many items')
+                self.fail('Too many items', obj, pointer)
         return obj
 
-    @error
-    def validate_max_length(self, obj):
+    def validate_max_length(self, obj, pointer=None):
         if 'max_length' in self.attrs:
             length = len(obj)
             if length > self.attrs['max_length']:
-                raise ValidationError('Too long {}'.format(length))
+                self.fail('Too long', obj, pointer)
         return obj
 
-    @error
-    def validate_maximum(self, obj):
+    def validate_maximum(self, obj, pointer=None):
         if 'maximum' in self.attrs:
             if obj > self.attrs['maximum']:
-                raise ValidationError('Too big number')
+                self.fail('Too big number', obj, pointer)
             if self.attrs['exclusive_maximum'] and obj == self.attrs['maximum']:  # noqa
-                raise ValidationError('Too big number')
+                self.fail('Too big number', obj, pointer)
         return obj
 
-    @error
-    def validate_min_items(self, obj):
+    def validate_min_items(self, obj, pointer=None):
         if 'min_items' in self.attrs:
             count = len(obj)
             if count < self.attrs['min_items']:
-                raise ValidationError('Too few items')
+                self.fail('Too few items', obj, pointer)
         return obj
 
-    @error
-    def validate_min_length(self, obj):
+    def validate_min_length(self, obj, pointer=None):
         if 'min_length' in self.attrs:
             length = len(obj)
             if length < self.attrs['min_length']:
-                raise ValidationError('Too short {}'.format(length))
+                self.fail('Too short', obj, pointer)
         return obj
 
-    @error
-    def validate_minimum(self, obj):
+    def validate_minimum(self, obj, pointer=None):
         if 'minimum' in self.attrs:
             if obj < self.attrs['minimum']:
-                raise ValidationError('Too low number')
+                self.fail('Too low number', obj, pointer)
             if self.attrs['exclusive_minimum'] and obj == self.attrs['minimum']:  # noqa
-                raise ValidationError('Too low number')
+                self.fail('Too low number',
+                          obj,
+                          pointer)
         return obj
 
-    @error
-    def validate_pattern(self, obj):
+    def validate_pattern(self, obj, pointer=None):
         if 'pattern' in self.attrs:
             regex = re.compile(self.attrs['pattern'])
             if not regex.search(obj):
-                raise ValidationError('Does not match pattern')
+                self.fail('Does not match pattern', obj, pointer)
         return obj
 
-    @error
-    def validate_properties(self, obj):
+    def validate_properties(self, obj, pointer=None):
         validated = set()
-        if 'properties' in self.attrs:
-            for name, validator in self.attrs['properties'].items():
-                if name in obj:
-                    obj[name] = validator(obj[name])
+        pending = set(obj.keys())
+
+        for name, validator in self.attrs['properties'].items():
+            if name in obj:
+                with self.catch_fail():
+                    pending.discard(name)
+                    obj[name] = validator(obj[name], pointer_join(pointer, name))  # noqa
                     validated.add(name)
-                elif not validator.is_optional():
-                    raise ValidationError('Required property')
-        if 'pattern_properties' in self.attrs:
-            for pattern, validator in self.attrs['pattern_properties'].items():
-                regex = re.compile(pattern)
-                for name, value in obj.items():
-                    if regex.search(name):
-                        obj[name] = validator(obj[name])
+            elif not validator.is_optional():
+                self.fail('Required property', obj, pointer)
+
+        for pattern, validator in self.attrs['pattern_properties'].items():
+            regex = re.compile(pattern)
+            for name, value in obj.items():
+                if regex.search(name):
+                    with self.catch_fail():
+                        pending.discard(name)
+                        obj[name] = validator(obj[name], pointer_join(pointer, name))  # noqa
                         validated.add(name)
 
-        if 'additional_properties' in self.attrs:
-            if self.attrs['additional_properties'] is True:
-                return obj
+        if not pending:
+            return obj
 
-            if self.attrs['additional_properties'] is False:
-                if len(obj) > len(validated):
-                    raise ValidationError('Additional properties are forbidden')  # noqa
+        if self.attrs['additional_properties'] is True:
+            return obj
 
-            validator = self.attrs['additional_properties']
-            for name, value in obj.items():
-                if name not in validated:
-                    obj[name] = validator(value)
-                    validated.add(name)
+        if self.attrs['additional_properties'] is False:
+            if len(obj) > len(validated):
+                self.fail('Additional properties are forbidden', obj, pointer)  # noqa
+            return obj
+
+        validator = self.attrs['additional_properties']
+        for name, value in obj.items():
+            if name not in validated:
+                obj[name] = validator(value, pointer_join(pointer, name))
+                validated.add(name)
 
         return obj
 
-    @error
-    def validate_type(self, obj):
+    def validate_type(self, obj, pointer=None):
         if 'type' in self.attrs:
             types = self.attrs['type']
             if not isinstance(types, sequence_types):
@@ -598,14 +615,13 @@ class Draft03Validator(Validator):
                 except ValidationError:
                     # let it, it may be good
                     pass
-            raise ValidationError('Wrong type', obj)
+            self.fail('Wrong type', obj, pointer)
         return obj
 
-    @error
-    def validate_unique_items(self, obj):
+    def validate_unique_items(self, obj, pointer=None):
         if self.attrs.get('unique_items'):
             if len(obj) > len(set(json.dumps(element) for element in obj)):
-                raise ValidationError('Elements must be unique', obj)
+                self.fail('Elements must be unique', obj, pointer)
         return obj
 
     def has_default(self):
@@ -617,3 +633,32 @@ class Draft03Validator(Validator):
         True by default.
         """
         return not self.attrs.get('required', False)
+
+    def fail(self, reason, obj, pointer=None):
+        """
+        Called when validation fails.
+        """
+        pointer = pointer_join(pointer)
+        err = ValidationError(reason, obj, pointer)
+        if self.fail_fast:
+            raise err
+        else:
+            self.errors.append(err)
+        return err
+
+    def catch_fail(self):
+        return FailCatcher(self)
+
+
+class FailCatcher(object):
+    def __init__(self, validator):
+        self.validator = validator
+
+    def __enter__(self):
+        return self
+
+    def __exit__(self, type, value, tb):
+        if isinstance(value, ValidationError) and not self.validator.fail_fast:
+            self.validator.errors.append(value)
+            return True
+        return False

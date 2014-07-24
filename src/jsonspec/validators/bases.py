@@ -41,12 +41,18 @@ class Validator(object):
         pass
 
     @abstractmethod
-    def validate(self, obj):
+    def validate(self, obj, pointer=None):
+        """
+        Validate object.
+
+        :param obj: the object to validate
+        :param pointer: the object pointer
+        """
         pass
 
-    def __call__(self, obj):
+    def __call__(self, obj, pointer=None):
         """shortcut for validate()"""
-        return self.validate(obj)
+        return self.validate(obj, pointer)
 
 
 class ReferenceValidator(Validator):
@@ -86,10 +92,11 @@ class ReferenceValidator(Validator):
     def is_optional(self):
         return self.validator.is_optional()
 
-    def validate(self, obj):
+    def validate(self, obj, pointer=None):
         """
-        Validate object against validator
+        Validate object against validator.
 
         :param obj: the object to validate
+        :param pointer: the object pointer
         """
-        return self.validator.validate(obj)
+        return self.validator.validate(obj, pointer)

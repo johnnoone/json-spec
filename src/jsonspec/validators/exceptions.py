@@ -1,6 +1,7 @@
 
 __all__ = ['error', 'CompilationError', 'ReferenceError', 'ValidationError']
 
+from collections import defaultdict
 from six import wraps
 
 
@@ -12,8 +13,8 @@ def error(meth):
         except ValidationError as error:
             if not error.obj:
                 error.obj = obj
-            if not error.rule:
-                error.rule = self.uri
+            if not error.pointer:
+                error.pointer = self.uri
             raise
     return wrapper
 
@@ -33,18 +34,45 @@ class ReferenceError(Exception):
 
 class ValidationError(ValueError):
     """Raised when validation fails"""
-    def __init__(self, reason, obj=None, rule=None, error=None):
+    def __init__(self, reason, obj=None, pointer=None, errors=None):
         """
         :param reason: the reason failing
         :param obj: the obj that fails
-        :param error: sub errors, if they exists
+        :param errors: sub errors, if they exists
         """
         super(ValidationError, self).__init__(reason, obj)
         self.obj = obj
-        self.rule = rule
+        self.pointer = pointer
 
-        self.error = set()
-        if isinstance(error, (list, tuple, set)):
-            self.error.update(error)
-        elif isinstance(error, Exception):
-            self.error.add(error)
+        self.errors = set()
+        if isinstance(errors, (list, tuple, set)):
+            self.errors.update(errors)
+        elif isinstance(errors, Exception):
+            self.errors.add(errors)
+
+    def flatten(self):
+        """
+        Flatten nested errors.
+
+        {pointer: reasons}
+        """
+        return flatten(self)
+
+
+def flatten(error):
+    def iter_it(src):
+        if isinstance(src, (list, set, tuple)):
+            for error in src:
+                for pointer, reason in iter_it(error):
+                    yield pointer, reason
+        if isinstance(src, ValidationError):
+            if src.errors:
+                for pointer, reason in iter_it(src.errors):
+                    yield pointer, reason
+            if src.pointer:
+                yield src.pointer, src.args[0]
+
+    data = defaultdict(set)
+    for pointer, reason in iter_it(error):
+        data[pointer].add(reason)
+    return dict(data)
