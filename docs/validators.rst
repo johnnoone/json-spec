@@ -188,8 +188,6 @@ API
 Exceptions
 ----------
 
-.. autofunction:: validators.error
-
 .. autoclass:: validators.CompilationError
     :members:
 

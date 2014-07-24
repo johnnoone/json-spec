@@ -1,10 +1,17 @@
 CHANGES
 =======
 
+0.9.8
+-----
+
+* better cli error formating
+* 0.9.7
+
 0.9.7
 -----
 
 * Reshap ValidationError
+* updated doc
 
 0.9.6
 -----
