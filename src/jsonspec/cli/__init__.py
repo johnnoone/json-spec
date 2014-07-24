@@ -94,7 +94,14 @@ def validate_cmd():
         validated = load(schema).validate(document)
         return driver.dumps(validated, indent=args.indent)
     except ValidationError as error:
-        raise Exception('document does not validate with schema: {}'.format(error.rule))
+        msg = 'document does not validate with schema.\n\n'
+        for pointer, reasons in error.flatten.items():
+            msg += '  {}\n'.format(pointer)
+            for reason in reasons:
+                msg += '    - reason {}\n'.format(reason)
+            msg += '\n'
+        raise Exception(msg)
+
 
 def parse_document(args, parser):
     if args.document_json:
@@ -127,7 +134,6 @@ def parse_schema(args, parser):
 
 def read_file(filename, placeholder=None):
     placeholder = placeholder or 'file'
-
     try:
         return driver.load(open(filename, 'r'))
     except OSError as error:
