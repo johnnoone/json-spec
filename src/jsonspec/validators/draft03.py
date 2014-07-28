@@ -425,13 +425,13 @@ class Draft03Validator(Validator):
         ================= ============
         Expected draft03  Alias of
         ----------------- ------------
-        color             css:color
-        date-time         utc:datetime
-        date              utc:date
-        time              utc:time
-        utc-millisec      utc:millisec
+        color             css.color
+        date-time         utc.datetime
+        date              utc.date
+        time              utc.time
+        utc-millisec      utc.millisec
         regex             regex
-        style             css:style
+        style             css.style
         phone             phone
         uri               uri
         email             email
@@ -444,13 +444,13 @@ class Draft03Validator(Validator):
 
         if 'format' in self.attrs:
             substituted = {
-                'color': 'css:color',
-                'date-time': 'utc:datetime',
-                'date': 'utc:date',
-                'time': 'utc:time',
-                'utc-millisec': 'utc:millisec',
+                'color': 'css.color',
+                'date-time': 'utc.datetime',
+                'date': 'utc.date',
+                'time': 'utc.time',
+                'utc-millisec': 'utc.millisec',
                 'regex': 'regex',
-                'style': 'css:style',
+                'style': 'css.style',
                 'phone': 'phone',
                 'uri': 'uri',
                 'email': 'email',

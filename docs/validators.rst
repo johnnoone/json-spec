@@ -125,22 +125,22 @@ This module implements a lot of formats, exposed to every draft:
     * - uri
       - validate uri
       - 
-    * - css:color
+    * - css.color
       - validate css color
       - 
     * - rfc3339:datetime
       - see rfc3339_
       - 
-    * - utc:datetime
+    * - utc.datetime
       - YYYY-MM-ddThh:mm:SSZ
       - 
-    * - utc:date
+    * - utc.date
       - YYYY-MM-dd
       - 
-    * - utc:time
+    * - utc.time
       - hh:mm:SS
       - 
-    * - utc:millisec
+    * - utc.millisec
       - any integer, float
       - 
 
