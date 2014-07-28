@@ -4,13 +4,15 @@
 
 """
 
-__all__ = ['error', 'ValidationError', 'Validator', 'ReferenceValidator']
+from __future__ import absolute_import
+
+__all__ = ['ValidationError', 'Validator', 'ReferenceValidator']
 
 import logging
 from abc import abstractmethod, ABCMeta
 from six import add_metaclass
 from jsonspec.pointer import DocumentPointer
-from .exceptions import error, ValidationError
+from .exceptions import ValidationError
 
 
 logger = logging.getLogger(__name__)

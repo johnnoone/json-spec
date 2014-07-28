@@ -1,22 +1,14 @@
+"""
+    jsonspec.validators.exceptions
+    ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
-__all__ = ['error', 'CompilationError', 'ReferenceError', 'ValidationError']
+"""
+
+from __future__ import absolute_import
+
+__all__ = ['CompilationError', 'ReferenceError', 'ValidationError']
 
 from collections import defaultdict
-from six import wraps
-
-
-def error(meth):
-    @wraps(meth)
-    def wrapper(self, obj, *args, **kwargs):
-        try:
-            return meth(self, obj, *args, **kwargs)
-        except ValidationError as error:
-            if not error.obj:
-                error.obj = obj
-            if not error.pointer:
-                error.pointer = self.uri
-            raise
-    return wrapper
 
 
 class CompilationError(Exception):

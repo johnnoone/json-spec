@@ -7,10 +7,10 @@
 __all__ = ['load', 'register', 'Factory', 'Context',
            'Validator', 'ReferenceValidator',
            'Draft03Validator', 'Draft04Validator',
-           'error', 'CompilationError', 'ReferenceError', 'ValidationError']
+           'CompilationError', 'ReferenceError', 'ValidationError']
 
 from .bases import Validator, ReferenceValidator
-from .exceptions import error, CompilationError, ReferenceError, ValidationError  # noqa
+from .exceptions import CompilationError, ReferenceError, ValidationError
 from .factorize import register, Factory, Context
 from . import draft04  # noqa
 from . import draft03  # noqa

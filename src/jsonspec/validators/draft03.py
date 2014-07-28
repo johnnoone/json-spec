@@ -5,6 +5,8 @@
     Implements JSON Schema draft03.
 """
 
+from __future__ import absolute_import
+
 __all__ = ['compile', 'Draft03Validator']
 
 import logging
