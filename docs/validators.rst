@@ -128,7 +128,7 @@ This module implements a lot of formats, exposed to every draft:
     * - css.color
       - validate css color
       - 
-    * - rfc3339:datetime
+    * - rfc3339.datetime
       - see rfc3339_
       - 
     * - utc.datetime

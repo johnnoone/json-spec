@@ -7,12 +7,13 @@ This library implements tools inspired by several cleaver specifications around 
 
 :jsonspec.cli:
 
-    Expose `JSON Pointer`_ and `JSON Schema`_ to your console:
+    Expose `JSON Pointer`_ , `JSON Schema`_ and `JSON Patch`_ to your console:
 
     .. code-block:: bash
 
-        json-extract '#/foo/1' --document-json='{"foo": ["bar", "baz"]}'
-        json-validate --schema-file=schema.json < doc.json
+        json extract '#/foo/1' --document-json='{"foo": ["bar", "baz"]}'
+        json validate --schema-file=schema.json < doc.json
+        cat doc.json | json add '#/foo/1' --fragment='{"foo": ["bar", "baz"]}'
 
 :jsonspec.pointer:
 

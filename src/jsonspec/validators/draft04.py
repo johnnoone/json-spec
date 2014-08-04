@@ -398,7 +398,7 @@ class Draft04Validator(Validator):
         ================= ============
         Expected draft04  Alias of
         ----------------- ------------
-        date-time         rfc3339:datetime
+        date-time         rfc3339.datetime
         email             email
         hostname          hostname
         ipv4              ipv4
@@ -409,7 +409,7 @@ class Draft04Validator(Validator):
         """
         if 'format' in self.attrs:
             substituted = {
-                'date-time': 'rfc3339:datetime',
+                'date-time': 'rfc3339.datetime',
                 'email': 'email',
                 'hostname': 'hostname',
                 'ipv4': 'ipv4',
