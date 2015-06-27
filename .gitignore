@@ -49,3 +49,4 @@ coverage.xml
 pytestdebug.log
 *~
 tests/.coverage.*
+.eggs/

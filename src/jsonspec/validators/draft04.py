@@ -326,7 +326,6 @@ class Draft04Validator(Validator):
             obj = validator.validate_format(obj, pointer)
 
         if validator.errors:
-            print(validator.errors)
             raise ValidationError('multiple errors',
                                   obj,
                                   errors=validator.errors)
@@ -549,7 +548,7 @@ class Draft04Validator(Validator):
                     pass
             if not validated:
                 self.fail('Validates noone', obj)
-            if validated == 1:
+            elif validated == 1:
                 return validated_obj
             else:
                 self.fail('Validates more than once', obj)
