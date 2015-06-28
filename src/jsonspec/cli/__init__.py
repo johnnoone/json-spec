@@ -464,7 +464,7 @@ def get_parser():
     parser = argparse.ArgumentParser(
         formatter_class=argparse.RawDescriptionHelpFormatter)
 
-    parser.add_argument('--version', action='version', version='%(prog)s 0.9.9')
+    parser.add_argument('--version', action='version', version='%(prog)s 0.9.10')
 
     subparsers = parser.add_subparsers(help='choose one of these actions',
                                        dest='action',
