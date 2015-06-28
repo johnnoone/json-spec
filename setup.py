@@ -7,7 +7,7 @@ with open('README.rst') as file:
 
 setup(
     name='json-spec',
-    version='0.1',
+    version='0.9.9',
     description='Implements JSON Schema, JSON Pointer and JSON Reference.',
     long_description=content,
     author='Xavier Barbosa',
