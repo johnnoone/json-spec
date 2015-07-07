@@ -59,29 +59,35 @@ def test_issue5():
         os.sep = '\\'
 
         validator = load({
-            "$schema": "http://json-schema.org/draft-04/schema#",
-            "type": "object",
-            "definitions": {
-                "test": {
-                    "type": "object",
-                    "properties": {
-                        "foo": {"type": "string"}
+            '$schema': 'http://json-schema.org/draft-04/schema#',
+            'type': 'object',
+            'definitions': {
+                'test': {
+                    'type': 'object',
+                    'properties': {
+                        'foo': {'type': 'string'}
                     },
-                    "additionalProperties": False
+                    'additionalProperties': False
                 }
             },
-            "properties": {
-                "bar": {
-                    "$ref": "#/definitions/test"
+            'properties': {
+                'bar': {
+                    '$ref': '#/definitions/test'
                 }
+            }
+        })
+
+        assert {'bar': {'foo': 'test'}} == validator.validate({
+            'bar': {
+                'foo': 'test',
             }
         })
 
         with pytest.raises(ValidationError):
             validator.validate({
-                "bar": {
-                    "foo": "test",
-                    "more": 2
+                'bar': {
+                    'foo': 'test',
+                    'more': 2
                 }
             })
 

@@ -6,7 +6,7 @@ python:
   - "3.4"
 
 install:
-  - pip install . ipaddress six 
+  - pip install . ipaddress six
   - pip install -r test-requirements.txt
 
 script:

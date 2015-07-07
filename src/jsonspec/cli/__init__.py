@@ -466,7 +466,7 @@ def get_parser():
 
     parser.add_argument('--version',
                         action='version',
-                        version='%(prog)s 0.9.9')
+                        version='%(prog)s 0.9.11')
 
     subparsers = parser.add_subparsers(help='choose one of these actions',
                                        dest='action',
