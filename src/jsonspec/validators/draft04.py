@@ -10,7 +10,6 @@ from __future__ import absolute_import
 __all__ = ['compile', 'Draft04Validator']
 
 import logging
-import os.path
 import re
 from copy import deepcopy
 from decimal import Decimal
@@ -54,7 +53,7 @@ def compile(schema, pointer, context, scope=None):
     attrs = {}
 
     if 'additionalItems' in schm:
-        subpointer = os.path.join(pointer, 'additionalItems')
+        subpointer = pointer_join(pointer, 'additionalItems')
         attrs['additional_items'] = schm.pop('additionalItems')
         if isinstance(attrs['additional_items'], dict):
             compiled = compile(attrs['additional_items'],
@@ -66,7 +65,7 @@ def compile(schema, pointer, context, scope=None):
             raise CompilationError('wrong type for {}'.format('additional_items'), schema)  # noqa
 
     if 'additionalProperties' in schm:
-        subpointer = os.path.join(pointer, 'additionalProperties')
+        subpointer = pointer_join(pointer, 'additionalProperties')
         attrs['additional_properties'] = schm.pop('additionalProperties')
         if isinstance(attrs['additional_properties'], dict):
             compiled = compile(attrs['additional_properties'],
@@ -78,7 +77,7 @@ def compile(schema, pointer, context, scope=None):
             raise CompilationError('wrong type for {}'.format('additional_properties'), schema)  # noqa
 
     if 'allOf' in schm:
-        subpointer = os.path.join(pointer, 'allOf')
+        subpointer = pointer_join(pointer, 'allOf')
         attrs['all_of'] = schm.pop('allOf')
         if isinstance(attrs['all_of'], (list, tuple)):
             attrs['all_of'] = [compile(element, subpointer, context, scope) for element in attrs['all_of']]  # noqa
@@ -87,7 +86,7 @@ def compile(schema, pointer, context, scope=None):
             raise CompilationError('wrong type for {}'.format('allOf'), schema)  # noqa
 
     if 'anyOf' in schm:
-        subpointer = os.path.join(pointer, 'anyOf')
+        subpointer = pointer_join(pointer, 'anyOf')
         attrs['any_of'] = schm.pop('anyOf')
         if isinstance(attrs['any_of'], (list, tuple)):
             attrs['any_of'] = [compile(element, subpointer, context, scope) for element in attrs['any_of']]  # noqa
@@ -104,7 +103,7 @@ def compile(schema, pointer, context, scope=None):
             raise CompilationError('dependencies must be an object', schema)
         for key, value in attrs['dependencies'].items():
             if isinstance(value, dict):
-                subpointer = os.path.join(pointer, 'dependencies', key)
+                subpointer = pointer_join(pointer, 'dependencies', key)
                 attrs['dependencies'][key] = compile(value,
                                                      subpointer,
                                                      context,
@@ -120,12 +119,12 @@ def compile(schema, pointer, context, scope=None):
     if 'exclusiveMaximum' in schm:
         attrs['exclusive_maximum'] = schm.pop('exclusiveMaximum')
         if not isinstance(attrs['exclusive_maximum'], bool):
-            raise CompilationError('exclusiveMaximum must be a boolean', schema)
+            raise CompilationError('exclusiveMaximum must be a boolean', schema)  # noqa
 
     if 'exclusiveMinimum' in schm:
         attrs['exclusive_minimum'] = schm.pop('exclusiveMinimum')
         if not isinstance(attrs['exclusive_minimum'], bool):
-            raise CompilationError('exclusiveMinimum must be a boolean', schema)
+            raise CompilationError('exclusiveMinimum must be a boolean', schema)  # noqa
 
     if 'format' in schm:
         attrs['format'] = schm.pop('format')
@@ -133,7 +132,7 @@ def compile(schema, pointer, context, scope=None):
             raise CompilationError('format must be a string', schema)
 
     if 'items' in schm:
-        subpointer = os.path.join(pointer, 'items')
+        subpointer = pointer_join(pointer, 'items')
         attrs['items'] = schm.pop('items')
         if isinstance(attrs['items'], (list, tuple)):
             # each value must be a json schema
@@ -194,11 +193,11 @@ def compile(schema, pointer, context, scope=None):
         attrs['not'] = schm.pop('not')
         if not isinstance(attrs['not'], dict):
             raise CompilationError('not must be an object', schema)
-        subpointer = os.path.join(pointer, 'not')
+        subpointer = pointer_join(pointer, 'not')
         attrs['not'] = compile(attrs['not'], subpointer, context, scope)
 
     if 'oneOf' in schm:
-        subpointer = os.path.join(pointer, 'oneOf')
+        subpointer = pointer_join(pointer, 'oneOf')
         attrs['one_of'] = schm.pop('oneOf')
         if isinstance(attrs['one_of'], (list, tuple)):
             # each value must be a json schema
@@ -224,9 +223,9 @@ def compile(schema, pointer, context, scope=None):
     if 'patternProperties' in schm:
         attrs['pattern_properties'] = schm.pop('patternProperties')
         if not isinstance(attrs['pattern_properties'], dict):
-            raise CompilationError('patternProperties must be an object', schema)
+            raise CompilationError('patternProperties must be an object', schema)  # noqa
         for subname, subschema in attrs['pattern_properties'].items():
-            subpointer = os.path.join(pointer, 'patternProperties', subname)
+            subpointer = pointer_join(pointer, 'patternProperties', subname)
             compiled = compile(subschema, subpointer, context, scope)
             attrs['pattern_properties'][subname] = compiled
 
@@ -445,7 +444,7 @@ class Draft04Validator(Validator):
                             elif additionals is False:
                                 self.fail('Forbidden value',
                                           obj,
-                                          pointer=pointer_join(self.uri, index))
+                                          pointer=pointer_join(self.uri, index))  # noqa
                                 continue
                             validator = additionals
                         obj[index] = validator(element, pointer_join(pointer, index))  # noqa

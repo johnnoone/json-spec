@@ -10,7 +10,6 @@ from __future__ import absolute_import
 __all__ = ['compile', 'Draft03Validator']
 
 import logging
-import os.path
 import re
 from copy import deepcopy
 from decimal import Decimal
@@ -54,7 +53,7 @@ def compile(schema, pointer, context, scope=None):
     attrs = {}
 
     if 'additionalItems' in schm:
-        subpointer = os.path.join(pointer, 'additionalItems')
+        subpointer = pointer_join(pointer, 'additionalItems')
         attrs['additional_items'] = schm.pop('additionalItems')
         if isinstance(attrs['additional_items'], dict):
             compiled = compile(attrs['additional_items'],
@@ -68,7 +67,7 @@ def compile(schema, pointer, context, scope=None):
     if 'additionalProperties' in schm:
         attrs['additional_properties'] = schm.pop('additionalProperties')
         if isinstance(attrs['additional_properties'], dict):
-            subpointer = os.path.join(pointer, 'additionalProperties')
+            subpointer = pointer_join(pointer, 'additionalProperties')
             value = attrs['additional_properties']
             attrs['additional_properties'] = compile(value,
                                                      subpointer,
@@ -83,7 +82,7 @@ def compile(schema, pointer, context, scope=None):
             raise CompilationError('dependencies must be an object', schema)
         for key, value in attrs['dependencies'].items():
             if isinstance(value, dict):
-                subpointer = os.path.join(pointer, 'dependencies', key)
+                subpointer = pointer_join(pointer, 'dependencies', key)
                 attrs['dependencies'][key] = compile(value,
                                                      subpointer,
                                                      context,
@@ -98,7 +97,7 @@ def compile(schema, pointer, context, scope=None):
         if isinstance(attrs['disallow'], sequence_types):
             for index, value in enumerate(attrs['disallow']):
                 if isinstance(value, dict):
-                    subpointer = os.path.join(pointer, 'disallow', str(index))
+                    subpointer = pointer_join(pointer, 'disallow', index)
                     attrs['disallow'][index] = compile(value,
                                                        subpointer,
                                                        context,
@@ -130,7 +129,7 @@ def compile(schema, pointer, context, scope=None):
 
     if 'extends' in schm:
         attrs['extends'] = schm.pop('extends')
-        subpointer = os.path.join(pointer, 'extends')
+        subpointer = pointer_join(pointer, 'extends')
         if isinstance(attrs['extends'], dict):
             attrs['extends'] = compile(attrs['extends'],
                                        subpointer,
@@ -151,7 +150,7 @@ def compile(schema, pointer, context, scope=None):
             raise CompilationError('format must be a string', schema)
 
     if 'items' in schm:
-        subpointer = os.path.join(pointer, 'items')
+        subpointer = pointer_join(pointer, 'items')
         attrs['items'] = schm.pop('items')
         if isinstance(attrs['items'], (list, tuple)):
             # each value must be a json schema
@@ -203,7 +202,7 @@ def compile(schema, pointer, context, scope=None):
         if not isinstance(attrs['pattern_properties'], dict):
             raise CompilationError('patternProperties must be an object', schema)  # noqa
         for name, value in attrs['pattern_properties'].items():
-            subpointer = os.path.join(pointer, 'patternProperties', name)
+            subpointer = pointer_join(pointer, 'patternProperties', name)
             attrs['pattern_properties'][name] = compile(value,
                                                         subpointer,
                                                         context,
@@ -214,7 +213,7 @@ def compile(schema, pointer, context, scope=None):
         if not isinstance(attrs['properties'], dict):
             raise CompilationError('properties must be an object', schema)
         for name, value in attrs['properties'].items():
-            subpointer = os.path.join(pointer, 'properties', name)
+            subpointer = pointer_join(pointer, 'properties', name)
             attrs['properties'][name] = compile(value,
                                                 subpointer,
                                                 context,
@@ -230,7 +229,7 @@ def compile(schema, pointer, context, scope=None):
         if isinstance(attrs['type'], sequence_types):
             for index, value in enumerate(attrs['type']):
                 if isinstance(value, dict):
-                    subpointer = os.path.join(pointer, 'type', str(index))
+                    subpointer = pointer_join(pointer, 'type', index)
                     attrs['type'][index] = compile(value,
                                                    subpointer,
                                                    context,
@@ -409,7 +408,7 @@ class Draft03Validator(Validator):
 
     def validate_enum(self, obj, pointer=None):
         if 'enum' in self.attrs:
-            if not obj in self.attrs['enum']:
+            if obj not in self.attrs['enum']:
                 self.fail('Forbidden value', obj, pointer)
         return obj
 

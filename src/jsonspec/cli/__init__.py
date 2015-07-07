@@ -464,7 +464,9 @@ def get_parser():
     parser = argparse.ArgumentParser(
         formatter_class=argparse.RawDescriptionHelpFormatter)
 
-    parser.add_argument('--version', action='version', version='%(prog)s 0.9.9')
+    parser.add_argument('--version',
+                        action='version',
+                        version='%(prog)s 0.9.9')
 
     subparsers = parser.add_subparsers(help='choose one of these actions',
                                        dest='action',
@@ -478,13 +480,13 @@ def get_parser():
     for name, command_class in sorted(cmds):
         description, help, epilog = None, None, None
         if command_class.__doc__:
-            description, _, epilog = command_class.__doc__.lstrip().partition('\n\n')
+            description, _, epilog = command_class.__doc__.lstrip().partition('\n\n')  # noqa
 
             if description:
                 description = description.replace('\n', ' ')
 
             if epilog:
-                epilog = dedent(epilog).replace('    ', '  ').replace('::\n\n', ':\n')
+                epilog = dedent(epilog).replace('    ', '  ').replace('::\n\n', ':\n')  # noqa
         description = command_class.description or description
         epilog = command_class.epilog or epilog
         help = command_class.help or description
@@ -492,9 +494,9 @@ def get_parser():
                                           help=help,
                                           description=description,
                                           epilog=epilog,
-                                          formatter_class=argparse.RawDescriptionHelpFormatter)
+                                          formatter_class=argparse.RawDescriptionHelpFormatter)  # noqa
 
-        command = command_class(subparser)
+        command = command_class(subparser)  # noqa
     return parser
 
 

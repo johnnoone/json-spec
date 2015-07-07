@@ -49,3 +49,41 @@ def test_issue4():
         validator.validate({
             'props': 42
         })
+
+
+def test_issue5():
+    import os
+
+    try:
+        prev_sep = os.sep
+        os.sep = '\\'
+
+        validator = load({
+            "$schema": "http://json-schema.org/draft-04/schema#",
+            "type": "object",
+            "definitions": {
+                "test": {
+                    "type": "object",
+                    "properties": {
+                        "foo": {"type": "string"}
+                    },
+                    "additionalProperties": False
+                }
+            },
+            "properties": {
+                "bar": {
+                    "$ref": "#/definitions/test"
+                }
+            }
+        })
+
+        with pytest.raises(ValidationError):
+            validator.validate({
+                "bar": {
+                    "foo": "test",
+                    "more": 2
+                }
+            })
+
+    finally:
+        os.sep = prev_sep
