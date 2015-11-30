@@ -7,8 +7,17 @@ python:
   - "3.5"
 
 install:
-  - pip install . ipaddress six
+  - pip install -e .
+  - pip install ipaddress six
   - pip install -r requirements-tests.txt
 
 script:
   - py.test tests
+
+deploy:
+  provider: pypi
+  user: ...
+  password: ...
+  on:
+    branch: master
+    tags: true

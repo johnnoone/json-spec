@@ -168,7 +168,7 @@ def validate_utc_millisec(obj):
     try:
         if not isinstance(obj, number_types):
             raise TypeError
-        datetime.utcfromtimestamp(obj/1000)
+        datetime.utcfromtimestamp(obj / 1000)
     except (TypeError, ValueError):
         raise ValidationError('{!r} is not a valid utc millis', obj)
     return obj

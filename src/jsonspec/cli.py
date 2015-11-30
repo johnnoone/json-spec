@@ -73,32 +73,65 @@ class JSONFile(argparse.FileType):
 
 def document_arguments(parser):
     group = parser.add_mutually_exclusive_group()
-    group.add_argument('--document-json', type=JSONStruct, help='json structure', dest='document_json', metavar='<doc>')
-    group.add_argument('--document-file', type=JSONFile('r'), help='json filename', dest='document_file', metavar='<doc>')
+    group.add_argument('--document-json',
+                       type=JSONStruct,
+                       help='json structure',
+                       dest='document_json',
+                       metavar='<doc>')
+    group.add_argument('--document-file',
+                       type=JSONFile('r'),
+                       help='json filename',
+                       dest='document_file',
+                       metavar='<doc>')
 
 
 def schema_arguments(parser):
     group = parser.add_mutually_exclusive_group()
-    group.add_argument('--schema-json', type=JSONStruct, help='json structure', dest='schema_json', metavar='<schema>')
-    group.add_argument('--schema-file', type=JSONFile('r'), help='json filename', dest='schema_file', metavar='<schema>')
+    group.add_argument('--schema-json',
+                       type=JSONStruct,
+                       help='json structure',
+                       dest='schema_json',
+                       metavar='<schema>')
+    group.add_argument('--schema-file',
+                       type=JSONFile('r'),
+                       help='json filename',
+                       dest='schema_file',
+                       metavar='<schema>')
 
 
 def fragment_arguments(parser):
     group = parser.add_mutually_exclusive_group()
-    group.add_argument('--fragment-json', type=JSONStruct, help='json structure', dest='fragment_json', metavar='<fragment>')
-    group.add_argument('--fragment-file', type=JSONFile('r'), help='json filename', dest='fragment_file', metavar='<fragment>')
+    group.add_argument('--fragment-json',
+                       type=JSONStruct,
+                       help='json structure',
+                       dest='fragment_json',
+                       metavar='<fragment>')
+    group.add_argument('--fragment-file',
+                       type=JSONFile('r'),
+                       help='json filename',
+                       dest='fragment_file',
+                       metavar='<fragment>')
 
 
 def indentation_arguments(parser):
-    parser.add_argument('--indent', type=int, help='return an indented json', metavar='<indentation>')
+    parser.add_argument('--indent',
+                        type=int,
+                        help='return an indented json',
+                        metavar='<indentation>')
 
 
 def pointer_arguments(parser):
-    parser.add_argument('pointer', type=str, help='json pointer', metavar='<pointer>')
+    parser.add_argument('pointer',
+                        type=str,
+                        help='json pointer',
+                        metavar='<pointer>')
 
 
 def target_arguments(parser):
-    parser.add_argument('-t', '--target-pointer', help='target pointer', dest='target', metavar='<target>')
+    parser.add_argument('-t', '--target-pointer',
+                        help='target pointer',
+                        dest='target',
+                        metavar='<target>')
 
 
 def parse_document(args):
@@ -152,8 +185,8 @@ class Command(object):
     epilog = None
 
     def __init__(self, parser=None):
-        self.parser = parser or argparse.ArgumentParser(description=self.description,
-                                                        epilog=self.epilog)
+        self.parser = parser or argparse.ArgumentParser(
+            description=self.description, epilog=self.epilog)
         self.parser.set_defaults(func=self)
         self.arguments(self.parser)
 

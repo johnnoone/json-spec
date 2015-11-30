@@ -1,15 +1,12 @@
 #!/usr/bin/env python
 
+import versioneer
 from setuptools import setup, find_packages
-
-with open('README.rst') as file:
-    content = file.read()
 
 setup(
     name='json-spec',
-    version='0.9.11',
+    version=versioneer.get_version(),
     description='Implements JSON Schema, JSON Pointer and JSON Reference.',
-    long_description=content,
     author='Xavier Barbosa',
     author_email='clint.northwood@gmail.com',
     license='BSD',
@@ -80,6 +77,6 @@ setup(
             'utc.time = jsonspec.validators.util:validate_utc_time',
             'utc.millisec = jsonspec.validators.util:validate_utc_millisec',
         ]
-    }
-
+    },
+    cmdclass=versioneer.get_cmdclass()
 )
