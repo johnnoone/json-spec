@@ -1,10 +1,10 @@
 language: python
 python:
-  - "pypy"
-  - "2.7"
-  - "3.3"
-  - "3.4"
-  - "3.5"
+  - pypy
+  - '2.7'
+  - '3.3'
+  - '3.4'
+  - '3.5'
 
 install:
   - pip install -e .
@@ -13,11 +13,3 @@ install:
 
 script:
   - py.test tests
-
-deploy:
-  provider: pypi
-  user: ...
-  password: ...
-  on:
-    branch: master
-    tags: true
