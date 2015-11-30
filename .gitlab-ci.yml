@@ -1,0 +1,30 @@
+---
+
+before_script:
+  - python -m pip install -e .
+  - python -m pip install ipaddress six
+  - python -m pip install -r requirements-tests.txt
+
+python3.4 tests:
+  script:
+    - py.test --cov jsonspec --cov-report term-missing tests/
+  tags:
+    - python3.4
+
+python3.5 tests:
+  script:
+    - py.test --cov jsonspec --cov-report term-missing tests/
+  tags:
+    - python3.5
+
+publish to pypi:
+  type: deploy
+  script:
+    - python -m pip install twine wheel
+    - python setup.py sdist bdist_wheel
+    - twine upload -u $PYPI_USER -p $PYPI_PASSWORD dist/*
+  tags:
+    - python3.4
+  only:
+    - /^v[\d\.]+.*$/
+  allow_failure: true
