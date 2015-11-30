@@ -1,7 +1,0 @@
-[run]
-branch = True
-source =
-  src/json
-
-[html]
-title = JSON Extensions report

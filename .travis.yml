@@ -4,10 +4,11 @@ python:
   - "2.7"
   - "3.3"
   - "3.4"
+  - "3.5"
 
 install:
   - pip install . ipaddress six
-  - pip install -r test-requirements.txt
+  - pip install -r requirements-tests.txt
 
 script:
   - py.test tests
