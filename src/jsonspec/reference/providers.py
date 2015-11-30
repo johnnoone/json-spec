@@ -62,10 +62,15 @@ class PkgProvider(Provider):
         raise NotFound('no providers could return {!r}'.format(uri))
 
     def __iter__(self):
-        raise NotImplementedError
+        if not self.loaded:
+            self.load()
+        for name in self.providers.keys():
+            yield name
 
     def __len__(self):
-        raise NotImplementedError
+        if not self.loaded:
+            self.load()
+        return len(self.providers)
 
 
 class FilesystemProvider(Provider):
