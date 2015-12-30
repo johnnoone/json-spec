@@ -22,7 +22,6 @@ here = os.path.dirname(os.path.abspath(__file__))
 
 def contents(*paths):
     fullpath = os.path.join(here, 'suite', *paths)
-    print("fullp", fullpath)
     d = len(fullpath) + 1
     for dirpath, dirnames, filenames in os.walk(fullpath):
         for filename in filenames:
@@ -48,10 +47,12 @@ def scenarios(draft):
 
         for block in data:
             for test in block['tests']:
-                yield block['schema'], test['description'], test['data'], test['valid'], src
+                yield (block['schema'], test['description'],
+                       test['data'], test['valid'], src)
 
 
-@pytest.mark.parametrize('schema, description, data, valid, src', scenarios('draft4'))
+@pytest.mark.parametrize('schema, description, data, valid, src',
+                         scenarios('draft4'))
 def test_common(schema, description, data, valid, src):
     try:
         load(schema, provider=provider).validate(data)

@@ -150,7 +150,7 @@ class TestRelative(object):
         # unstage
         assert extract(baz_relative, '0').obj == 'baz'
         assert extract(baz_relative, '1/0').obj == 'bar'
-        assert extract(baz_relative, '2/highly/nested/objects').obj is True
+        assert extract(baz_relative, '2/highly/nested/objects').obj == True
 
     def test_relative_2(self):
         nested_relative = extract(self.document, '/highly/nested')
@@ -160,6 +160,6 @@ class TestRelative(object):
         assert extract(nested_relative, '0#') == 'nested'
         assert extract(nested_relative, '1#') == 'highly'
 
-        assert extract(nested_relative, '0/objects').obj is True
-        assert extract(nested_relative, '1/nested/objects').obj is True
+        assert extract(nested_relative, '0/objects').obj == True
+        assert extract(nested_relative, '1/nested/objects').obj == True
         assert extract(nested_relative, '2/foo/0').obj == 'bar'

@@ -6,10 +6,6 @@
 
 __all__ = ['ref', 'Mapping', 'MutableMapping']
 
-import fnmatch
-import os
-import re
-
 
 def ref(obj):
     """Extracts $ref of object."""

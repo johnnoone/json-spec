@@ -10,10 +10,10 @@ __all__ = ['Provider', 'FilesystemProvider', 'PkgProvider', 'SpecProvider']
 import json
 import logging
 import os
-import glob
 import pkg_resources
 from .bases import Provider
 from .exceptions import NotFound
+from pathlib import Path
 
 logger = logging.getLogger(__name__)
 
@@ -88,12 +88,11 @@ class FilesystemProvider(Provider):
 
     """
 
-    def __init__(self, directory, prefix=None):
+    def __init__(self, directory, prefix=None, aliases=None):
         self.directory = directory
-        if not self.directory.endswith('/'):
-            self.directory += '/'
         self.prefix = prefix or ''
         self.loaded = False
+        self.aliases = aliases or {}
 
     @property
     def data(self):
@@ -101,17 +100,18 @@ class FilesystemProvider(Provider):
             data = {}
 
             l = len(self.directory)
-            for filename in glob.glob(self.directory + '/**/*json'):
-                spec = filename[l:-5]
-                with open(filename, 'r') as file:
+            for filename in Path(self.directory).glob('**/*.json'):
+                with filename.open() as file:
                     schema = json.load(file)
 
-                # Let's assume the schema knows its name more accurately than its path can provide.
+                # Let's assume the schema knows its name more accurately than
+                # its path can provide.
                 if schema.get('id'):
-                    spec = schema['id']
+                    spec = schema['id'].lstrip(self.prefix).lstrip('/').rstrip('#')
+                else:
+                    spec = filename.as_posix()[l:-5].lstrip('/')
 
                 data[spec] = schema
-
             # set the fallbacks
             for spec in sorted(data.keys(), reverse=True):
                 if spec.startswith('draft-'):
@@ -130,6 +130,7 @@ class FilesystemProvider(Provider):
             if spec.endswith('#'):
                 spec = spec[:-1]
 
+        spec = self.aliases.get(spec, spec)
         try:
             return self.data[spec]
         except (KeyError, UnboundLocalError):
@@ -153,7 +154,10 @@ class SpecProvider(FilesystemProvider):
         base = os.path.realpath(os.path.dirname(misc))
         src = os.path.join(base, 'schemas/')
         prefix = 'http://json-schema.org/'
-        super(SpecProvider, self).__init__(src, prefix)
+        super(SpecProvider, self).__init__(src, prefix, aliases={
+            'hyper-schema': 'draft-04/hyper-schema',
+            'schema': 'draft-04/schema'
+        })
 
 
 class ProxyProvider(Provider):

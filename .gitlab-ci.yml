@@ -5,6 +5,12 @@ before_script:
   - python -m pip install ipaddress six
   - python -m pip install -r requirements-tests.txt
 
+python2.7 tests:
+  script:
+    - py.test --cov jsonspec --cov-report term-missing tests/
+  tags:
+    - python2.7
+
 python3.4 tests:
   script:
     - py.test --cov jsonspec --cov-report term-missing tests/

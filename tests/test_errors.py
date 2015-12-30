@@ -30,7 +30,7 @@ class TestErrors(TestCase):
         validator = load(fixture('five.schema.json'))
 
         try:
-            response = validator.validate({
+            validator.validate({
                 'creditcard': {
                     'provider': 'mastercard',
                     'securitycode': 123

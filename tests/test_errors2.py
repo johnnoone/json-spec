@@ -8,7 +8,6 @@
 import pytest
 from jsonspec.validators import load
 from jsonspec.validators.exceptions import ValidationError
-from . import TestCase, fixture
 
 
 schema = {
@@ -35,18 +34,28 @@ schema = {
 
 scenarii = [
     # Pointer scenarii
-    ('foo', {'#/': {'Wrong type'}}, 'object required'),
-    ({'foo': 'data'}, {'#/foo': {'Wrong type'}}, 'integer required'),
-    ({'bar': 'foo'}, {'#/': {"Missing property"}}, 'string required'),
-    ({'foo': 12, 'baz': None}, {'#/': {"Missing property"}}, 'miss a dependencies'),
-    ({'foo': 42}, {'#/foo': {"Exceeded maximum"}}, 'too big'),
-    ({'foo': 12, 'baz': None, 'quux': True}, {
-        '#/': {'Forbidden additional properties', 'Missing property'}
-     }, 'too big'),
-    ({'foo': 42, 'baz': None, 'quux': True}, {
-        '#/': {'Forbidden additional properties', 'Missing property'},
-        '#/foo': {'Exceeded maximum'}
-     }, 'too big'),
+    ('foo',
+     {'#/': {'Wrong type'}},
+     'object required'),
+    ({'foo': 'data'},
+     {'#/foo': {'Wrong type'}},
+     'integer required'),
+    ({'bar': 'foo'},
+     {'#/': {"Missing property"}},
+     'string required'),
+    ({'foo': 12, 'baz': None},
+     {'#/': {"Missing property"}},
+     'miss a dependencies'),
+    ({'foo': 42},
+     {'#/foo': {"Exceeded maximum"}},
+     'too big'),
+    ({'foo': 12, 'baz': None, 'quux': True},
+     {'#/': {'Forbidden additional properties', 'Missing property'}},
+     'too big'),
+    ({'foo': 42, 'baz': None, 'quux': True},
+     {'#/': {'Forbidden additional properties', 'Missing property'},
+      '#/foo': {'Exceeded maximum'}},
+     'too big'),
 ]
 
 
@@ -58,9 +67,6 @@ def test_errors_object(document, expected, reason):
     except ValidationError as error:
         f = error.flatten()
         assert f == expected, (reason, expected, f)
-
-
-
 
 
 schema2 = {
@@ -84,14 +90,20 @@ schema2 = {
 
 scenarii2 = [
     # Pointer scenarii
-    ('foo', {'#/': {'Wrong type'}}, 'array required'),
-    (['foo', 12], {'#/0': {'Wrong type'}, '#/1': {'Wrong type'}}, 'multiple errors'),
-    ([12], {'#/': {'Too few elements'}}, 'string required'),
-    ([12, 12, 12, 12], {
-        '#/3': {'Forbidden value'},
-        '#/1': {'Wrong type'},
-        '#/2': {'Wrong type'}
-     }, 'string required'),
+    ('foo',
+     {'#/': {'Wrong type'}},
+     'array required'),
+    (['foo', 12],
+     {'#/0': {'Wrong type'}, '#/1': {'Wrong type'}},
+     'multiple errors'),
+    ([12],
+     {'#/': {'Too few elements'}},
+     'string required'),
+    ([12, 12, 12, 12],
+     {'#/3': {'Forbidden value'},
+      '#/1': {'Wrong type'},
+      '#/2': {'Wrong type'}},
+     'string required')
 ]
 
 
