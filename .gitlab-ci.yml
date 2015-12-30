@@ -4,6 +4,7 @@ before_script:
   - python -m pip install -e .
   - python -m pip install ipaddress six
   - python -m pip install -r requirements-tests.txt
+  - git submodule init && git submodule update
 
 python2.7 tests:
   script:
