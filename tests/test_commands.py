@@ -4,12 +4,11 @@
 
 """
 
-import os.path
 import pytest
 from subprocess import Popen, PIPE
 from jsonspec import cli
 import json
-from . import TestCase, move_cwd
+from . import move_cwd
 
 
 def runner(cmd, args, success, result):
@@ -76,11 +75,13 @@ add_scenes = [
 ]
 
 
-@pytest.mark.parametrize('pointer, document, fragment, success, result', add_scenes)
+@pytest.mark.parametrize('pointer, document, fragment, success, result',
+                         add_scenes)
 def test_cli_add(pointer, document, fragment, success, result):
     doc, frag = json.dumps(document), json.dumps(fragment)
     cmd = cli.AddCommand()
-    runner(cmd, [pointer, '--document-json', doc, '--fragment-json', frag], success, result)
+    runner(cmd, [pointer, '--document-json', doc, '--fragment-json', frag],
+           success, result)
 
 
 remove_scenes = [
@@ -102,11 +103,13 @@ replace_scenes = [
 ]
 
 
-@pytest.mark.parametrize('pointer, document, fragment, success, result', replace_scenes)
+@pytest.mark.parametrize('pointer, document, fragment, success, result',
+                         replace_scenes)
 def test_cli_replace(pointer, document, fragment, success, result):
     doc, frag = json.dumps(document), json.dumps(fragment)
     cmd = cli.ReplaceCommand()
-    runner(cmd, [pointer, '--document-json', doc, '--fragment-json', frag], success, result)
+    runner(cmd, [pointer, '--document-json', doc, '--fragment-json', frag],
+           success, result)
 
 
 move_scenes = [
@@ -115,11 +118,13 @@ move_scenes = [
 ]
 
 
-@pytest.mark.parametrize('pointer, document, target, success, result', move_scenes)
+@pytest.mark.parametrize('pointer, document, target, success, result',
+                         move_scenes)
 def test_cli_move(pointer, document, target, success, result):
     doc = json.dumps(document)
     cmd = cli.MoveCommand()
-    runner(cmd, [pointer, '--document-json', doc, '--target-pointer', target], success, result)
+    runner(cmd, [pointer, '--document-json', doc, '--target-pointer', target],
+           success, result)
 
 
 copy_scenes = [
@@ -128,8 +133,10 @@ copy_scenes = [
 ]
 
 
-@pytest.mark.parametrize('pointer, document, target, success, result', copy_scenes)
+@pytest.mark.parametrize('pointer, document, target, success, result',
+                         copy_scenes)
 def test_cli_copy(pointer, document, target, success, result):
     doc = json.dumps(document)
     cmd = cli.CopyCommand()
-    runner(cmd, [pointer, '--document-json', doc, '--target-pointer', target], success, result)
+    runner(cmd, [pointer, '--document-json', doc, '--target-pointer', target],
+           success, result)

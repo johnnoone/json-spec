@@ -15,6 +15,7 @@ import io
 import os
 import pytest
 import logging
+from pathlib import Path
 from six import PY2
 logger = logging.getLogger(__name__)
 here = os.path.dirname(os.path.abspath(__file__))
@@ -22,14 +23,10 @@ here = os.path.dirname(os.path.abspath(__file__))
 
 def contents(*paths):
     fullpath = os.path.join(here, 'suite', *paths)
-    print("fullp", fullpath)
-    d = len(fullpath) + 1
-    for dirpath, dirnames, filenames in os.walk(fullpath):
-        for filename in filenames:
-            if filename.endswith('.json'):
-                filepath = os.path.join(dirpath, filename)
-                with io.open(filepath, 'r', encoding='utf-8') as file:
-                    yield json.load(file), filepath[d:]
+    d = len(fullpath)
+    for filepath in Path(fullpath).glob('**/*.json'):
+        with filepath.open('r', encoding='utf-8') as file:
+            yield json.load(file), filepath.as_posix()[d:].lstrip('/')
 
 
 provider = ProxyProvider(SpecProvider())
@@ -38,20 +35,23 @@ for data, src in contents('remotes'):
 
 
 def scenarios(draft):
+    skip = []
+    if PY2:
+        # json module cannot handle well unicode strings
+        skip.extend(('minLength.json', 'maxLength.json'))
+
     for data, src in contents('tests', draft):
-        skip = []
-        if PY2:
-            # json module cannot handle well unicode strings
-            skip.extend(('minLength.json', 'maxLength.json'))
         if src in skip:
             continue
 
         for block in data:
             for test in block['tests']:
-                yield block['schema'], test['description'], test['data'], test['valid'], src
+                yield (block['schema'], test['description'],
+                       test['data'], test['valid'], src)
 
 
-@pytest.mark.parametrize('schema, description, data, valid, src', scenarios('draft4'))
+@pytest.mark.parametrize('schema, description, data, valid, src',
+                         scenarios('draft4'))
 def test_common(schema, description, data, valid, src):
     try:
         load(schema, provider=provider).validate(data)

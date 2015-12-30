@@ -44,7 +44,10 @@ setup(
         'ip': [],
         'ip:python_version=="2.7"': ['ipaddress'],
         'ip:python_version=="3.2"': ['ipaddress'],
-        'cli': ['termcolor']
+        'cli': ['termcolor'],
+        ':python_version=="2.7"': ['pathlib'],
+        ':python_version=="3.2"': ['pathlib'],
+        ':python_version=="3.3"': ['pathlib']
     },
     entry_points={
         'console_scripts': [

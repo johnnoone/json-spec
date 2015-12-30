@@ -44,7 +44,6 @@ def test_issue4():
             'props': 'hello'
         })
 
-
     with pytest.raises(ValidationError):
         validator.validate({
             'props': 42
