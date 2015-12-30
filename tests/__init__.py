@@ -3,7 +3,7 @@
     ~~~~~
 """
 
-__all__ = ['fixture', 'fixture_dirname', 'TestCase']
+__all__ = ['fixture', 'fixture_dir', 'TestCase']
 
 import json
 import logging
@@ -14,7 +14,7 @@ from contextlib import contextmanager
 logging.basicConfig(level=logging.INFO)
 
 here = os.path.dirname(os.path.abspath(__file__))
-fixture_dirname = os.path.join(here, 'fixtures')
+fixture_dir = os.path.join(here, 'fixtures')
 
 
 def fixture(filename):

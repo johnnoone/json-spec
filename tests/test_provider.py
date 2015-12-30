@@ -20,7 +20,6 @@ def test_foo():
 
 
 def test_pkg():
-    """docstring for test_pkg"""
     provider = PkgProvider()
     a = provider['http://json-schema.org/schema#']
     b = provider['http://json-schema.org/draft-04/schema#']

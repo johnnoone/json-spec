@@ -6,7 +6,7 @@
 
 from jsonspec.reference import resolve, Registry
 from jsonspec.reference.providers import FilesystemProvider
-from . import fixture_dirname
+from . import fixture_dir
 
 
 def test_local():
@@ -64,5 +64,5 @@ def test_fs_provider():
     obj = {
         'foo': {'$ref': 'test:first.data1#/address'}
     }
-    provider = FilesystemProvider(fixture_dirname, prefix='test:')
+    provider = FilesystemProvider(fixture_dir, prefix='test:')
     assert 'Mount Vernon, Virginia, United States' == resolve(obj, '#/foo', registry=provider)  # noqa
