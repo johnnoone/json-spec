@@ -10,10 +10,10 @@ __all__ = ['Provider', 'FilesystemProvider', 'PkgProvider', 'SpecProvider']
 import json
 import logging
 import os
+import glob
 import pkg_resources
 from .bases import Provider
 from .exceptions import NotFound
-from .util import loop
 
 logger = logging.getLogger(__name__)
 
@@ -101,10 +101,15 @@ class FilesystemProvider(Provider):
             data = {}
 
             l = len(self.directory)
-            for filename in loop(self.directory, '*.json'):
+            for filename in glob.glob(self.directory + '/**/*json'):
                 spec = filename[l:-5]
                 with open(filename, 'r') as file:
                     schema = json.load(file)
+
+                # Let's assume the schema knows its name more accurately than its path can provide.
+                if schema.get('id'):
+                    spec = schema['id']
+
                 data[spec] = schema
 
             # set the fallbacks
