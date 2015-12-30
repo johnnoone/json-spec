@@ -105,6 +105,11 @@ class FilesystemProvider(Provider):
                 spec = filename[l:-5]
                 with open(filename, 'r') as file:
                     schema = json.load(file)
+
+                # Let's assume the schema knows its name more accurately than its path can provide.
+                if schema.get('id'):
+                    spec = schema['id']
+
                 data[spec] = schema
 
             # set the fallbacks
