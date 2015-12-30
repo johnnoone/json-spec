@@ -94,23 +94,26 @@ class FilesystemProvider(Provider):
         self.loaded = False
         self.aliases = aliases or {}
 
+    def _spec_name(self, schema, filename):
+        # Let's assume the schema knows its name more accurately than
+        # its path can provide.
+        if schema.get('id'):
+            return schema['id']
+        else:
+            return filename.as_posix()[len(self.directory):-5].lstrip('/')
+
     @property
     def data(self):
         if not self.loaded:
             data = {}
 
-            l = len(self.directory)
             for filename in Path(self.directory).glob('**/*.json'):
                 with filename.open() as file:
                     schema = json.load(file)
 
                 # Let's assume the schema knows its name more accurately than
                 # its path can provide.
-                if schema.get('id'):
-                    spec = schema['id'].lstrip(self.prefix).lstrip('/').rstrip('#')
-                else:
-                    spec = filename.as_posix()[l:-5].lstrip('/')
-
+                spec = self._spec_name(schema, filename)
                 data[spec] = schema
             # set the fallbacks
             for spec in sorted(data.keys(), reverse=True):
@@ -158,6 +161,9 @@ class SpecProvider(FilesystemProvider):
             'hyper-schema': 'draft-04/hyper-schema',
             'schema': 'draft-04/schema'
         })
+
+    def _spec_name(self, schema, filename):
+        return filename.as_posix()[len(self.directory):-5].lstrip('/')
 
 
 class ProxyProvider(Provider):
