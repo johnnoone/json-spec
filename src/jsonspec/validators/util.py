@@ -80,7 +80,6 @@ def uncamel(name):
 class offset(tzinfo):
     def __init__(self, value):
         self.value = value
-        # super(tzinfo, self).__init__()
 
     def utcoffset(self, dt):
         hours, minutes = self.value.split(':', 1)
@@ -151,7 +150,7 @@ def validate_utc_datetime(obj):
 def validate_utc_date(obj):
     try:
         time.strptime(obj, '%Y-%m-%d')
-    except ValueError:
+    except (TypeError, ValueError):
         raise ValidationError('{!r} is not a valid date', obj)
     return obj
 
@@ -159,7 +158,7 @@ def validate_utc_date(obj):
 def validate_utc_time(obj):
     try:
         time.strptime(obj, '%H:%M:%S')
-    except ValueError:
+    except (TypeError, ValueError):
         raise ValidationError('{!r} is not a valid time', obj)
     return obj
 
