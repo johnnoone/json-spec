@@ -31,7 +31,7 @@ publish to pypi:
     - python setup.py sdist bdist_wheel
     - twine upload -u $PYPI_USER -p $PYPI_PASSWORD dist/*
   tags:
-    - python3.4
+    - python3.5
   only:
     - /^v[\d\.]+.*$/
   allow_failure: true
