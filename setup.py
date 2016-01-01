@@ -13,6 +13,11 @@ setup(
     url='http://github.com/johnnoone/json-spec',
     package_dir={'': 'src'},
     packages=find_packages('src'),
+    package_data={
+        'jsonspec': [
+            'misc/schemas/**/*.json'
+        ],
+    },
     include_package_data=True,
     zip_safe=False,
     keywords=[
