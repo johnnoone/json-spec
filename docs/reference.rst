@@ -120,4 +120,4 @@ Defining providers
 .. autoclass:: reference.providers.SpecProvider
     :members:
 
-.. _`JSON Reference`: http://tools.ietf.org/html/draft-pbryan-zyp-ref-03
+.. _`JSON Reference`: http://tools.ietf.org/html/draft-pbryan-zyp-json-ref-03
