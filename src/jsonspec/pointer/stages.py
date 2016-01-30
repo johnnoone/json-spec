@@ -3,7 +3,7 @@
     ~~~~~~~~~~~~~~~~~~~~~~~
 
 """
-
+from collections import MutableMapping, MutableSequence
 
 class Staged(object):
     obj = None
@@ -54,10 +54,10 @@ def stage(obj, parent=None, member=None):
     """
     obj = Staged(obj, parent, member)
 
-    if isinstance(obj, dict):
+    if isinstance(obj, MutableMapping):
         for key, value in obj.items():
             stage(value, obj, key)
-    elif isinstance(obj, (list, tuple)):
+    elif isinstance(obj, MutableSequence):
         for index, value in enumerate(obj):
             stage(value, obj, index)
     elif isinstance(obj, set):
