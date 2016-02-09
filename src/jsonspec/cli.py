@@ -485,7 +485,7 @@ class ValidateCommand(Command):
             return driver.dumps(validated, indent=args.indent)
         except ValidationError as error:
             msg = 'document does not validate with schema.\n\n'
-            for pointer, reasons in error.flatten.items():
+            for pointer, reasons in error.flatten().items():
                 msg += '  {}\n'.format(pointer)
                 for reason in reasons:
                     msg += '    - reason {}\n'.format(reason)
