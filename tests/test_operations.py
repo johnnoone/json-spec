@@ -5,7 +5,7 @@
 """
 
 import pytest
-from collections import UserDict, UserList
+from six.moves import UserDict, UserList
 from jsonspec.operations import check, remove, add, replace, copy, move
 from jsonspec.operations import Error, NonexistentTarget
 

@@ -4,7 +4,7 @@
 
 """
 
-from collections import UserDict, UserList
+from six.moves import UserDict, UserList
 from jsonspec.pointer import extract, stage
 from jsonspec.pointer import RefError, DocumentPointer, Pointer
 from jsonspec.pointer import exceptions as events
