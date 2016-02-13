@@ -5,6 +5,7 @@
 """
 
 import pytest
+from collections import UserDict, UserList
 from jsonspec.operations import check, remove, add, replace, copy, move
 from jsonspec.operations import Error, NonexistentTarget
 
@@ -177,6 +178,12 @@ def test_comparing_strings_and_numbers():
 
 def test_adding_array_value():
     obj = {'foo': ['bar']}
+    assert add(obj, '/foo/-', ['abc', 'def']) == {
+        'foo': ['bar', ['abc', 'def']]
+    }
+
+def test_adding_mapping_type_value():
+    obj = UserDict({'foo': UserList(['bar'])})
     assert add(obj, '/foo/-', ['abc', 'def']) == {
         'foo': ['bar', ['abc', 'def']]
     }
