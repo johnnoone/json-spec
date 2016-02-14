@@ -5,10 +5,14 @@
 """
 
 import pytest
-from six.moves import UserDict, UserList
+from collections import Mapping, Sequence
+from . import TestMappingType, TestSequenceType
 from jsonspec.operations import check, remove, add, replace, copy, move
 from jsonspec.operations import Error, NonexistentTarget
 
+def test_types():
+    assert isinstance(TestMappingType(), Mapping)
+    assert isinstance(TestSequenceType(), Sequence)
 
 def test_check():
     assert check({'foo': 'bar'}, '/foo', 'bar')
@@ -183,7 +187,7 @@ def test_adding_array_value():
     }
 
 def test_adding_mapping_type_value():
-    obj = UserDict({'foo': UserList(['bar'])})
-    assert add(obj, '/foo/-', ['abc', 'def']) == {
+    obj = TestMappingType({'foo': ['bar']})
+    assert add(obj, '/foo/-', ['abc', 'def']) == TestMappingType({
         'foo': ['bar', ['abc', 'def']]
-    }
+    })

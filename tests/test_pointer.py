@@ -4,8 +4,8 @@
 
 """
 
-from six.moves import UserDict, UserList
 from jsonspec.pointer import extract, stage
+from . import TestMappingType, TestSequenceType
 from jsonspec.pointer import RefError, DocumentPointer, Pointer
 from jsonspec.pointer import exceptions as events
 from . import TestCase
@@ -56,7 +56,7 @@ class TestPointer(TestCase):
 
 class TestSequence(TestCase):
     document = ['foo', 'bar', {'$ref': 'baz'}]
-    collections_document = UserList(['foo', 'bar', UserDict({'$ref': 'baz'})])
+    collections_document = TestSequenceType(['foo', 'bar', TestMappingType({'$ref': 'baz'})])
 
     def test_sequence(self):
         assert 'bar' == extract(self.document, '/1')
@@ -92,9 +92,10 @@ class TestSequence(TestCase):
             self.fail('last element needed')
         except events.WrongType as event:
             assert self.document == event.obj
+
 
 class TestSequenceType(TestCase):
-    document = UserList(['foo', 'bar', UserDict({'$ref': 'baz'})])
+    document = TestSequenceType(['foo', 'bar', TestMappingType({'$ref': 'baz'})])
 
     def test_sequence(self):
         assert 'bar' == extract(self.document, '/1')
@@ -130,6 +131,7 @@ class TestSequenceType(TestCase):
             self.fail('last element needed')
         except events.WrongType as event:
             assert self.document == event.obj
+
 
 class TestMapping(TestCase):
     document = {'foo': 42, 'bar': {'$ref': 'baz'}, 4: True}
@@ -164,8 +166,9 @@ class TestMapping(TestCase):
         except events.OutOfBounds as event:
             assert self.document == event.obj
 
+
 class TestMappingType(TestCase):
-    document = UserDict({'foo': 42, 'bar': UserDict({'$ref': 'baz'}), 4: True})
+    document = TestMappingType({'foo': 42, 'bar': TestMappingType({'$ref': 'baz'}), 4: True})
 
     def test_mapping(self):
         assert 42 == extract(self.document, '/foo')
@@ -196,6 +199,7 @@ class TestMappingType(TestCase):
             self.fail('out of bound')
         except events.OutOfBounds as event:
             assert self.document == event.obj
+
 
 class TestRelative(object):
     document = stage({
