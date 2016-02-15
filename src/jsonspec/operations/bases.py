@@ -10,6 +10,7 @@ __all__ = ['Target']
 from copy import deepcopy
 import logging
 from jsonspec.pointer import Pointer
+from collections import Mapping, MutableSequence
 from jsonspec.pointer import ExtractError, OutOfBounds, OutOfRange, LastElement
 from .exceptions import Error, NonexistentTarget
 logger = logging.getLogger(__name__)
@@ -58,10 +59,10 @@ class Target(object):
                 parent, obj = obj, token.extract(obj, bypass_ref=True)
 
             # removing
-            if isinstance(parent, dict):
+            if isinstance(parent, Mapping):
                 del parent[token]
 
-            if isinstance(parent, list):
+            if isinstance(parent, MutableSequence):
                 parent.pop(int(token))
         except Exception as error:
             raise Error(*error.args)
@@ -102,9 +103,9 @@ class Target(object):
             for token in Pointer(pointer):
                 parent, obj = obj, token.extract(obj, bypass_ref=True)
             else:
-                if isinstance(parent, list):
+                if isinstance(parent, MutableSequence):
                     raise OutOfRange(parent)
-                if isinstance(parent, dict):
+                if isinstance(parent, Mapping):
                     raise OutOfBounds(parent)
                 raise Error('already setted')
         except (OutOfBounds, OutOfRange, LastElement) as error:
@@ -137,10 +138,10 @@ class Target(object):
 
             # replace
             value = deepcopy(value)
-            if isinstance(parent, dict):
+            if isinstance(parent, Mapping):
                 parent[token] = value
 
-            if isinstance(parent, list):
+            if isinstance(parent, MutableSequence):
                 parent[int(token)] = value
         except Exception as error:
             raise Error(*error.args)
@@ -176,10 +177,10 @@ class Target(object):
             parent, fragment = fragment, token.extract(fragment,
                                                        bypass_ref=True)
 
-        if isinstance(parent, dict):
+        if isinstance(parent, Mapping):
             del parent[token]
 
-        if isinstance(parent, list):
+        if isinstance(parent, MutableSequence):
             parent.pop(int(token))
 
         # insert

@@ -3,13 +3,14 @@
     ~~~~~
 """
 
-__all__ = ['fixture', 'fixture_dir', 'TestCase']
+__all__ = ['fixture', 'fixture_dir', 'TestCase', 'TestMappingType', 'TestSequenceType']
 
 import json
 import logging
 import os.path
 import unittest
 from contextlib import contextmanager
+from collections import MutableMapping, MutableSequence
 
 logging.basicConfig(level=logging.INFO)
 
@@ -33,3 +34,23 @@ def move_cwd():
 
 class TestCase(unittest.TestCase):
     pass
+
+
+class TestMappingType(dict, MutableMapping):
+    def copy(self):
+        if self.__class__ is UserDict:
+            return UserDict(self.data.copy())
+        import copy
+        data = self.data
+        try:
+            self.data = {}
+            c = copy.copy(self)
+        finally:
+            self.data = data
+        c.update(self)
+        return c
+
+
+class TestSequenceType(list, MutableSequence):
+    def copy(self):
+        return self.__class__(self)
