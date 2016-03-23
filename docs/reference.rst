@@ -10,7 +10,7 @@ This module implements utilities for exploring these objects.
 
 .. note::
 
-    A JSON Reference is a mapping with a unique key ``$ref``, which value is a :doc:`pointer`. For example, this object:
+    A JSON Reference is a mapping with a unique key ``$ref``, whose value is a :doc:`pointer`. For example, this object:
 
     .. code-block:: javascript
 
