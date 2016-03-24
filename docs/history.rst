@@ -2,4 +2,4 @@
 History
 =======
 
-.. include:: ../ChangeLog
+.. include:: ../CHANGELOG

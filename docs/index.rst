@@ -31,7 +31,7 @@ This library implements tools inspired by several cleaver specifications around 
 
     Implements `JSON Schema`_, it adds the power of document validation.
 
-Of course, it works for Python 2.7, Python 3.3 and Python 3.4.
+Of course, it works for Python 2.7, Python 3.4 and Python 3.5.
 
 .. code-block:: python
 

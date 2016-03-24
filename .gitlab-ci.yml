@@ -9,18 +9,24 @@ before_script:
 python2.7 tests:
   script:
     - py.test --cov jsonspec --cov-report term-missing tests/
+  except:
+    - docs
   tags:
     - python2.7
 
 python3.4 tests:
   script:
     - py.test --cov jsonspec --cov-report term-missing tests/
+  except:
+    - docs
   tags:
     - python3.4
 
 python3.5 tests:
   script:
     - py.test --cov jsonspec --cov-report term-missing tests/
+  except:
+    - docs
   tags:
     - python3.5
 
@@ -35,3 +41,17 @@ publish to pypi:
   only:
     - /^v[\d\.]+.*$/
   allow_failure: true
+
+pages:
+  script:
+    - python -m pip install sphinx
+    - python -m pip install -r docs/requirements.txt
+    - sphinx-build -b html docs public
+  artifacts:
+    paths:
+      - public
+  only:
+    - master
+    - docs
+  tags:
+    - python3.5
