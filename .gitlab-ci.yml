@@ -2,31 +2,28 @@
 
 before_script:
   - python -m pip install -e .
-  - python -m pip install ipaddress six
-  - python -m pip install -r requirements-tests.txt
-  - git submodule init && git submodule update
 
-python2.7 tests:
+.tests_template: &tests_definition
   script:
+    - python -m pip install ipaddress six
+    - python -m pip install -r requirements-tests.txt
+    - git submodule init && git submodule update
     - py.test --cov jsonspec --cov-report term-missing tests/
   except:
     - docs
+
+python2.7 tests:
+  <<: *tests_definition
   tags:
     - python2.7
 
 python3.4 tests:
-  script:
-    - py.test --cov jsonspec --cov-report term-missing tests/
-  except:
-    - docs
+  <<: *tests_definition
   tags:
     - python3.4
 
 python3.5 tests:
-  script:
-    - py.test --cov jsonspec --cov-report term-missing tests/
-  except:
-    - docs
+  <<: *tests_definition
   tags:
     - python3.5
 
