@@ -28,7 +28,7 @@ This module implements utilities for exploring these objects.
           "bar": true
         }
 
-They are some ways to resolve JSON Reference. The simpliest one:
+They are some ways to resolve JSON Reference. The simplest one:
 
 
 .. code-block:: python
