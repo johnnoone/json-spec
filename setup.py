@@ -10,7 +10,7 @@ setup(
     author='Xavier Barbosa',
     author_email='clint.northwood@gmail.com',
     license='BSD',
-    url='http://github.com/johnnoone/json-spec',
+    url='http://py.errorist.io/json-spec',
     package_dir={'': 'src'},
     packages=find_packages('src'),
     package_data={

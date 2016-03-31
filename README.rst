@@ -7,10 +7,8 @@ Json Spec
 .. image:: https://travis-ci.org/johnnoone/json-spec.png?branch=master
     :target: https://travis-ci.org/johnnoone/json-spec
 
-.. image:: https://pypip.in/d/json-spec/badge.png
-    :target: https://pypi.python.org/pypi/json-spec
-
-This library implements several JSON specs, like `JSON Schema`_,  `JSON Reference`_ and `JSON Pointer`_:
+This library implements several JSON specs, like `JSON Schema`_,
+`JSON Reference`_ and `JSON Pointer`_:
 
 * It works on python 2.7, python 3.3 and above
 * It is release under the `BSD license`_
@@ -125,5 +123,5 @@ Other examples can be found in the documentation_ or in the tests_.
 .. _`JSON Reference`: http://tools.ietf.org/html/draft-pbryan-zyp-json-ref-03
 .. _`JSON Pointer`: http://tools.ietf.org/html/rfc6901
 .. _`BSD license`: https://github.com/johnnoone/json-spec/blob/master/LICENSE
-.. _documentation: http://py.pages.errorist.xyz/json-spec/
+.. _documentation: http://py.errorist.io/json-spec/
 .. _tests: https://github.com/johnnoone/json-spec/tree/master/tests
