@@ -6,12 +6,12 @@
 
 from __future__ import absolute_import
 
-__all__ = ['register', 'FormatRegistry']
-
 import logging
 from functools import partial
 from pkg_resources import iter_entry_points, DistributionNotFound
 from .exceptions import CompilationError
+
+__all__ = ['register', 'FormatRegistry']
 
 logger = logging.getLogger(__name__)
 

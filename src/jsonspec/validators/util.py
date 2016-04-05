@@ -6,8 +6,6 @@
 
 from __future__ import absolute_import
 
-__all__ = []
-
 import logging
 import re
 import time
@@ -18,6 +16,8 @@ from six import text_type
 from six import integer_types
 from six.moves.urllib.parse import urlparse
 from .exceptions import ValidationError
+
+__all__ = []
 
 number_types = (integer_types, float, Decimal)
 

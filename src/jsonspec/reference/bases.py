@@ -4,12 +4,12 @@
 
 """
 
-__all__ = ['LocalRegistry', 'Registry']
-
 import logging
 from .exceptions import NotFound, Forbidden
 from .util import ref, MutableMapping, Mapping
 from jsonspec.pointer import DocumentPointer
+
+__all__ = ['LocalRegistry', 'Registry']
 
 logger = logging.getLogger(__name__)
 

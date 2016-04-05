@@ -7,8 +7,6 @@
 
 from __future__ import absolute_import
 
-__all__ = ['compile', 'Draft03Validator']
-
 import logging
 import re
 from copy import deepcopy
@@ -22,6 +20,8 @@ from jsonspec.validators.exceptions import ValidationError
 from jsonspec.validators.util import uncamel
 from jsonspec.validators.pointer_util import pointer_join
 from jsonspec import driver as json
+
+__all__ = ['compile', 'Draft03Validator']
 
 sequence_types = (list, set, tuple)
 number_types = (integer_types, float, Decimal)

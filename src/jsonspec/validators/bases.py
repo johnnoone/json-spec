@@ -6,14 +6,13 @@
 
 from __future__ import absolute_import
 
-__all__ = ['ValidationError', 'Validator', 'ReferenceValidator']
-
 import logging
 from abc import abstractmethod, ABCMeta
 from six import add_metaclass
 from jsonspec.pointer import DocumentPointer
 from .exceptions import ValidationError
 
+__all__ = ['ValidationError', 'Validator', 'ReferenceValidator']
 
 logger = logging.getLogger(__name__)
 

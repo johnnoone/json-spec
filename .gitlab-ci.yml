@@ -1,9 +1,15 @@
 ---
 
+stages:
+  - test
+  - document
+  - publish
+
 before_script:
   - python -m pip install -e .
 
 .tests_template: &tests_definition
+  stage: test
   script:
     - python -m pip install ipaddress six
     - python -m pip install -r requirements-tests.txt
@@ -27,19 +33,8 @@ python3.5 tests:
   tags:
     - python3.5
 
-publish to pypi:
-  type: deploy
-  script:
-    - python -m pip install twine wheel
-    - python setup.py sdist bdist_wheel
-    - twine upload -u $PYPI_USER -p $PYPI_PASSWORD dist/*
-  tags:
-    - python3.5
-  only:
-    - /^v[\d\.]+.*$/
-  allow_failure: true
-
 pages:
+  stage: document
   script:
     - python -m pip install sphinx
     - python -m pip install -r docs/requirements.txt
@@ -52,3 +47,15 @@ pages:
     - docs
   tags:
     - python3.5
+
+publish to pypi:
+  stage: publish
+  script:
+    - python -m pip install twine wheel
+    - python setup.py sdist bdist_wheel
+    - twine upload -u $PYPI_USER -p $PYPI_PASSWORD dist/*
+  tags:
+    - python3.5
+  only:
+    - /^v[\d\.]+.*$/
+  allow_failure: true
