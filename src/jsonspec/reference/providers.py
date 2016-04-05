@@ -4,9 +4,6 @@
 
 """
 
-
-__all__ = ['Provider', 'FilesystemProvider', 'PkgProvider', 'SpecProvider']
-
 import json
 import logging
 import os
@@ -14,6 +11,8 @@ import pkg_resources
 from .bases import Provider
 from .exceptions import NotFound
 from pathlib import Path
+
+__all__ = ['Provider', 'FilesystemProvider', 'PkgProvider', 'SpecProvider']
 
 logger = logging.getLogger(__name__)
 

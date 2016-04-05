@@ -14,11 +14,11 @@
 
 from __future__ import absolute_import, print_function, unicode_literals
 
-__all__ = ['resolve', 'Registry', 'LocalRegistry', 'NotFound', 'Forbidden']
-
 from .bases import Registry, LocalRegistry
 from .exceptions import NotFound, Forbidden
 from jsonspec.pointer import DocumentPointer
+
+__all__ = ['resolve', 'Registry', 'LocalRegistry', 'NotFound', 'Forbidden']
 
 
 def resolve(obj, pointer, registry=None):

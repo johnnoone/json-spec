@@ -109,10 +109,10 @@ This module implements a lot of formats, exposed to every draft:
       - enabling
     * - email
       - validate email
-      - 
+      -
     * - hostname
       - validate hostname
-      - 
+      -
     * - ipv4
       - validate ipv4
       - pip install json-spec[ip]
@@ -121,28 +121,28 @@ This module implements a lot of formats, exposed to every draft:
       - pip install json-spec[ip]
     * - regex
       - validate regex
-      - 
+      -
     * - uri
       - validate uri
-      - 
+      -
     * - css.color
       - validate css color
-      - 
+      -
     * - rfc3339.datetime
       - see rfc3339_
-      - 
+      -
     * - utc.datetime
       - YYYY-MM-ddThh:mm:SSZ
-      - 
+      -
     * - utc.date
       - YYYY-MM-dd
-      - 
+      -
     * - utc.time
       - hh:mm:SS
-      - 
+      -
     * - utc.millisec
       - any integer, float
-      - 
+      -
 
 
 Some formats rely on external modules, and they are not enabled by default.
@@ -152,13 +152,25 @@ Each draft validator aliases they formats to these formats. See :meth:`draft04 <
 
 Regarding your needs, you can register your own formats. Use ``entry_points`` in your ``setup.py``. for example:
 
-
 .. code-block:: ini
 
     [entry_points]
 
     jsonspec.validators.formats =
         my:format = my.module:validate_format
+
+
+the function must have this signature:
+
+.. code-block:: python
+
+    from jsonspec.validators.exceptions import ValidationError
+
+    def validate_format(obj):
+        if obj == 'wrong':
+            raise ValidationError('ojb cannot be wrong')
+        return obj
+
 
 API
 ---

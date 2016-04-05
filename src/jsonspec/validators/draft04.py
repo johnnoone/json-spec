@@ -7,8 +7,6 @@
 
 from __future__ import absolute_import
 
-__all__ = ['compile', 'Draft04Validator']
-
 import logging
 import re
 from copy import deepcopy
@@ -22,6 +20,8 @@ from jsonspec.validators.exceptions import ValidationError
 from jsonspec.validators.util import uncamel
 from jsonspec.validators.pointer_util import pointer_join
 from jsonspec import driver as json
+
+__all__ = ['compile', 'Draft04Validator']
 
 sequence_types = (list, set, tuple)
 number_types = (integer_types, float, Decimal)
@@ -434,7 +434,9 @@ class Draft04Validator(Validator):
             elif isinstance(items, (list, tuple)):
                 additionals = self.attrs['additional_items']
                 validators = items
-                for index, element in enumerate(obj):
+
+                validated = list(obj)
+                for index, element in enumerate(validated):
                     with self.catch_fail():
                         try:
                             validator = validators[index]
@@ -447,7 +449,9 @@ class Draft04Validator(Validator):
                                           pointer=pointer_join(self.uri, index))  # noqa
                                 continue
                             validator = additionals
-                        obj[index] = validator(element, pointer_join(pointer, index))  # noqa
+                        validated[index] = \
+                            validator(element, pointer_join(pointer, index))  # noqa
+                obj = obj.__class__(validated)
                 return obj
             else:
                 raise NotImplementedError(items)

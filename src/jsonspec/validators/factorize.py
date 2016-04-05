@@ -4,8 +4,6 @@
 
 """
 
-__all__ = ['Context', 'Factory', 'register']
-
 import logging
 from functools import partial
 from jsonspec.pointer import DocumentPointer
@@ -13,6 +11,8 @@ from jsonspec.pointer.exceptions import ExtractError
 from jsonspec.reference import LocalRegistry
 from .exceptions import CompilationError
 from .formats import FormatRegistry
+
+__all__ = ['Context', 'Factory', 'register']
 
 logger = logging.getLogger(__name__)
 
