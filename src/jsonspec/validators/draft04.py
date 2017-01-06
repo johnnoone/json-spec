@@ -379,8 +379,8 @@ class Draft04Validator(Validator):
         for key, dependencies in self.attrs.get('dependencies', {}).items():
             if key in obj:
                 if isinstance(dependencies, sequence_types):
-                    for dep in set(dependencies) - set(obj.keys()):
-                        self.fail('Missing property', obj, pointer)
+                    for name in set(dependencies) - set(obj.keys()):
+                        self.fail('Missing property', obj, pointer_join(pointer, name))  # noqa
                 else:
                     dependencies(obj)
         return obj
@@ -596,7 +596,8 @@ class Draft04Validator(Validator):
             return obj
 
         if additionals is False:
-            self.fail('Forbidden additional properties', obj, pointer)
+            for name in pending:
+                self.fail('Forbidden property', obj, pointer_join(pointer, name))  # noqa
             return obj
 
         validator = additionals
@@ -609,7 +610,7 @@ class Draft04Validator(Validator):
         if 'required' in self.attrs:
             for name in self.attrs['required']:
                 if name not in obj:
-                    self.fail('Missing property', obj, pointer)
+                    self.fail('Missing property', obj, pointer_join(pointer, name))  # noqa
         return obj
 
     def validate_type(self, obj, pointer=None):
