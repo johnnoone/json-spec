@@ -10,7 +10,13 @@ __all__ = ['DocumentPointer', 'Pointer', 'PointerToken']
 import logging
 from abc import abstractmethod, ABCMeta
 from six import add_metaclass, string_types
-from collections import Mapping, Sequence, MutableSequence
+try:
+    # py3
+    from collections.abc import Mapping, Sequence, MutableSequence
+except ImportError:
+    # py2
+    from collections import Mapping, Sequence, MutableSequence
+
 from .exceptions import ExtractError, RefError, LastElement, OutOfBounds, OutOfRange, WrongType, UnstagedError, ParseError  # noqa
 
 logger = logging.getLogger(__name__)

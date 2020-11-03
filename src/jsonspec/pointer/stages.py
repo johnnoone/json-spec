@@ -4,7 +4,14 @@
 
 """
 from six import string_types
-from collections import Mapping, Sequence, Set
+
+try:
+    # py3
+    from collections.abc import Mapping, Sequence, Set
+except ImportError:
+    # py2
+    from collections import Mapping, Sequence, Set
+
 
 class Staged(object):
     obj = None
