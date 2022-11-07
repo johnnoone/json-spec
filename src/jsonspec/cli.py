@@ -9,10 +9,12 @@ import logging
 import os
 import stat
 import sys
-import pkg_resources
 from functools import wraps
-from jsonspec import driver
 from textwrap import dedent
+
+import pkg_resources
+
+from jsonspec import driver
 
 try:
     from termcolor import colored
@@ -240,7 +242,7 @@ class AddCommand(Command):
         parse_document(args)
         parse_fragment(args)
 
-        from jsonspec.operations import add, Error
+        from jsonspec.operations import Error, add
         from jsonspec.pointer import ParseError
 
         try:
@@ -275,7 +277,7 @@ class CheckCommand(Command):
         parse_document(args)
         parse_fragment(args)
 
-        from jsonspec.operations import check, Error
+        from jsonspec.operations import Error, check
         from jsonspec.pointer import ParseError
 
         try:
@@ -313,7 +315,7 @@ class CopyCommand(Command):
         parse_document(args)
         parse_target(args)
 
-        from jsonspec.operations import copy, Error
+        from jsonspec.operations import Error, copy
         from jsonspec.pointer import ParseError
 
         try:
@@ -347,8 +349,7 @@ class ExtractCommand(Command):
         parse_pointer(args)
         parse_document(args)
 
-        from jsonspec.pointer import extract
-        from jsonspec.pointer import ExtractError, ParseError
+        from jsonspec.pointer import ExtractError, ParseError, extract
 
         try:
             response = extract(args.document, args.pointer)
@@ -384,7 +385,7 @@ class MoveCommand(Command):
         parse_target(args)
         parse_document(args)
 
-        from jsonspec.operations import move, Error
+        from jsonspec.operations import Error, move
         from jsonspec.pointer import ParseError
 
         try:
@@ -418,7 +419,7 @@ class RemoveCommand(Command):
         parse_pointer(args)
         parse_document(args)
 
-        from jsonspec.operations import remove, Error
+        from jsonspec.operations import Error, remove
         from jsonspec.pointer import ParseError
 
         try:
@@ -454,7 +455,7 @@ class ReplaceCommand(Command):
         parse_document(args)
         parse_fragment(args)
 
-        from jsonspec.operations import replace, Error
+        from jsonspec.operations import Error, replace
         from jsonspec.pointer import ParseError
 
         try:
@@ -488,8 +489,7 @@ class ValidateCommand(Command):
         parse_document(args)
         parse_schema(args)
 
-        from jsonspec.validators import load
-        from jsonspec.validators import ValidationError
+        from jsonspec.validators import ValidationError, load
 
         try:
             validated = load(args.schema).validate(args.document)

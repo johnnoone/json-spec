@@ -7,15 +7,16 @@
     .. _`Common test suite`:: https://github.com/json-schema/JSON-Schema-Test-Suite
 """
 
-from jsonspec.validators import load, ValidationError, CompilationError
-from jsonspec.reference.providers import SpecProvider, ProxyProvider
-from jsonspec import driver as json
-
 import io
-import os
-import pytest
 import logging
+import os
 from pathlib import Path
+
+import pytest
+
+from jsonspec import driver as json
+from jsonspec.reference.providers import ProxyProvider, SpecProvider
+from jsonspec.validators import CompilationError, ValidationError, load
 
 logger = logging.getLogger(__name__)
 here = os.path.dirname(os.path.abspath(__file__))

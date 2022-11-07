@@ -6,7 +6,9 @@
 
 import logging
 from functools import partial
-from pkg_resources import iter_entry_points, DistributionNotFound
+
+from pkg_resources import DistributionNotFound, iter_entry_points
+
 from .exceptions import CompilationError
 
 __all__ = ["register", "FormatRegistry"]

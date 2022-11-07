@@ -7,10 +7,12 @@
 import json
 import logging
 import os
+from pathlib import Path
+
 import pkg_resources
+
 from .bases import Provider
 from .exceptions import NotFound
-from pathlib import Path
 
 __all__ = ["Provider", "FilesystemProvider", "PkgProvider", "SpecProvider"]
 

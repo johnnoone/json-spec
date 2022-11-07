@@ -4,11 +4,22 @@
 
 """
 
-import pytest
 from collections.abc import Mapping, Sequence
+
+import pytest
+
+from jsonspec.operations import (
+    Error,
+    NonexistentTarget,
+    add,
+    check,
+    copy,
+    move,
+    remove,
+    replace,
+)
+
 from . import MyMappingType, MySequenceType
-from jsonspec.operations import check, remove, add, replace, copy, move
-from jsonspec.operations import Error, NonexistentTarget
 
 
 def test_types():

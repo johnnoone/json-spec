@@ -5,9 +5,8 @@
 """
 
 
-from json import *
-
 from functools import wraps
+from json import *
 
 __all__ = ["load", "loads", "dump", "dumps"]
 

@@ -10,13 +10,15 @@ import re
 from copy import deepcopy
 from decimal import Decimal
 from urllib.parse import urljoin
+
+from jsonspec import driver as json
+from jsonspec.validators.exceptions import ValidationError
+from jsonspec.validators.pointer_util import pointer_join
+from jsonspec.validators.util import uncamel
+
 from .bases import ReferenceValidator, Validator
 from .exceptions import CompilationError
 from .factorize import register
-from jsonspec.validators.exceptions import ValidationError
-from jsonspec.validators.util import uncamel
-from jsonspec.validators.pointer_util import pointer_join
-from jsonspec import driver as json
 
 __all__ = ["compile", "Draft04Validator"]
 

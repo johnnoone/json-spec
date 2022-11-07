@@ -5,8 +5,10 @@
 """
 
 import logging
-from abc import abstractmethod, ABCMeta
+from abc import ABCMeta, abstractmethod
+
 from jsonspec.pointer import DocumentPointer
+
 from .exceptions import ValidationError
 
 __all__ = ["ValidationError", "Validator", "ReferenceValidator"]

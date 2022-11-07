@@ -5,9 +5,11 @@
 """
 
 import logging
-from .exceptions import NotFound, Forbidden
-from .util import ref, MutableMapping, Mapping
+
 from jsonspec.pointer import DocumentPointer
+
+from .exceptions import Forbidden, NotFound
+from .util import Mapping, MutableMapping, ref
 
 __all__ = ["LocalRegistry", "Registry"]
 

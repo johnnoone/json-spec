@@ -8,19 +8,19 @@
 __all__ = ["DocumentPointer", "Pointer", "PointerToken"]
 
 import logging
-from abc import abstractmethod, ABCMeta
+from abc import ABCMeta, abstractmethod
 from collections.abc import Mapping, Sequence
 
 from .exceptions import (
     ExtractError,
-    RefError,
     LastElement,
-    OutOfBounds,
+    OutOfBounds,  # noqa
     OutOfRange,
-    WrongType,
-    UnstagedError,
     ParseError,
-)  # noqa
+    RefError,
+    UnstagedError,
+    WrongType,
+)
 
 logger = logging.getLogger(__name__)
 

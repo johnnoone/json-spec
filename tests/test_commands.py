@@ -4,10 +4,13 @@
 
 """
 
-import pytest
-from subprocess import Popen, PIPE
-from jsonspec import cli
 import json
+from subprocess import PIPE, Popen
+
+import pytest
+
+from jsonspec import cli
+
 from . import move_cwd
 
 

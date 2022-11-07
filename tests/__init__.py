@@ -9,8 +9,8 @@ import json
 import logging
 import os.path
 import unittest
-from contextlib import contextmanager
 from collections.abc import MutableMapping, MutableSequence
+from contextlib import contextmanager
 
 logging.basicConfig(level=logging.INFO)
 

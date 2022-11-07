@@ -5,7 +5,8 @@
 """
 
 import pytest
-from jsonspec.validators import load, ValidationError
+
+from jsonspec.validators import ValidationError, load
 
 
 def test_issue4():

@@ -6,13 +6,12 @@
 
 __all__ = ["Target"]
 
-from copy import deepcopy
 import logging
-from jsonspec.pointer import Pointer
-
 from collections.abc import Mapping, MutableSequence
+from copy import deepcopy
 
-from jsonspec.pointer import ExtractError, OutOfBounds, OutOfRange, LastElement
+from jsonspec.pointer import ExtractError, LastElement, OutOfBounds, OutOfRange, Pointer
+
 from .exceptions import Error, NonexistentTarget
 
 logger = logging.getLogger(__name__)

@@ -4,8 +4,9 @@
 
 """
 
-from jsonspec.reference import resolve, Registry
+from jsonspec.reference import Registry, resolve
 from jsonspec.reference.providers import FilesystemProvider
+
 from . import fixture_dir
 
 

@@ -5,8 +5,9 @@
 """
 
 import pytest
-from jsonspec.reference.providers import PkgProvider, SpecProvider
+
 from jsonspec.reference import NotFound
+from jsonspec.reference.providers import PkgProvider, SpecProvider
 
 
 def test_foo():

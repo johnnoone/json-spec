@@ -21,17 +21,18 @@ __all__ = [
 ]  # noqa
 
 import logging
+
 from .bases import DocumentPointer, Pointer, PointerToken
 from .exceptions import (
     ExtractError,
-    RefError,
     LastElement,
-    OutOfBounds,
+    OutOfBounds,  # noqa
     OutOfRange,
-    WrongType,
-    UnstagedError,
     ParseError,
-)  # noqa
+    RefError,
+    UnstagedError,
+    WrongType,
+)
 from .stages import stage
 
 logger = logging.getLogger(__name__)

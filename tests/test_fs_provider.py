@@ -5,8 +5,10 @@
 """
 
 import pytest
-from jsonspec.reference.providers import FilesystemProvider
+
 from jsonspec.reference import NotFound
+from jsonspec.reference.providers import FilesystemProvider
+
 from . import fixture_dir
 
 

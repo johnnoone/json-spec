@@ -4,15 +4,16 @@
 
 """
 
+import ipaddress
 import logging
 import re
 import time
 from copy import deepcopy
+from datetime import date, datetime, timedelta, tzinfo
 from decimal import Decimal
-from datetime import tzinfo, timedelta, datetime, date
 from urllib.parse import urlparse
+
 from .exceptions import ValidationError
-import ipaddress
 
 __all__ = []
 

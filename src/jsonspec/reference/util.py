@@ -15,4 +15,4 @@ def ref(obj):
         return None
 
 
-from collections.abc import MutableMapping, Mapping
+from collections.abc import Mapping, MutableMapping

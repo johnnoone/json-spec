@@ -12,9 +12,10 @@
 
 """
 
-from .bases import Registry, LocalRegistry
-from .exceptions import NotFound, Forbidden
 from jsonspec.pointer import DocumentPointer
+
+from .bases import LocalRegistry, Registry
+from .exceptions import Forbidden, NotFound
 
 __all__ = ["resolve", "Registry", "LocalRegistry", "NotFound", "Forbidden"]
 

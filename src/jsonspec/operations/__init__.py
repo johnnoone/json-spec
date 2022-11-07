@@ -15,8 +15,8 @@ __all__ = [
     "Target",
 ]
 
-from .exceptions import Error, NonexistentTarget
 from .bases import Target
+from .exceptions import Error, NonexistentTarget
 
 
 def check(doc, pointer, expected, raise_onerror=False):

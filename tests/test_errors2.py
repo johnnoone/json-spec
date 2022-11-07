@@ -6,9 +6,9 @@
 
 
 import pytest
+
 from jsonspec.validators import load
 from jsonspec.validators.exceptions import ValidationError
-
 
 schema = {
     "type": "object",

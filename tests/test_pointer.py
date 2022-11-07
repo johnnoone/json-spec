@@ -4,11 +4,11 @@
 
 """
 
-from jsonspec.pointer import extract, stage
-from . import MyMappingType, MySequenceType
-from jsonspec.pointer import RefError, DocumentPointer, Pointer
+from jsonspec.pointer import DocumentPointer, Pointer, RefError
 from jsonspec.pointer import exceptions as events
-from . import TestCase
+from jsonspec.pointer import extract, stage
+
+from . import MyMappingType, MySequenceType, TestCase
 
 
 class TestPointer(TestCase):

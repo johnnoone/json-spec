@@ -4,13 +4,13 @@
 
 """
 
-from .bases import Validator, ReferenceValidator
-from .exceptions import CompilationError, ReferenceError, ValidationError
-from .factorize import register, Factory, Context
-from . import draft04  # noqa
 from . import draft03  # noqa
+from . import draft04  # noqa
+from .bases import ReferenceValidator, Validator
 from .draft03 import Draft03Validator  # noqa
 from .draft04 import Draft04Validator  # noqa
+from .exceptions import CompilationError, ReferenceError, ValidationError
+from .factorize import Context, Factory, register
 
 __all__ = [
     "load",

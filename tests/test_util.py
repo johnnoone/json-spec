@@ -5,16 +5,24 @@
 """
 
 import pytest
-from jsonspec.validators.util import rfc3339_to_datetime, validate_email
-from jsonspec.validators.util import validate_ipv4, validate_hostname
-from jsonspec.validators.util import validate_ipv6
-from jsonspec.validators.util import validate_utc_time, validate_utc_millisec
-from jsonspec.validators.util import validate_utc_date, validate_uri
-from jsonspec.validators.util import validate_regex, validate_css_color
-from jsonspec.validators.util import validate_rfc3339_datetime
-from jsonspec.validators.util import validate_utc_datetime
-from jsonspec.validators.util import uncamel
+
 from jsonspec.validators.exceptions import ValidationError
+from jsonspec.validators.util import (
+    rfc3339_to_datetime,
+    uncamel,
+    validate_css_color,
+    validate_email,
+    validate_hostname,
+    validate_ipv4,
+    validate_ipv6,
+    validate_regex,
+    validate_rfc3339_datetime,
+    validate_uri,
+    validate_utc_date,
+    validate_utc_datetime,
+    validate_utc_millisec,
+    validate_utc_time,
+)
 
 
 def test_rfc3339():
