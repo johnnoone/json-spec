@@ -15,9 +15,4 @@ def ref(obj):
         return None
 
 
-try:
-    # py3
-    from collections.abc import MutableMapping, Mapping
-except ImportError:
-    # py2
-    from collections import MutableMapping, Mapping
+from collections.abc import MutableMapping, Mapping

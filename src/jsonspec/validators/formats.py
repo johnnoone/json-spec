@@ -14,7 +14,7 @@ __all__ = ["register", "FormatRegistry"]
 logger = logging.getLogger(__name__)
 
 
-class FormatRegistry(object):
+class FormatRegistry:
     """
     Declare callables that must validate strings.
 

@@ -4,15 +4,10 @@
 
 """
 
-try:
-    # py3
-    from collections.abc import Mapping, Sequence, Set
-except ImportError:
-    # py2
-    from collections import Mapping, Sequence, Set
+from collections.abc import Mapping, Sequence, Set
 
 
-class Staged(object):
+class Staged:
     obj = None
     parent_obj = None
     parent_member = None

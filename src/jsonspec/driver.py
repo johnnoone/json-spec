@@ -5,10 +5,7 @@
 """
 
 
-try:
-    from simplejson import *  # noqa
-except ImportError:
-    from json import *  # noqa
+from json import *
 
 from functools import wraps
 

@@ -206,7 +206,7 @@ class MyMappingType(TestCase):
             assert self.document == event.obj
 
 
-class TestRelative(object):
+class TestRelative:
     document = stage({"foo": ["bar", "baz"], "highly": {"nested": {"objects": True}}})
 
     def test_relative_1(self):

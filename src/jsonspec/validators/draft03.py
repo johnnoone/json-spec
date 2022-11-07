@@ -648,7 +648,7 @@ class Draft03Validator(Validator):
         return FailCatcher(self)
 
 
-class FailCatcher(object):
+class FailCatcher:
     def __init__(self, validator):
         self.validator = validator
 

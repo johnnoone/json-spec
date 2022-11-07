@@ -12,6 +12,7 @@ from decimal import Decimal
 from datetime import tzinfo, timedelta, datetime, date
 from urllib.parse import urlparse
 from .exceptions import ValidationError
+import ipaddress
 
 __all__ = []
 
@@ -312,12 +313,8 @@ def validate_hostname(obj):
 
 def validate_ipv4(obj):
     try:
-        import ipaddress
-
         obj = str(obj)
         ipaddress.IPv4Address(obj)
-    except ImportError:
-        raise ValidationError("IPv4 relies on ipaddress package", obj)
     except (ipaddress.AddressValueError, ipaddress.NetmaskValueError):
         raise ValidationError(
             "{!r} does not appear to " "be an IPv4 address".format(obj)
@@ -327,12 +324,8 @@ def validate_ipv4(obj):
 
 def validate_ipv6(obj):
     try:
-        import ipaddress
-
         obj = str(obj)
         ipaddress.IPv6Address(obj)
-    except ImportError:
-        raise ValidationError("IPv6 relies on ipaddress package", obj)
     except (ipaddress.AddressValueError, ipaddress.NetmaskValueError):
         raise ValidationError(
             "{!r} does not appear to " "be an IPv6 address".format(obj)

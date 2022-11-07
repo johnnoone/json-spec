@@ -11,7 +11,7 @@ class NotFound(Exception):
     pass
 
 
-class Forbidden(object):
+class Forbidden:
     """raises when a trying to replace <local> document"""
 
     pass

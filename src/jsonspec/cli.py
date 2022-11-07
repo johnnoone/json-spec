@@ -189,7 +189,7 @@ def parse_target(args):
         raise ValueError("target is required")
 
 
-class Command(object):
+class Command:
     help = None
     description = None
     epilog = None

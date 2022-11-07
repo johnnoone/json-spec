@@ -17,7 +17,7 @@ __all__ = ["Context", "Factory", "register"]
 logger = logging.getLogger(__name__)
 
 
-class Context(object):
+class Context:
     """
 
     :ivar factory: global factory
@@ -50,7 +50,7 @@ class Context(object):
             raise CompilationError({}, error)
 
 
-class Factory(object):
+class Factory:
     """
 
     :ivar provider: global registry

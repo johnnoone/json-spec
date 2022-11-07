@@ -9,13 +9,7 @@ __all__ = ["DocumentPointer", "Pointer", "PointerToken"]
 
 import logging
 from abc import abstractmethod, ABCMeta
-
-try:
-    # py3
-    from collections.abc import Mapping, Sequence, MutableSequence
-except ImportError:
-    # py2
-    from collections import Mapping, Sequence, MutableSequence
+from collections.abc import Mapping, Sequence
 
 from .exceptions import (
     ExtractError,
@@ -31,7 +25,7 @@ from .exceptions import (
 logger = logging.getLogger(__name__)
 
 
-class DocumentPointer(object):
+class DocumentPointer:
     """Defines a document pointer
 
     :ivar document: document name
@@ -91,7 +85,7 @@ class DocumentPointer(object):
         return "<DocumentPointer({})".format(self)
 
 
-class Pointer(object):
+class Pointer:
     """Defines a pointer
 
     :ivar tokens: list of PointerToken
