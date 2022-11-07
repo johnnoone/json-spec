@@ -9,7 +9,6 @@ __all__ = ['DocumentPointer', 'Pointer', 'PointerToken']
 
 import logging
 from abc import abstractmethod, ABCMeta
-from six import add_metaclass, string_types
 try:
     # py3
     from collections.abc import Mapping, Sequence, MutableSequence
@@ -73,7 +72,7 @@ class DocumentPointer(object):
         return iter([self.document, self.pointer])
 
     def __eq__(self, other):
-        if isinstance(other, string_types):
+        if isinstance(other, str):
             return other == self.__str__()
         return super(Pointer, self).__eq__(other)
 
@@ -143,7 +142,7 @@ class Pointer(object):
         return iter(self.tokens)
 
     def __eq__(self, other):
-        if isinstance(other, string_types):
+        if isinstance(other, str):
             return other == self.__str__()
         return super(Pointer, self).__eq__(other)
 
@@ -162,8 +161,7 @@ class Pointer(object):
         return '<{}({!r})>'.format(self.__class__.__name__, self.__str__())
 
 
-@add_metaclass(ABCMeta)
-class PointerToken(str):
+class PointerToken(str, metaclass=ABCMeta):
     """
     A single token
     """
@@ -227,7 +225,7 @@ class ChildToken(PointerToken):
                 if not bypass_ref and '$ref' in obj:
                     raise RefError(obj, 'presence of a $ref member')
                 obj = self.extract_mapping(obj)
-            elif isinstance(obj, Sequence) and not isinstance(obj, string_types):
+            elif isinstance(obj, Sequence) and not isinstance(obj, str):
                 obj = self.extract_sequence(obj)
             else:
                 raise WrongType(obj, '{!r} does not apply '

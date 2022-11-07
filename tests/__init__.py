@@ -3,14 +3,14 @@
     ~~~~~
 """
 
-__all__ = ['fixture', 'fixture_dir', 'TestCase', 'TestMappingType', 'TestSequenceType']
+__all__ = ['fixture', 'fixture_dir', 'TestCase', 'MyMappingType', 'MySequenceType']
 
 import json
 import logging
 import os.path
 import unittest
 from contextlib import contextmanager
-from collections import MutableMapping, MutableSequence
+from collections.abc import MutableMapping, MutableSequence
 
 logging.basicConfig(level=logging.INFO)
 
@@ -36,7 +36,7 @@ class TestCase(unittest.TestCase):
     pass
 
 
-class TestMappingType(dict, MutableMapping):
+class MyMappingType(dict, MutableMapping):
     def copy(self):
         if self.__class__ is UserDict:
             return UserDict(self.data.copy())
@@ -51,6 +51,6 @@ class TestMappingType(dict, MutableMapping):
         return c
 
 
-class TestSequenceType(list, MutableSequence):
+class MySequenceType(list, MutableSequence):
     def copy(self):
         return self.__class__(self)

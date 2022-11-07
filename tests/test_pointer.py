@@ -5,7 +5,7 @@
 """
 
 from jsonspec.pointer import extract, stage
-from . import TestMappingType, TestSequenceType
+from . import MyMappingType, MySequenceType
 from jsonspec.pointer import RefError, DocumentPointer, Pointer
 from jsonspec.pointer import exceptions as events
 from . import TestCase
@@ -56,7 +56,7 @@ class TestPointer(TestCase):
 
 class TestSequence(TestCase):
     document = ['foo', 'bar', {'$ref': 'baz'}]
-    collections_document = TestSequenceType(['foo', 'bar', TestMappingType({'$ref': 'baz'})])
+    collections_document = MySequenceType(['foo', 'bar', MyMappingType({'$ref': 'baz'})])
 
     def test_sequence(self):
         assert 'bar' == extract(self.document, '/1')
@@ -94,8 +94,8 @@ class TestSequence(TestCase):
             assert self.document == event.obj
 
 
-class TestSequenceType(TestCase):
-    document = TestSequenceType(['foo', 'bar', TestMappingType({'$ref': 'baz'})])
+class MySequenceType(TestCase):
+    document = MySequenceType(['foo', 'bar', MyMappingType({'$ref': 'baz'})])
 
     def test_sequence(self):
         assert 'bar' == extract(self.document, '/1')
@@ -167,8 +167,8 @@ class TestMapping(TestCase):
             assert self.document == event.obj
 
 
-class TestMappingType(TestCase):
-    document = TestMappingType({'foo': 42, 'bar': TestMappingType({'$ref': 'baz'}), 4: True})
+class MyMappingType(TestCase):
+    document = MyMappingType({'foo': 42, 'bar': MyMappingType({'$ref': 'baz'}), 4: True})
 
     def test_mapping(self):
         assert 42 == extract(self.document, '/foo')

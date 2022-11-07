@@ -11,8 +11,7 @@ import logging
 import re
 from copy import deepcopy
 from decimal import Decimal
-from six import integer_types, string_types
-from six.moves.urllib.parse import urljoin
+from urllib.parse import urljoin
 from .bases import ReferenceValidator, Validator
 from .exceptions import CompilationError
 from .factorize import register
@@ -24,7 +23,7 @@ from jsonspec import driver as json
 __all__ = ['compile', 'Draft04Validator']
 
 sequence_types = (list, set, tuple)
-number_types = (integer_types, float, Decimal)
+number_types = (int, float, Decimal)
 logger = logging.getLogger(__name__)
 
 
@@ -128,7 +127,7 @@ def compile(schema, pointer, context, scope=None):
 
     if 'format' in schm:
         attrs['format'] = schm.pop('format')
-        if not isinstance(attrs['format'], string_types):
+        if not isinstance(attrs['format'], str):
             raise CompilationError('format must be a string', schema)
 
     if 'items' in schm:
@@ -151,17 +150,17 @@ def compile(schema, pointer, context, scope=None):
 
     if 'maxItems' in schm:
         attrs['max_items'] = schm.pop('maxItems')
-        if not isinstance(attrs['max_items'], integer_types):
+        if not isinstance(attrs['max_items'], int):
             raise CompilationError('maxItems must be integer', schema)
 
     if 'maxLength' in schm:
         attrs['max_length'] = schm.pop('maxLength')
-        if not isinstance(attrs['max_length'], integer_types):
+        if not isinstance(attrs['max_length'], int):
             raise CompilationError('maxLength must be integer', schema)
 
     if 'maxProperties' in schm:
         attrs['max_properties'] = schm.pop('maxProperties')
-        if not isinstance(attrs['max_properties'], integer_types):
+        if not isinstance(attrs['max_properties'], int):
             raise CompilationError('maxProperties must be integer', schema)
 
     if 'minimum' in schm:
@@ -171,17 +170,17 @@ def compile(schema, pointer, context, scope=None):
 
     if 'minItems' in schm:
         attrs['min_items'] = schm.pop('minItems')
-        if not isinstance(attrs['min_items'], integer_types):
+        if not isinstance(attrs['min_items'], int):
             raise CompilationError('minItems must be integer', schema)
 
     if 'minLength' in schm:
         attrs['min_length'] = schm.pop('minLength')
-        if not isinstance(attrs['min_length'], integer_types):
+        if not isinstance(attrs['min_length'], int):
             raise CompilationError('minLength must be integer', schema)
 
     if 'minProperties' in schm:
         attrs['min_properties'] = schm.pop('minProperties')
-        if not isinstance(attrs['min_properties'], integer_types):
+        if not isinstance(attrs['min_properties'], int):
             raise CompilationError('minProperties must be integer', schema)
 
     if 'multipleOf' in schm:
@@ -208,7 +207,7 @@ def compile(schema, pointer, context, scope=None):
 
     if 'pattern' in schm:
         attrs['pattern'] = schm.pop('pattern')
-        if not isinstance(attrs['pattern'], string_types):
+        if not isinstance(attrs['pattern'], str):
             raise CompilationError('pattern must be a string', schema)
 
     if 'properties' in schm:
@@ -238,7 +237,7 @@ def compile(schema, pointer, context, scope=None):
 
     if 'type' in schm:
         attrs['type'] = schm.pop('type')
-        if isinstance(attrs['type'], string_types):
+        if isinstance(attrs['type'], str):
             attrs['type'] = [attrs['type']]
         elif not isinstance(attrs['type'], sequence_types):
             raise CompilationError('type must be string or sequence', schema)
@@ -338,7 +337,7 @@ class Draft04Validator(Validator):
         return isinstance(obj, bool)
 
     def is_integer(self, obj):
-        return isinstance(obj, integer_types) and not isinstance(obj, bool)
+        return isinstance(obj, int) and not isinstance(obj, bool)
 
     def is_number(self, obj):
         return isinstance(obj, number_types) and not isinstance(obj, bool)
@@ -347,7 +346,7 @@ class Draft04Validator(Validator):
         return isinstance(obj, dict)
 
     def is_string(self, obj):
-        return isinstance(obj, string_types)
+        return isinstance(obj, str)
 
     def has_default(self):
         return 'default' in self.attrs
@@ -616,7 +615,7 @@ class Draft04Validator(Validator):
     def validate_type(self, obj, pointer=None):
         if 'type' in self.attrs:
             types = self.attrs['type']
-            if isinstance(types, string_types):
+            if isinstance(types, str):
                 types = [types]
 
             for t in types:

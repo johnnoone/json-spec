@@ -16,7 +16,6 @@ import os
 import pytest
 import logging
 from pathlib import Path
-from six import PY2
 logger = logging.getLogger(__name__)
 here = os.path.dirname(os.path.abspath(__file__))
 
@@ -37,9 +36,6 @@ for data, src in contents('remotes'):
 def scenarios(draft):
     # no ECMA 262 regex parser
     skip = ['optional/jsregex.json']
-    if PY2:
-        # json module cannot handle well unicode strings
-        skip.extend(('minLength.json', 'maxLength.json'))
 
     for data, src in contents('tests', draft):
         if src in skip:

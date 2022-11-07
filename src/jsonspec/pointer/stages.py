@@ -3,7 +3,6 @@
     ~~~~~~~~~~~~~~~~~~~~~~~
 
 """
-from six import string_types
 
 try:
     # py3
@@ -65,7 +64,7 @@ def stage(obj, parent=None, member=None):
     if isinstance(obj, Mapping):
         for key, value in obj.items():
             stage(value, obj, key)
-    elif isinstance(obj, Sequence) and not isinstance(obj, string_types):
+    elif isinstance(obj, Sequence) and not isinstance(obj, str):
         for index, value in enumerate(obj):
             stage(value, obj, index)
     elif isinstance(obj, Set):

@@ -12,14 +12,12 @@ import time
 from copy import deepcopy
 from decimal import Decimal
 from datetime import tzinfo, timedelta, datetime, date
-from six import text_type
-from six import integer_types
-from six.moves.urllib.parse import urlparse
+from urllib.parse import urlparse
 from .exceptions import ValidationError
 
 __all__ = []
 
-number_types = (integer_types, float, Decimal)
+number_types = (int, float, Decimal)
 
 logger = logging.getLogger(__name__)
 
@@ -199,7 +197,7 @@ def validate_hostname(obj):
 def validate_ipv4(obj):
     try:
         import ipaddress
-        obj = text_type(obj)
+        obj = str(obj)
         ipaddress.IPv4Address(obj)
     except ImportError:
         raise ValidationError('IPv4 relies on ipaddress package', obj)
@@ -212,7 +210,7 @@ def validate_ipv4(obj):
 def validate_ipv6(obj):
     try:
         import ipaddress
-        obj = text_type(obj)
+        obj = str(obj)
         ipaddress.IPv6Address(obj)
     except ImportError:
         raise ValidationError('IPv6 relies on ipaddress package', obj)

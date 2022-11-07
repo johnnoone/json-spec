@@ -5,14 +5,14 @@
 """
 
 import pytest
-from collections import Mapping, Sequence
-from . import TestMappingType, TestSequenceType
+from collections.abc import Mapping, Sequence
+from . import MyMappingType, MySequenceType
 from jsonspec.operations import check, remove, add, replace, copy, move
 from jsonspec.operations import Error, NonexistentTarget
 
 def test_types():
-    assert isinstance(TestMappingType(), Mapping)
-    assert isinstance(TestSequenceType(), Sequence)
+    assert isinstance(MyMappingType(), Mapping)
+    assert isinstance(MySequenceType(), Sequence)
 
 def test_check():
     assert check({'foo': 'bar'}, '/foo', 'bar')
@@ -187,7 +187,7 @@ def test_adding_array_value():
     }
 
 def test_adding_mapping_type_value():
-    obj = TestMappingType({'foo': ['bar']})
-    assert add(obj, '/foo/-', ['abc', 'def']) == TestMappingType({
+    obj = MyMappingType({'foo': ['bar']})
+    assert add(obj, '/foo/-', ['abc', 'def']) == MyMappingType({
         'foo': ['bar', ['abc', 'def']]
     })

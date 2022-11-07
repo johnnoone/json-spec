@@ -8,7 +8,6 @@ from __future__ import absolute_import
 
 import logging
 from abc import abstractmethod, ABCMeta
-from six import add_metaclass
 from jsonspec.pointer import DocumentPointer
 from .exceptions import ValidationError
 
@@ -17,8 +16,7 @@ __all__ = ['ValidationError', 'Validator', 'ReferenceValidator']
 logger = logging.getLogger(__name__)
 
 
-@add_metaclass(ABCMeta)
-class Validator(object):
+class Validator(metaclass=ABCMeta):
     """
     The mother of Validators.
     """
