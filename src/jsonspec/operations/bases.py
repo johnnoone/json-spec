@@ -10,7 +10,14 @@ __all__ = ['Target']
 from copy import deepcopy
 import logging
 from jsonspec.pointer import Pointer
-from collections import Mapping, MutableSequence
+
+try:
+    # py3
+    from collections.abc import Mapping, MutableSequence
+except ImportError:
+    # py2
+    from collections import Mapping, MutableSequence
+
 from jsonspec.pointer import ExtractError, OutOfBounds, OutOfRange, LastElement
 from .exceptions import Error, NonexistentTarget
 logger = logging.getLogger(__name__)
