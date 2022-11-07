@@ -12,7 +12,7 @@ from jsonspec.reference import LocalRegistry
 from .exceptions import CompilationError
 from .formats import FormatRegistry
 
-__all__ = ['Context', 'Factory', 'register']
+__all__ = ["Context", "Factory", "register"]
 
 logger = logging.getLogger(__name__)
 
@@ -25,6 +25,7 @@ class Context(object):
     :ivar spec: the current spec
     :ivar formats: the current formats exposed
     """
+
     def __init__(self, factory, registry, spec=None, formats=None):
         self.factory = factory
         self.registry = registry
@@ -38,16 +39,13 @@ class Context(object):
         try:
             dp = DocumentPointer(pointer)
             if dp.is_inner():
-                logger.debug('resolve inner %s', pointer)
-                return self.factory.local(self.registry.resolve(pointer),
-                                          pointer,
-                                          self.registry,
-                                          self.spec)
+                logger.debug("resolve inner %s", pointer)
+                return self.factory.local(
+                    self.registry.resolve(pointer), pointer, self.registry, self.spec
+                )
 
-            logger.debug('resolve outside %s', pointer)
-            return self.factory(self.registry.resolve(pointer),
-                                pointer,
-                                self.spec)
+            logger.debug("resolve outside %s", pointer)
+            return self.factory(self.registry.resolve(pointer), pointer, self.spec)
         except ExtractError as error:
             raise CompilationError({}, error)
 
@@ -59,7 +57,7 @@ class Factory(object):
     :ivar spec: default spec
     """
 
-    spec = 'http://json-schema.org/draft-04/schema#'
+    spec = "http://json-schema.org/draft-04/schema#"
     compilers = {}
 
     def __init__(self, provider=None, spec=None, formats=None):
@@ -71,26 +69,26 @@ class Factory(object):
 
     def __call__(self, schema, pointer, spec=None):
         try:
-            spec = schema.get('$schema', spec or self.spec)
+            spec = schema.get("$schema", spec or self.spec)
             compiler = self.compilers[spec]
         except KeyError:
-            raise CompilationError('{!r} not registered'.format(spec), schema)
+            raise CompilationError("{!r} not registered".format(spec), schema)
 
         registry = LocalRegistry(schema, self.provider)
         local = DocumentPointer(pointer)
 
         if local.document:
             registry[local.document] = schema
-        local.document = '<local>'
+        local.document = "<local>"
         context = Context(self, registry, spec, self.formats)
         return compiler(schema, pointer, context)
 
     def local(self, schema, pointer, registry, spec=None):
         try:
-            spec = schema.get('$schema', spec or self.spec)
+            spec = schema.get("$schema", spec or self.spec)
             compiler = self.compilers[spec]
         except KeyError:
-            raise CompilationError('{!r} not registered'.format(spec))
+            raise CompilationError("{!r} not registered".format(spec))
 
         context = Context(self, registry, spec, self.formats)
         return compiler(schema, pointer, context)
@@ -125,7 +123,7 @@ def register(compiler=None, spec=None):
 
     """
     if not spec:
-        raise CompilationError('Spec is required')
+        raise CompilationError("Spec is required")
     if not compiler:
         return partial(register, spec=spec)
     return Factory.register(spec, compiler)

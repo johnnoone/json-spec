@@ -9,13 +9,14 @@ from .exceptions import NotFound, Forbidden
 from .util import ref, MutableMapping, Mapping
 from jsonspec.pointer import DocumentPointer
 
-__all__ = ['LocalRegistry', 'Registry']
+__all__ = ["LocalRegistry", "Registry"]
 
 logger = logging.getLogger(__name__)
 
 
 class Provider(Mapping):
     """Defines a generic way to provide external documents"""
+
     pass
 
 
@@ -55,7 +56,7 @@ class Registry(Provider, MutableMapping):
         try:
             return self.provider[uri]
         except KeyError:
-            raise NotFound('{!r} not registered'.format(uri))
+            raise NotFound("{!r} not registered".format(uri))
 
     def __setitem__(self, uri, obj):
         self.provider[uri] = obj
@@ -80,7 +81,7 @@ class LocalRegistry(Registry):
 
     """
 
-    key = '<local>'
+    key = "<local>"
 
     def __init__(self, doc, provider=None):
         self.doc = doc
@@ -97,17 +98,17 @@ class LocalRegistry(Registry):
         try:
             return self.doc if uri == self.key else self.provider[uri]
         except (NotFound, KeyError):
-            raise NotFound('{!r} not registered'.format(uri))
+            raise NotFound("{!r} not registered".format(uri))
 
     def __setitem__(self, uri, obj):
         if uri == self.key:
-            raise Forbidden('setting {} is forbidden'.format(self.key))
+            raise Forbidden("setting {} is forbidden".format(self.key))
         if uri not in self.provider:
             self.provider[uri] = obj
 
     def __delitem__(self, uri):
         if uri == self.key:
-            raise Forbidden('deleting {} is forbidden'.format(self.key))
+            raise Forbidden("deleting {} is forbidden".format(self.key))
         del self.provider[uri]
 
     def __len__(self):

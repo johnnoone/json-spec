@@ -1,6 +1,6 @@
 [tool.poetry]
 name = "json-spec"
-version = "0.1.0"
+version = "0.11.0.pre0"
 description = "Implements JSON Schema, JSON Pointer and JSON Reference."
 authors = [ "Xavier Barbosa <clint.northwood@gmail.com>" ]
 license = "BSD-3-Clause"
@@ -64,7 +64,10 @@ python = "^3.10"
 termcolor = { version = "*", optional = true }
 
 [tool.poetry.dev-dependencies]
-pytest = "^7.2.0"
+pytest = "*"
+pytest-cov = "*"
+pytest-flake8 = "*"
+black = "*"
 
 [build-system]
 requires = [ "poetry-core>=1.0.0" ]

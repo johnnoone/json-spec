@@ -6,13 +6,14 @@
 
 from __future__ import absolute_import
 
-__all__ = ['CompilationError', 'ReferenceError', 'ValidationError']
+__all__ = ["CompilationError", "ReferenceError", "ValidationError"]
 
 from collections import defaultdict
 
 
 class CompilationError(Exception):
     """Raised while schema parsing"""
+
     def __init__(self, message, schema):
         super(CompilationError, self).__init__(message, schema)
         self.schema = schema
@@ -20,12 +21,14 @@ class CompilationError(Exception):
 
 class ReferenceError(Exception):
     """Raised while reference error"""
+
     def __init__(self, *args):
         super(ReferenceError, self).__init__(*args)
 
 
 class ValidationError(ValueError):
     """Raised when validation fails"""
+
     def __init__(self, reason, obj=None, pointer=None, errors=None):
         """
         :param reason: the reason failing

@@ -3,7 +3,7 @@
     ~~~~~
 """
 
-__all__ = ['fixture', 'fixture_dir', 'TestCase', 'MyMappingType', 'MySequenceType']
+__all__ = ["fixture", "fixture_dir", "TestCase", "MyMappingType", "MySequenceType"]
 
 import json
 import logging
@@ -15,12 +15,12 @@ from collections.abc import MutableMapping, MutableSequence
 logging.basicConfig(level=logging.INFO)
 
 here = os.path.dirname(os.path.abspath(__file__))
-fixture_dir = os.path.join(here, 'fixtures')
+fixture_dir = os.path.join(here, "fixtures")
 
 
 def fixture(filename):
-    fullpath = os.path.join(here, 'fixtures', filename)
-    with open(fullpath, 'r') as file:
+    fullpath = os.path.join(here, "fixtures", filename)
+    with open(fullpath, "r") as file:
         return json.load(file)
 
 
@@ -41,6 +41,7 @@ class MyMappingType(dict, MutableMapping):
         if self.__class__ is UserDict:
             return UserDict(self.data.copy())
         import copy
+
         data = self.data
         try:
             self.data = {}

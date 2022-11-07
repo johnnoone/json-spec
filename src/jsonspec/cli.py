@@ -39,6 +39,7 @@ def disable_logging(func):
         resp = func(*args, **kwargs)
         logger.removeHandler(handler)
         return resp
+
     return wrapper
 
 
@@ -53,11 +54,12 @@ def format_output(func):
         try:
             response = func(*args, **kwargs)
         except Exception as error:
-            print(colored(error, 'red'), file=sys.stderr)
+            print(colored(error, "red"), file=sys.stderr)
             sys.exit(1)
         else:
             print(response)
             sys.exit(0)
+
     return wrapper
 
 
@@ -73,65 +75,76 @@ class JSONFile(argparse.FileType):
 
 def document_arguments(parser):
     group = parser.add_mutually_exclusive_group()
-    group.add_argument('--document-json',
-                       type=JSONStruct,
-                       help='json structure',
-                       dest='document_json',
-                       metavar='<doc>')
-    group.add_argument('--document-file',
-                       type=JSONFile('r'),
-                       help='json filename',
-                       dest='document_file',
-                       metavar='<doc>')
+    group.add_argument(
+        "--document-json",
+        type=JSONStruct,
+        help="json structure",
+        dest="document_json",
+        metavar="<doc>",
+    )
+    group.add_argument(
+        "--document-file",
+        type=JSONFile("r"),
+        help="json filename",
+        dest="document_file",
+        metavar="<doc>",
+    )
 
 
 def schema_arguments(parser):
     group = parser.add_mutually_exclusive_group()
-    group.add_argument('--schema-json',
-                       type=JSONStruct,
-                       help='json structure',
-                       dest='schema_json',
-                       metavar='<schema>')
-    group.add_argument('--schema-file',
-                       type=JSONFile('r'),
-                       help='json filename',
-                       dest='schema_file',
-                       metavar='<schema>')
+    group.add_argument(
+        "--schema-json",
+        type=JSONStruct,
+        help="json structure",
+        dest="schema_json",
+        metavar="<schema>",
+    )
+    group.add_argument(
+        "--schema-file",
+        type=JSONFile("r"),
+        help="json filename",
+        dest="schema_file",
+        metavar="<schema>",
+    )
 
 
 def fragment_arguments(parser):
     group = parser.add_mutually_exclusive_group()
-    group.add_argument('--fragment-json',
-                       type=JSONStruct,
-                       help='json structure',
-                       dest='fragment_json',
-                       metavar='<fragment>')
-    group.add_argument('--fragment-file',
-                       type=JSONFile('r'),
-                       help='json filename',
-                       dest='fragment_file',
-                       metavar='<fragment>')
+    group.add_argument(
+        "--fragment-json",
+        type=JSONStruct,
+        help="json structure",
+        dest="fragment_json",
+        metavar="<fragment>",
+    )
+    group.add_argument(
+        "--fragment-file",
+        type=JSONFile("r"),
+        help="json filename",
+        dest="fragment_file",
+        metavar="<fragment>",
+    )
 
 
 def indentation_arguments(parser):
-    parser.add_argument('--indent',
-                        type=int,
-                        help='return an indented json',
-                        metavar='<indentation>')
+    parser.add_argument(
+        "--indent", type=int, help="return an indented json", metavar="<indentation>"
+    )
 
 
 def pointer_arguments(parser):
-    parser.add_argument('pointer',
-                        type=str,
-                        help='json pointer',
-                        metavar='<pointer>')
+    parser.add_argument("pointer", type=str, help="json pointer", metavar="<pointer>")
 
 
 def target_arguments(parser):
-    parser.add_argument('-t', '--target-pointer',
-                        help='target pointer',
-                        dest='target',
-                        metavar='<target>')
+    parser.add_argument(
+        "-t",
+        "--target-pointer",
+        help="target pointer",
+        dest="target",
+        metavar="<target>",
+    )
 
 
 def parse_document(args):
@@ -149,34 +162,34 @@ def parse_document(args):
             # cmd < doc.json
             document = driver.load(sys.stdin)
 
-    setattr(args, 'document', document)
+    setattr(args, "document", document)
     return args
 
 
 def parse_fragment(args):
-    setattr(args, 'fragment', args.fragment_json or args.fragment_file)
+    setattr(args, "fragment", args.fragment_json or args.fragment_file)
     return args
 
 
 def parse_pointer(args):
     target = args.pointer
-    if target.startswith('#'):
+    if target.startswith("#"):
         target = target[1:]
-    setattr(args, 'pointer', target)
+    setattr(args, "pointer", target)
 
 
 def parse_schema(args):
-    setattr(args, 'schema', args.schema_json or args.schema_file)
+    setattr(args, "schema", args.schema_json or args.schema_file)
     return args
 
 
 def parse_target(args):
     target = args.target
-    if target.startswith('#'):
+    if target.startswith("#"):
         target = target[1:]
-    setattr(args, 'target', target)
+    setattr(args, "target", target)
     if not target:
-        raise ValueError('target is required')
+        raise ValueError("target is required")
 
 
 class Command(object):
@@ -186,7 +199,8 @@ class Command(object):
 
     def __init__(self, parser=None):
         self.parser = parser or argparse.ArgumentParser(
-            description=self.description, epilog=self.epilog)
+            description=self.description, epilog=self.epilog
+        )
         self.parser.set_defaults(func=self)
         self.arguments(self.parser)
 
@@ -216,7 +230,7 @@ class AddCommand(Command):
         %(prog)s '#/foo/1' --fragment-file=fragment.json < doc.json
     """
 
-    help = 'add fragment to a document'
+    help = "add fragment to a document"
 
     def arguments(self, parser):
         pointer_arguments(parser)
@@ -238,7 +252,7 @@ class AddCommand(Command):
         except Error as error:
             raise Exception(error)
         except ParseError as error:
-            raise Exception('{} is not a valid pointer'.format(args.pointer))
+            raise Exception("{} is not a valid pointer".format(args.pointer))
 
 
 class CheckCommand(Command):
@@ -252,7 +266,7 @@ class CheckCommand(Command):
         %(prog)s '#/foo/1' --fragment-file=fragment.json < doc.json
     """
 
-    help = 'check member of a document'
+    help = "check member of a document"
 
     def arguments(self, parser):
         pointer_arguments(parser)
@@ -269,13 +283,13 @@ class CheckCommand(Command):
 
         try:
             if check(args.document, args.pointer, args.fragment):
-                return 'It validates'
+                return "It validates"
             else:
-                raise Exception('It does not validate')
+                raise Exception("It does not validate")
         except Error as error:
-            raise Exception('It does not validate')
+            raise Exception("It does not validate")
         except ParseError as error:
-            raise Exception('{} is not a valid pointer'.format(args.pointer))
+            raise Exception("{} is not a valid pointer".format(args.pointer))
 
 
 class CopyCommand(Command):
@@ -289,7 +303,7 @@ class CopyCommand(Command):
         %(prog)s '#/foo/1' --target='#/foo/2' < doc.json
     """
 
-    help = 'copy a member of a document'
+    help = "copy a member of a document"
 
     def arguments(self, parser):
         pointer_arguments(parser)
@@ -311,7 +325,7 @@ class CopyCommand(Command):
         except Error as error:
             raise Exception(error)
         except ParseError as error:
-            raise Exception('{} is not a valid pointer'.format(args.pointer))
+            raise Exception("{} is not a valid pointer".format(args.pointer))
 
 
 class ExtractCommand(Command):
@@ -325,7 +339,7 @@ class ExtractCommand(Command):
         %(prog)s '#/foo/1' < doc.json
     """
 
-    help = 'extract a member of a document'
+    help = "extract a member of a document"
 
     def arguments(self, parser):
         pointer_arguments(parser)
@@ -344,9 +358,9 @@ class ExtractCommand(Command):
             return driver.dumps(response, indent=args.indent)
         except ExtractError:
             raise Exception(args)
-            raise Exception('{} does not match'.format(args.pointer))
+            raise Exception("{} does not match".format(args.pointer))
         except ParseError:
-            raise Exception('{} is not a valid pointer'.format(args.pointer))
+            raise Exception("{} is not a valid pointer".format(args.pointer))
 
 
 class MoveCommand(Command):
@@ -360,7 +374,7 @@ class MoveCommand(Command):
         %(prog)s '#/foo/2' --target='#/foo/1' < doc.json
     """
 
-    help = 'move a member of a document'
+    help = "move a member of a document"
 
     def arguments(self, parser):
         pointer_arguments(parser)
@@ -382,7 +396,7 @@ class MoveCommand(Command):
         except Error as error:
             raise Exception(error)
         except ParseError as error:
-            raise Exception('{} is not a valid pointer'.format(args.pointer))
+            raise Exception("{} is not a valid pointer".format(args.pointer))
 
 
 class RemoveCommand(Command):
@@ -396,7 +410,7 @@ class RemoveCommand(Command):
 
     """
 
-    help = 'remove a member of a document'
+    help = "remove a member of a document"
 
     def arguments(self, parser):
         pointer_arguments(parser)
@@ -414,9 +428,9 @@ class RemoveCommand(Command):
             response = remove(args.document, args.pointer)
             return driver.dumps(response, indent=args.indent)
         except Error:
-            raise Exception('{} does not match'.format(args.pointer))
+            raise Exception("{} does not match".format(args.pointer))
         except ParseError:
-            raise Exception('{} is not a valid pointer'.format(args.pointer))
+            raise Exception("{} is not a valid pointer".format(args.pointer))
 
 
 class ReplaceCommand(Command):
@@ -430,7 +444,7 @@ class ReplaceCommand(Command):
         %(prog)s '#/foo/1' --fragment-file=fragment.json < doc.json
     """
 
-    help = 'replace a member of a document'
+    help = "replace a member of a document"
 
     def arguments(self, parser):
         pointer_arguments(parser)
@@ -452,7 +466,7 @@ class ReplaceCommand(Command):
         except Error as error:
             raise Exception(error)
         except ParseError as error:
-            raise Exception('{} is not a valid pointer'.format(args.pointer))
+            raise Exception("{} is not a valid pointer".format(args.pointer))
 
 
 class ValidateCommand(Command):
@@ -466,7 +480,7 @@ class ValidateCommand(Command):
         %(prog)s --schema-file=schema.json < doc.json
     """
 
-    help = 'validate a document against a schema'
+    help = "validate a document against a schema"
 
     def arguments(self, parser):
         document_arguments(parser)
@@ -484,50 +498,55 @@ class ValidateCommand(Command):
             validated = load(args.schema).validate(args.document)
             return driver.dumps(validated, indent=args.indent)
         except ValidationError as error:
-            msg = 'document does not validate with schema.\n\n'
+            msg = "document does not validate with schema.\n\n"
             for pointer, reasons in error.flatten().items():
-                msg += '  {}\n'.format(pointer)
+                msg += "  {}\n".format(pointer)
                 for reason in reasons:
-                    msg += '    - reason {}\n'.format(reason)
-                msg += '\n'
+                    msg += "    - reason {}\n".format(reason)
+                msg += "\n"
             raise Exception(msg)
 
 
 def get_parser():
     parser = argparse.ArgumentParser(
-        formatter_class=argparse.RawDescriptionHelpFormatter)
+        formatter_class=argparse.RawDescriptionHelpFormatter
+    )
 
-    parser.add_argument('--version',
-                        action='version',
-                        version='%(prog)s 0.9.11')
+    parser.add_argument("--version", action="version", version="%(prog)s 0.9.11")
 
-    subparsers = parser.add_subparsers(help='choose one of these actions',
-                                       dest='action',
-                                       metavar='<action>')
+    subparsers = parser.add_subparsers(
+        help="choose one of these actions", dest="action", metavar="<action>"
+    )
     subparsers.required = True
     cmds = []
-    for entrypoint in pkg_resources.iter_entry_points('jsonspec.cli.commands'):
-        logging.debug('loaded %s from %s', entrypoint, entrypoint.dist)
+    for entrypoint in pkg_resources.iter_entry_points("jsonspec.cli.commands"):
+        logging.debug("loaded %s from %s", entrypoint, entrypoint.dist)
         cmds.append((entrypoint.name, entrypoint.load()))
 
     for name, command_class in sorted(cmds):
         description, help, epilog = None, None, None
         if command_class.__doc__:
-            description, _, epilog = command_class.__doc__.lstrip().partition('\n\n')  # noqa
+            description, _, epilog = command_class.__doc__.lstrip().partition(
+                "\n\n"
+            )  # noqa
 
             if description:
-                description = description.replace('\n', ' ')
+                description = description.replace("\n", " ")
 
             if epilog:
-                epilog = dedent(epilog).replace('    ', '  ').replace('::\n\n', ':\n')  # noqa
+                epilog = (
+                    dedent(epilog).replace("    ", "  ").replace("::\n\n", ":\n")
+                )  # noqa
         description = command_class.description or description
         epilog = command_class.epilog or epilog
         help = command_class.help or description
-        subparser = subparsers.add_parser(name,
-                                          help=help,
-                                          description=description,
-                                          epilog=epilog,
-                                          formatter_class=argparse.RawDescriptionHelpFormatter)  # noqa
+        subparser = subparsers.add_parser(
+            name,
+            help=help,
+            description=description,
+            epilog=epilog,
+            formatter_class=argparse.RawDescriptionHelpFormatter,
+        )  # noqa
 
         command = command_class(subparser)  # noqa
     return parser
@@ -541,5 +560,5 @@ def main():
     args.func(args)
 
 
-if __name__ == '__main__':
+if __name__ == "__main__":
     main()

@@ -23,34 +23,34 @@ class Staged(object):
         self.parent_member = member
 
     def __getattribute__(self, name):
-        if name in ('obj', 'parent_obj', 'parent_member'):
+        if name in ("obj", "parent_obj", "parent_member"):
             return object.__getattribute__(self, name)
-        return getattr(object.__getattribute__(self, 'obj'), name)
+        return getattr(object.__getattribute__(self, "obj"), name)
 
     def __delattr__(self, name):
-        delattr(object.__getattribute__(self, 'obj'), name)
+        delattr(object.__getattribute__(self, "obj"), name)
 
     def __setattr__(self, name, value):
-        if name in ('obj', 'parent_obj', 'parent_member'):
+        if name in ("obj", "parent_obj", "parent_member"):
             object.__setattr__(self, name, value)
         else:
-            setattr(object.__getattribute__(self, 'obj'), name, value)
+            setattr(object.__getattribute__(self, "obj"), name, value)
 
     def __iter__(self):
-        return object.__getattribute__(self, 'obj').__iter__()
+        return object.__getattribute__(self, "obj").__iter__()
 
     def __getitem__(self, key):
-        value = object.__getattribute__(self, 'obj').__getitem__(key)
+        value = object.__getattribute__(self, "obj").__getitem__(key)
         return Staged(value, self, key)
 
     def __len__(self):
-        return object.__getattribute__(self, 'obj').__len__()
+        return object.__getattribute__(self, "obj").__len__()
 
     def __eq__(self, other):
-        return object.__getattribute__(self, 'obj') == other
+        return object.__getattribute__(self, "obj") == other
 
     def __str__(self):
-        return object.__getattribute__(self, 'obj').__str__()
+        return object.__getattribute__(self, "obj").__str__()
 
 
 def stage(obj, parent=None, member=None):

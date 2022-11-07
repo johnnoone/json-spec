@@ -11,7 +11,7 @@ from functools import partial
 from pkg_resources import iter_entry_points, DistributionNotFound
 from .exceptions import CompilationError
 
-__all__ = ['register', 'FormatRegistry']
+__all__ = ["register", "FormatRegistry"]
 
 logger = logging.getLogger(__name__)
 
@@ -60,7 +60,7 @@ class FormatRegistry(object):
 
     """
 
-    namespace = 'jsonspec.validators.formats'
+    namespace = "jsonspec.validators.formats"
     custom = {}
 
     def __init__(self, data=None, namespace=None):
@@ -93,14 +93,15 @@ class FormatRegistry(object):
                 pass
 
         if error:
-            logger.warn('Unable to load %s: %s is missing', name, error)
+            logger.warn("Unable to load %s: %s is missing", name, error)
         else:
-            logger.warn('%s is not defined', name)
+            logger.warn("%s is not defined", name)
 
         def fallback(obj):
-            logger.info('Unable to validate %s: %s is missing', name, error)
+            logger.info("Unable to validate %s: %s is missing", name, error)
             return obj
-        fallback.__doc__ = 'fallback for {!r} validation'.format(name)
+
+        fallback.__doc__ = "fallback for {!r} validation".format(name)
         self.fallback[name] = fallback
         return self.fallback[name]
 
@@ -137,7 +138,7 @@ def register(func=None, name=None):
 
     """
     if not name:
-        raise CompilationError('Name is required')
+        raise CompilationError("Name is required")
     if not func:
         return partial(register, name=name)
     return FormatRegistry.register(name, func)

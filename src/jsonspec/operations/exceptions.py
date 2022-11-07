@@ -5,7 +5,7 @@
 
 from __future__ import absolute_import
 
-__all__ = ['Error', 'NonexistentTarget']
+__all__ = ["Error", "NonexistentTarget"]
 
 
 class Error(LookupError):
@@ -14,4 +14,5 @@ class Error(LookupError):
 
 class NonexistentTarget(Error):
     """Raised when trying to get a non existent target"""
+
     pass

@@ -12,7 +12,7 @@ from .bases import Provider
 from .exceptions import NotFound
 from pathlib import Path
 
-__all__ = ['Provider', 'FilesystemProvider', 'PkgProvider', 'SpecProvider']
+__all__ = ["Provider", "FilesystemProvider", "PkgProvider", "SpecProvider"]
 
 logger = logging.getLogger(__name__)
 
@@ -31,7 +31,7 @@ class PkgProvider(Provider):
 
     """
 
-    namespace = 'jsonspec.reference.contributions'
+    namespace = "jsonspec.reference.contributions"
 
     def __init__(self, namespace=None, configuration=None):
         self.namespace = namespace or self.namespace
@@ -43,7 +43,7 @@ class PkgProvider(Provider):
         for entrypoint in pkg_resources.iter_entry_points(self.namespace):
             kwargs = self.configuration.get(entrypoint.name, {})
             providers[entrypoint.name] = entrypoint.load()(**kwargs)
-            logger.debug('loaded %s from %s', entrypoint, entrypoint.dist)
+            logger.debug("loaded %s from %s", entrypoint, entrypoint.dist)
         self.providers = providers
         self.loaded = True
 
@@ -54,11 +54,11 @@ class PkgProvider(Provider):
         for name, provider in self.providers.items():
             try:
                 value = provider[uri]
-                logger.info('got %s from %s', uri, name)
+                logger.info("got %s from %s", uri, name)
                 return value
             except (KeyError, NotFound):
                 pass
-        raise NotFound('no providers could return {!r}'.format(uri))
+        raise NotFound("no providers could return {!r}".format(uri))
 
     def __iter__(self):
         if not self.loaded:
@@ -89,24 +89,24 @@ class FilesystemProvider(Provider):
 
     def __init__(self, directory, prefix=None, aliases=None):
         self.directory = directory
-        self.prefix = prefix or ''
+        self.prefix = prefix or ""
         self.loaded = False
         self.aliases = aliases or {}
 
     def _spec_name(self, schema, filename):
         # Let's assume the schema knows its name more accurately than
         # its path can provide.
-        if schema.get('id'):
-            return schema['id']
+        if schema.get("id"):
+            return schema["id"]
         else:
-            return filename.as_posix()[len(self.directory):-5].lstrip('/')
+            return filename.as_posix()[len(self.directory) : -5].lstrip("/")
 
     @property
     def data(self):
         if not self.loaded:
             data = {}
 
-            for filename in Path(self.directory).glob('**/*.json'):
+            for filename in Path(self.directory).glob("**/*.json"):
                 with filename.open() as file:
                     schema = json.load(file)
 
@@ -116,8 +116,8 @@ class FilesystemProvider(Provider):
                 data[spec] = schema
             # set the fallbacks
             for spec in sorted(data.keys(), reverse=True):
-                if spec.startswith('draft-'):
-                    metaspec = spec.split('/', 1)[1]
+                if spec.startswith("draft-"):
+                    metaspec = spec.split("/", 1)[1]
                     if metaspec not in data:
                         data[metaspec] = data[spec]
 
@@ -128,8 +128,8 @@ class FilesystemProvider(Provider):
     def __getitem__(self, uri):
         spec = uri
         if uri.startswith(self.prefix):
-            spec = uri[len(self.prefix):]
-            if spec.endswith('#'):
+            spec = uri[len(self.prefix) :]
+            if spec.endswith("#"):
                 spec = spec[:-1]
 
         spec = self.aliases.get(spec, spec)
@@ -140,7 +140,7 @@ class FilesystemProvider(Provider):
 
     def __iter__(self):
         for spec in self.data.keys():
-            yield '{}{}#'.format(self.prefix, spec)
+            yield "{}{}#".format(self.prefix, spec)
 
     def __len__(self):
         return len(self.data.keys())
@@ -153,16 +153,21 @@ class SpecProvider(FilesystemProvider):
 
     def __init__(self):
         from jsonspec.misc import __file__ as misc
+
         base = os.path.realpath(os.path.dirname(misc))
-        src = os.path.join(base, 'schemas/')
-        prefix = 'http://json-schema.org/'
-        super(SpecProvider, self).__init__(src, prefix, aliases={
-            'hyper-schema': 'draft-04/hyper-schema',
-            'schema': 'draft-04/schema'
-        })
+        src = os.path.join(base, "schemas/")
+        prefix = "http://json-schema.org/"
+        super(SpecProvider, self).__init__(
+            src,
+            prefix,
+            aliases={
+                "hyper-schema": "draft-04/hyper-schema",
+                "schema": "draft-04/schema",
+            },
+        )
 
     def _spec_name(self, schema, filename):
-        return filename.as_posix()[len(self.directory):-5].lstrip('/')
+        return filename.as_posix()[len(self.directory) : -5].lstrip("/")
 
 
 class ProxyProvider(Provider):

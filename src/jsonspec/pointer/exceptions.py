@@ -4,8 +4,15 @@
 
 """
 
-__all__ = ['ExtractError', 'RefError', 'LastElement', 'OutOfBounds',
-           'OutOfRange', 'WrongType', 'UnstagedError']
+__all__ = [
+    "ExtractError",
+    "RefError",
+    "LastElement",
+    "OutOfBounds",
+    "OutOfRange",
+    "WrongType",
+    "UnstagedError",
+]
 
 
 class ParseError(ValueError):

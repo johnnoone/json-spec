@@ -2,8 +2,6 @@ include AUTHORS
 include CONTRIBUTING.rst
 include LICENSE
 include README.rst
-include versioneer.py
-include src/jsonspec/_version.py
 recursive-include src/jsonspec/misc/schemas *.json
 recursive-include tests *
 recursive-exclude * __pycache__

@@ -9,45 +9,34 @@ from jsonspec.validators import load, ValidationError
 
 
 def test_issue4():
-    validator = load({
-        '$schema': 'http://json-schema.org/draft-04/schema#',
-        'type': 'object',
-        'properties': {
-            'props': {
-                'type': 'array',
-                'items': {
-                    'oneOf': [
-                        {'type': 'string'},
-                        {'type': 'number'}
-                    ]
+    validator = load(
+        {
+            "$schema": "http://json-schema.org/draft-04/schema#",
+            "type": "object",
+            "properties": {
+                "props": {
+                    "type": "array",
+                    "items": {"oneOf": [{"type": "string"}, {"type": "number"}]},
                 }
-            }
+            },
         }
-    })
+    )
 
-    assert {'props': ['hello']} == validator.validate({'props': ['hello']})
+    assert {"props": ["hello"]} == validator.validate({"props": ["hello"]})
 
-    assert {'props': [42, 'you']} == validator.validate({'props': [42, 'you']})
-
-    with pytest.raises(ValidationError):
-        validator.validate({
-            'props': [None]
-        })
+    assert {"props": [42, "you"]} == validator.validate({"props": [42, "you"]})
 
     with pytest.raises(ValidationError):
-        validator.validate({
-            'props': None
-        })
+        validator.validate({"props": [None]})
 
     with pytest.raises(ValidationError):
-        validator.validate({
-            'props': 'hello'
-        })
+        validator.validate({"props": None})
 
     with pytest.raises(ValidationError):
-        validator.validate({
-            'props': 42
-        })
+        validator.validate({"props": "hello"})
+
+    with pytest.raises(ValidationError):
+        validator.validate({"props": 42})
 
 
 def test_issue5():
@@ -55,40 +44,33 @@ def test_issue5():
 
     try:
         prev_sep = os.sep
-        os.sep = '\\'
+        os.sep = "\\"
 
-        validator = load({
-            '$schema': 'http://json-schema.org/draft-04/schema#',
-            'type': 'object',
-            'definitions': {
-                'test': {
-                    'type': 'object',
-                    'properties': {
-                        'foo': {'type': 'string'}
-                    },
-                    'additionalProperties': False
-                }
-            },
-            'properties': {
-                'bar': {
-                    '$ref': '#/definitions/test'
+        validator = load(
+            {
+                "$schema": "http://json-schema.org/draft-04/schema#",
+                "type": "object",
+                "definitions": {
+                    "test": {
+                        "type": "object",
+                        "properties": {"foo": {"type": "string"}},
+                        "additionalProperties": False,
+                    }
+                },
+                "properties": {"bar": {"$ref": "#/definitions/test"}},
+            }
+        )
+
+        assert {"bar": {"foo": "test"}} == validator.validate(
+            {
+                "bar": {
+                    "foo": "test",
                 }
             }
-        })
-
-        assert {'bar': {'foo': 'test'}} == validator.validate({
-            'bar': {
-                'foo': 'test',
-            }
-        })
+        )
 
         with pytest.raises(ValidationError):
-            validator.validate({
-                'bar': {
-                    'foo': 'test',
-                    'more': 2
-                }
-            })
+            validator.validate({"bar": {"foo": "test", "more": 2}})
 
     finally:
         os.sep = prev_sep

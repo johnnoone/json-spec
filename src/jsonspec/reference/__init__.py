@@ -18,7 +18,7 @@ from .bases import Registry, LocalRegistry
 from .exceptions import NotFound, Forbidden
 from jsonspec.pointer import DocumentPointer
 
-__all__ = ['resolve', 'Registry', 'LocalRegistry', 'NotFound', 'Forbidden']
+__all__ = ["resolve", "Registry", "LocalRegistry", "NotFound", "Forbidden"]
 
 
 def resolve(obj, pointer, registry=None):
@@ -58,5 +58,5 @@ def resolve(obj, pointer, registry=None):
 
     if local.document:
         registry[local.document] = obj
-    local.document = '<local>'
+    local.document = "<local>"
     return registry.resolve(local)

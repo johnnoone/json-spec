@@ -4,13 +4,13 @@
 
 """
 
-__all__ = ['ref', 'Mapping', 'MutableMapping']
+__all__ = ["ref", "Mapping", "MutableMapping"]
 
 
 def ref(obj):
     """Extracts $ref of object."""
     try:
-        return obj['$ref']
+        return obj["$ref"]
     except (KeyError, TypeError):
         return None
 

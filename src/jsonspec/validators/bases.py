@@ -11,7 +11,7 @@ from abc import abstractmethod, ABCMeta
 from jsonspec.pointer import DocumentPointer
 from .exceptions import ValidationError
 
-__all__ = ['ValidationError', 'Validator', 'ReferenceValidator']
+__all__ = ["ValidationError", "Validator", "ReferenceValidator"]
 
 logger = logging.getLogger(__name__)
 
@@ -20,13 +20,14 @@ class Validator(metaclass=ABCMeta):
     """
     The mother of Validators.
     """
+
     #: indicates current uri
     uri = None
 
     default = None
 
     def __init__(self, **attrs):
-        self.uri = attrs.pop('uri', None)
+        self.uri = attrs.pop("uri", None)
 
     @abstractmethod
     def has_default(self):
@@ -69,6 +70,7 @@ class ReferenceValidator(Validator):
     >>>     'longitude': 1.2345
     >>> })
     """
+
     def __init__(self, pointer, context):
         super(ReferenceValidator, self).__init__()
         self.pointer = DocumentPointer(pointer)
@@ -77,7 +79,7 @@ class ReferenceValidator(Validator):
 
     @property
     def validator(self):
-        if not hasattr(self, '_validator'):
+        if not hasattr(self, "_validator"):
             self._validator = self.context.resolve(self.pointer)
         return self._validator
 

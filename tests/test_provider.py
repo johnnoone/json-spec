@@ -11,9 +11,9 @@ from jsonspec.reference import NotFound
 
 def test_foo():
     provider = SpecProvider()
-    a = provider['http://json-schema.org/schema#']
-    b = provider['http://json-schema.org/draft-04/schema#']
-    c = provider['http://json-schema.org/draft-03/schema#']
+    a = provider["http://json-schema.org/schema#"]
+    b = provider["http://json-schema.org/draft-04/schema#"]
+    c = provider["http://json-schema.org/draft-03/schema#"]
     assert a == b
     assert b != c
     assert a != c
@@ -21,12 +21,12 @@ def test_foo():
 
 def test_pkg():
     provider = PkgProvider()
-    a = provider['http://json-schema.org/schema#']
-    b = provider['http://json-schema.org/draft-04/schema#']
-    c = provider['http://json-schema.org/draft-03/schema#']
+    a = provider["http://json-schema.org/schema#"]
+    b = provider["http://json-schema.org/draft-04/schema#"]
+    c = provider["http://json-schema.org/draft-03/schema#"]
     assert a == b
     assert b != c
     assert a != c
 
     with pytest.raises(NotFound):
-        provider['does not exist']
+        provider["does not exist"]

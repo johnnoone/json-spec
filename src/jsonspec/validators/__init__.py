@@ -12,10 +12,19 @@ from . import draft03  # noqa
 from .draft03 import Draft03Validator  # noqa
 from .draft04 import Draft04Validator  # noqa
 
-__all__ = ['load', 'register', 'Factory', 'Context',
-           'Validator', 'ReferenceValidator',
-           'Draft03Validator', 'Draft04Validator',
-           'CompilationError', 'ReferenceError', 'ValidationError']
+__all__ = [
+    "load",
+    "register",
+    "Factory",
+    "Context",
+    "Validator",
+    "ReferenceValidator",
+    "Draft03Validator",
+    "Draft04Validator",
+    "CompilationError",
+    "ReferenceError",
+    "ValidationError",
+]
 
 
 def load(schema, uri=None, spec=None, provider=None):
@@ -34,4 +43,4 @@ def load(schema, uri=None, spec=None, provider=None):
     :type provider: Mapping, Provider...
     """
     factory = Factory(provider, spec)
-    return factory(schema, uri or '#')
+    return factory(schema, uri or "#")
