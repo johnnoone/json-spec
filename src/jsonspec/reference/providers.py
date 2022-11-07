@@ -9,7 +9,7 @@ import logging
 import os
 from pathlib import Path
 
-import pkg_resources
+import importlib_metadata
 
 from .bases import Provider
 from .exceptions import NotFound
@@ -42,7 +42,7 @@ class PkgProvider(Provider):
 
     def load(self):
         providers = {}
-        for entrypoint in pkg_resources.iter_entry_points(self.namespace):
+        for entrypoint in importlib_metadata.entry_points(group=self.namespace):
             kwargs = self.configuration.get(entrypoint.name, {})
             providers[entrypoint.name] = entrypoint.load()(**kwargs)
             logger.debug("loaded %s from %s", entrypoint, entrypoint.dist)

@@ -62,6 +62,7 @@ uri = "jsonspec.validators.util:validate_uri"
 [tool.poetry.dependencies]
 python = "^3.10"
 termcolor = { version = "*", optional = true }
+importlib-metadata = "^5.0.0"
 
 [tool.poetry.dev-dependencies]
 pytest = "*"

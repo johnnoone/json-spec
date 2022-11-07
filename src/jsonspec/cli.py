@@ -12,7 +12,7 @@ import sys
 from functools import wraps
 from textwrap import dedent
 
-import pkg_resources
+import importlib_metadata
 
 from jsonspec import driver
 
@@ -516,7 +516,7 @@ def get_parser():
     )
     subparsers.required = True
     cmds = []
-    for entrypoint in pkg_resources.iter_entry_points("jsonspec.cli.commands"):
+    for entrypoint in importlib_metadata.entry_points(group="jsonspec.cli.commands"):
         logging.debug("loaded %s from %s", entrypoint, entrypoint.dist)
         cmds.append((entrypoint.name, entrypoint.load()))
 
