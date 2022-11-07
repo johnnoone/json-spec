@@ -4,8 +4,6 @@
 
 """
 
-from __future__ import absolute_import
-
 
 def pointer_join(pre, *parts):
     resp = str(pre or "#")

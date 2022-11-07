@@ -4,8 +4,6 @@
 
 """
 
-from __future__ import absolute_import
-
 import logging
 from functools import partial
 from pkg_resources import iter_entry_points, DistributionNotFound

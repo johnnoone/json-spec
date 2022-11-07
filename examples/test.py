@@ -1,4 +1,3 @@
-from __future__ import absolute_import, print_function, unicode_literals
 from json import schema
 from jsonspec.validators.exceptions import ValidationError
 import os

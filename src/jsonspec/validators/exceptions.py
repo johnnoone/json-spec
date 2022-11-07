@@ -4,8 +4,6 @@
 
 """
 
-from __future__ import absolute_import
-
 __all__ = ["CompilationError", "ReferenceError", "ValidationError"]
 
 from collections import defaultdict

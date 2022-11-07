@@ -4,8 +4,6 @@
 
 """
 
-from __future__ import absolute_import
-
 import logging
 from abc import abstractmethod, ABCMeta
 from jsonspec.pointer import DocumentPointer

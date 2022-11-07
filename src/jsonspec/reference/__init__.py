@@ -12,8 +12,6 @@
 
 """
 
-from __future__ import absolute_import, print_function, unicode_literals
-
 from .bases import Registry, LocalRegistry
 from .exceptions import NotFound, Forbidden
 from jsonspec.pointer import DocumentPointer
