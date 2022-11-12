@@ -10,7 +10,7 @@ Json Spec
 This library implements several JSON specs, like `JSON Schema`_,
 `JSON Reference`_ and `JSON Pointer`_:
 
-* It works on python 2.7, python 3.3 and above
+* It works on python 3.6 and above
 * It is release under the `BSD license`_
 
 
