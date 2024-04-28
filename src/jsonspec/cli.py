@@ -25,7 +25,6 @@ except ImportError:
 
 
 def disable_logging(func):
-    return func
     """
     Temporary disable logging.
     """
@@ -43,7 +42,6 @@ def disable_logging(func):
 
 
 def format_output(func):
-    return func
     """
     Format output.
     """
@@ -398,7 +396,7 @@ class MoveCommand(Command):
 
 
 class RemoveCommand(Command):
-    """Replace the value of pointer.
+    """Remove the value of pointer.
 
     examples:
       %(prog)s '#/foo/1' --document-json='{"foo": ["bar", "baz"]}'
@@ -509,7 +507,7 @@ def get_parser():
         formatter_class=argparse.RawDescriptionHelpFormatter
     )
 
-    parser.add_argument("--version", action="version", version="%(prog)s 0.9.11")
+    parser.add_argument("--version", action="version", version="%(prog)s 0.11.1")
 
     subparsers = parser.add_subparsers(
         help="choose one of these actions", dest="action", metavar="<action>"
