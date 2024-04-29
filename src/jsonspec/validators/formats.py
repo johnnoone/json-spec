@@ -1,13 +1,13 @@
 """
-    jsonspec.validators.formats
-    ~~~~~~~~~~~~~~~~~~~~~~~~~~~
+jsonspec.validators.formats
+~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
 """
 
 import logging
 from functools import partial
 
-from pkg_resources import DistributionNotFound, iter_entry_points
+from jsonspec._compat import PackageNotFoundError, load_entry_points
 
 from .exceptions import CompilationError
 
@@ -84,12 +84,12 @@ class FormatRegistry:
     def load(self, name):
         error = None
 
-        for entrypoint in iter_entry_points(self.namespace):
+        for entrypoint in load_entry_points(group=self.namespace):
             try:
                 if entrypoint.name == name:
                     self.loaded[name] = entrypoint.load()
                     return self.loaded[name]
-            except DistributionNotFound as error:
+            except PackageNotFoundError as error:
                 pass
 
         if error:

@@ -339,7 +339,7 @@ def validate_regex(obj):
     import re
 
     try:
-        re.compile(obj)
+        patt = re.compile(obj)
     except:
         raise ValidationError("Not a regex", obj)
     return obj
