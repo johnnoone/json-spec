@@ -21,9 +21,9 @@ number_types = (int, float, Decimal)
 
 logger = logging.getLogger(__name__)
 
-HOSTNAME_TOKENS = re.compile("(?!-)[a-z\d-]{1,63}(?<!-)$", re.IGNORECASE)
-HOSTNAME_LAST_TOKEN = re.compile("[a-z]+$", re.IGNORECASE)
-EMAIL = re.compile("[^@]+@[^@]+\.[^@]+")
+HOSTNAME_TOKENS = re.compile(r"(?!-)[a-z\d-]{1,63}(?<!-)$", re.IGNORECASE)
+HOSTNAME_LAST_TOKEN = re.compile(r"[a-z]+$", re.IGNORECASE)
+EMAIL = re.compile(r"[^@]+@[^@]+\.[^@]+")
 
 CSS_COLORS = set(
     [
@@ -283,7 +283,7 @@ def validate_utc_millisec(obj):
     try:
         if not isinstance(obj, number_types):
             raise TypeError
-        datetime.utcfromtimestamp(obj / 1000)
+        datetime.fromtimestamp(obj / 1000)
     except (TypeError, ValueError):
         raise ValidationError("{!r} is not a valid utc millis", obj)
     return obj
