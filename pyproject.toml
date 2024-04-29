@@ -2,13 +2,20 @@
 name = "json-spec"
 version = "0.11.1"
 description = "Implements JSON Schema, JSON Pointer and JSON Reference."
-authors = [ "Xavier Barbosa <clint.northwood@gmail.com>" ]
+authors = ["Xavier Barbosa <clint.northwood@gmail.com>"]
 license = "BSD-3-Clause"
 readme = "README.rst"
 homepage = "https://json-spec.readthedocs.org"
 repository = "https://github.com/johnnoone/json-spec"
 documentation = "https://json-spec.readthedocs.org"
-keywords = [ "json", "utilitaries", "validation", "json-pointer", "json-reference", "json-schema" ]
+keywords = [
+    "json",
+    "utilitaries",
+    "validation",
+    "json-pointer",
+    "json-reference",
+    "json-schema",
+]
 classifiers = [
     "Development Status :: 4 - Beta",
     "Environment :: Console",
@@ -20,14 +27,12 @@ classifiers = [
     "Programming Language :: Python",
     "Programming Language :: Python :: 3",
 ]
-packages = [
-    { include = "jsonspec", from = "src" },
-]
+packages = [{ include = "jsonspec", from = "src" }]
 
 # include = [ "jsonspec/misc/schemas/**/*.json" ]
 
 [tool.poetry.extras]
-cli = [ "termcolor" ]
+cli = ["termcolor"]
 
 [tool.poetry.scripts]
 json = "jsonspec.cli:main"
@@ -62,7 +67,7 @@ uri = "jsonspec.validators.util:validate_uri"
 [tool.poetry.dependencies]
 python = "^3.10"
 termcolor = { version = "*", optional = true }
-importlib-metadata = "^5.0.0"
+importlib-metadata = { version = ">=5.0.0", python = "<3.10" }
 
 [tool.poetry.dev-dependencies]
 pytest = "*"
@@ -71,5 +76,5 @@ pytest-flake8 = "*"
 black = "*"
 
 [build-system]
-requires = [ "poetry-core>=1.0.0" ]
+requires = ["poetry-core>=1.0.0"]
 build-backend = "poetry.core.masonry.api"

@@ -1,6 +1,6 @@
 """
-    jsonspec.reference.providers
-    ~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+jsonspec.reference.providers
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
 """
 
@@ -9,7 +9,7 @@ import logging
 import os
 from pathlib import Path
 
-import importlib_metadata
+from jsonspec._compat import load_entry_points
 
 from .bases import Provider
 from .exceptions import NotFound
@@ -42,7 +42,7 @@ class PkgProvider(Provider):
 
     def load(self):
         providers = {}
-        for entrypoint in importlib_metadata.entry_points(group=self.namespace):
+        for entrypoint in load_entry_points(group=self.namespace):
             kwargs = self.configuration.get(entrypoint.name, {})
             providers[entrypoint.name] = entrypoint.load()(**kwargs)
             logger.debug("loaded %s from %s", entrypoint, entrypoint.dist)

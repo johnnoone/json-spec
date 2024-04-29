@@ -12,9 +12,8 @@ import sys
 from functools import wraps
 from textwrap import dedent
 
-import importlib_metadata
-
 from jsonspec import driver
+from jsonspec._compat import load_entry_points
 
 try:
     from termcolor import colored
@@ -514,7 +513,7 @@ def get_parser():
     )
     subparsers.required = True
     cmds = []
-    for entrypoint in importlib_metadata.entry_points(group="jsonspec.cli.commands"):
+    for entrypoint in load_entry_points(group="jsonspec.cli.commands"):
         logging.debug("loaded %s from %s", entrypoint, entrypoint.dist)
         cmds.append((entrypoint.name, entrypoint.load()))
 
