@@ -1,6 +1,6 @@
 [tool.poetry]
 name = "json-spec"
-version = "0.11.2"
+version = "0.12.0"
 description = "Implements JSON Schema, JSON Pointer and JSON Reference."
 authors = ["Xavier Barbosa <clint.northwood@gmail.com>"]
 license = "BSD-3-Clause"
