@@ -17,7 +17,7 @@ from . import move_cwd
 def runner(cmd, args, success, result):
     try:
         args = cmd.parse_args(args)
-        response = cmd(args)
+        response = cmd.run(args)
         if not success:
             raise Exception("error expected", response)
     except Exception as error:
