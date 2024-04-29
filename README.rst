@@ -36,22 +36,63 @@ This one will enable ip format for json schema::
 CLI Usage
 ---------
 
-This module expose 2 cli commands.
+This module expose a cli command with multiple operations.
 
+**json add** will transform the json document::
 
-**json-extract** will extract parts of your json document::
+    $ json add '#/foo/1' --fragment-file=fragment.json --document-json='{"foo": ["bar", "baz"]}'
+    $ echo '{"foo": ["bar", "baz"]}' | json add '#/foo/1' --fragment-json='first'
+    $ json add '#/foo/1' --fragment-file=fragment.json --document-file=doc.json
+    $ json add '#/foo/1' --fragment-file=fragment.json < doc.json
 
-    $ json-extract '#/foo/1' --document-json='{"foo": ["bar", "baz"]}'
-    $ echo '{"foo": ["bar", "baz"]}' | json-extract '#/foo/1'
-    $ json-extract '#/foo/1' --document-file=doc.json
-    $ json-extract '#/foo/1' < doc.json
+**json check** will test that a value at the target location is equal to a specified value::
 
-**json-validate** will validate your document against a schema::
+    $ json check '#/foo/1' --fragment-file=fragment.json --document-json='{"foo": ["bar", "baz"]}'
+    $ echo '{"foo": ["bar", "baz"]}' | json check '#/foo/1' --fragment-file=fragment.json
+    $ json check '#/foo/1' --fragment-file=fragment.json --document-file=doc.json
+    $ json check '#/foo/1' --fragment-file=fragment.json < doc.json
 
-    $ json-validate --schema-file=schema.json --document-json='{"foo": ["bar", "baz"]}'
-    $ echo '{"foo": ["bar", "baz"]}' | json-validate --schema-file=schema.json
-    $ json-validate --schema-file=schema.json --document-file=doc.json
-    $ json-validate --schema-file=schema.json < doc.json
+**json copy** will copy the value at a specified location to the target location::
+
+    $ json copy '#/foo/1' --target='#/foo/2' --document-json='{"foo": ["bar", "baz"]}'
+    $ echo '{"foo": ["bar", "baz"]}' | json copy '#/foo/1' --target='#/foo/2'
+    $ json copy '#/foo/1' --target='#/foo/2' --document-file=doc.json
+    $ json copy '#/foo/1' --target='#/foo/2' < doc.json
+
+**json extract** will extract parts of your json document::
+
+    $ json extract '#/foo/1' --document-json='{"foo": ["bar", "baz"]}'
+    $ echo '{"foo": ["bar", "baz"]}' | json extract '#/foo/1'
+    $ json extract '#/foo/1' --document-file=doc.json
+    $ json extract '#/foo/1' < doc.json
+
+**json move** will remove the value at a specified location and it will add the value to the target location::
+
+    $ json move '#/foo/2' --target='#/foo/1' --document-json='{"foo": ["bar", "baz"]}'
+    $ echo '{"foo": ["bar", "baz"]}' | json move '#/foo/2' --target='#/foo/1'
+    $ json move '#/foo/2' --target='#/foo/1' --document-file=doc.json
+    $ json move '#/foo/2' --target='#/foo/1' < doc.json
+
+**json remove** will remove the value at a specified location::
+
+    $ json remove '#/foo/1' --document-json='{"foo": ["bar", "baz"]}'
+    $ echo '{"foo": ["bar", "baz"]}' | json remove '#/foo/1'
+    $ json remove '#/foo/1' --document-file=doc.json
+    $ json remove '#/foo/1' < doc.json
+
+**json replace** will replace the value at a specified location with given fragment::
+
+    $ json replace '#/foo/1' --fragment-file=fragment.json --document-json='{"foo": ["bar", "baz"]}'
+    $ echo '{"foo": ["bar", "baz"]}' | json replace '#/foo/1' --fragment-file=fragment.json
+    $ json replace '#/foo/1' --fragment-file=fragment.json --document-file=doc.json
+    $ json replace '#/foo/1' --fragment-file=fragment.json < doc.json
+
+**json validate** will validate your document against a schema::
+
+    $ json validate --schema-file=schema.json --document-json='{"foo": ["bar", "baz"]}'
+    $ echo '{"foo": ["bar", "baz"]}' | json validate --schema-file=schema.json
+    $ json validate --schema-file=schema.json --document-file=doc.json
+    $ json validate --schema-file=schema.json < doc.json
 
 
 Library usage

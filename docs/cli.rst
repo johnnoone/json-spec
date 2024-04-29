@@ -127,7 +127,7 @@ Removes the value at a specified location and adds it to the target location.
 json remove
 -----------
 
-Removes the value at a specified location and adds it to the target location.
+Removes the value at a specified location.
 
 **Usage**
 
@@ -150,7 +150,7 @@ Removes the value at a specified location and adds it to the target location.
 json replace
 ------------
 
-Removes the value at a specified location and adds it to the target location.
+Replace the value at a specified location with the given fragment.
 
 **Usage**
 
