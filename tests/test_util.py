@@ -191,7 +191,7 @@ def test_regex():
     validate_regex("http://foo.bar")
     validate_regex("foo.bar")
     with pytest.raises(ValidationError):
-        validate_regex("foo++bar")
+        validate_regex("*foo++bar")
     with pytest.raises(ValidationError):
         validate_regex(123)
 
