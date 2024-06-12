@@ -7,6 +7,11 @@ Json Spec
 .. image:: https://travis-ci.org/johnnoone/json-spec.png?branch=master
     :target: https://travis-ci.org/johnnoone/json-spec
 
+.. image:: https://assets.piptrends.com/get-last-month-downloads-badge/json-spec.svg
+    :alt: json-spec Downloads Last Month by pip Trends
+    :target: https://piptrends.com/package/json-spec
+
+
 This library implements several JSON specs, like `JSON Schema`_,
 `JSON Reference`_ and `JSON Pointer`_:
 
