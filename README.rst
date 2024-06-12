@@ -164,5 +164,5 @@ Other examples can be found in the documentation_ or in the tests_.
 .. _`JSON Reference`: http://tools.ietf.org/html/draft-pbryan-zyp-json-ref-03
 .. _`JSON Pointer`: http://tools.ietf.org/html/rfc6901
 .. _`BSD license`: https://github.com/johnnoone/json-spec/blob/master/LICENSE
-.. _documentation: http://py.errorist.io/json-spec/
+.. _documentation: https://json-spec.readthedocs.io/
 .. _tests: https://github.com/johnnoone/json-spec/tree/master/tests
